@@ -1,0 +1,8 @@
+.c-form-input {
+    @include fontSizeRem(14, 20);
+    @include lineHeightRem(17, 24);
+    background: transparent;
+    border: none;
+    width: 85%;
+    vertical-align: top;
+}

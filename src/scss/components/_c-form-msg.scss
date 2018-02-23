@@ -1,0 +1,6 @@
+.c-form-msg {
+    @include fontSizeRem(10, 16);
+    @include lineHeightRem(12, 19);
+    color: $red;
+    height: 1.2rem;
+}

@@ -1,0 +1,11 @@
+.c-heading-start {
+    font-family: 'HelveticaNeue', sans-serif;
+    @include fontSizeRem(44, 80);
+    @include lineHeightRem(52, 95);
+    text-align: center;
+
+    span {
+        font-family: 'HelveticaNeue-Thin', sans-serif;
+        @include lineHeightRem(53, 96);
+    }
+}

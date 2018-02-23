@@ -1,0 +1,17 @@
+.c-form-btn {
+    @include fontSizeRem(14, 20);
+    @include lineHeightRem(17, 24);
+    text-transform: uppercase;
+    color: $white;
+    width: 98%;
+    padding-top: 0.8rem;
+    padding-bottom: 0.8rem;
+    background-color: $lightgreen;
+    border-radius: 30px;
+
+    @include breakpoint(desktop) {
+        width: 100%;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+}
