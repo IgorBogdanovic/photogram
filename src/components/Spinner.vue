@@ -9,12 +9,12 @@
 
     .a-spinner {
         position: relative;
-        top: -5%;
+        top: 0;
         left: 50%;
         transform: translateX(-50%);
         width: 10%;
         height: auto;
-        margin: 5% 0 5% 0;
+        margin: 5% 0 3% 0;
         color: $lightblack;
 
         svg {

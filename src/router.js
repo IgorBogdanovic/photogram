@@ -30,6 +30,12 @@ const PostDetail = resolve => {
 	});
 };
 
+const Comments = resolve => {
+	require.ensure(['./components/Comments.vue'], () => {
+		resolve(require('./components/Comments.vue'));
+	});
+};
+
 Vue.use(VueRouter);
 
 const routes = [
@@ -40,7 +46,8 @@ const routes = [
 	{ path: '/terms', name: 'terms', component: Terms },
 	{ path: '/homepage', name: 'homepage', component: HomePage,
 		children: [
-			{ path: 'photo', name: 'photo', component: PostDetail }
+			{ path: 'photo', name: 'photo', component: PostDetail },
+			{ path: 'comments', name: 'comments', component: Comments }
 		]
 	}
 ]

@@ -11,3 +11,7 @@ export const users = axios.create({
 export const posts = axios.create({
 	baseURL: 'http://192.168.0.154:8000/api/posts/'
 });
+
+export const comments = axios.create({
+	baseURL: 'http://192.168.0.154:8000/api/comments/'
+});

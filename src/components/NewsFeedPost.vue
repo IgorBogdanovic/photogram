@@ -63,7 +63,7 @@
 			</div>
 
 			<!-- need route path once made -->
-			<router-link to="/" class="m-comments__view-all">view all comments</router-link>
+			<router-link :to="{ name: 'comments' }" tag="span" class="m-comments__view-all" @click.native="viewAllComments">view all comments</router-link>
 		</div>
 
 		<div class="o-news-feed-post__comments  m-comments" v-else>
@@ -85,15 +85,20 @@
     export default {
         props: ['followedUserPost'],
 		mixins: [ mixinStorage, basicVars ],
-		data () {
-		    return {
-		    }
-		},
 		methods: {
 			inPostDetail() {
 				const post = this.followedUserPost;
 				this.$store.dispatch('nfPosts/changeNewsFeedPost', post);
 				this.$store.dispatch('nfPosts/changePostDetail');
+				this.$store.dispatch('nfPosts/changeInfScrollDisable');
+				if (this.windowWidth > this.breakpoint) {
+					$('.o-homepage').addClass('u-overflow-disabled');
+				}
+			},
+			viewAllComments() {
+				const post = this.followedUserPost;
+				this.$store.dispatch('nfPosts/changeNewsFeedPost', post);
+				this.$store.dispatch('nfPosts/changeAllComments');
 				this.$store.dispatch('nfPosts/changeInfScrollDisable');
 				if (this.windowWidth > this.breakpoint) {
 					$('.o-homepage').addClass('u-overflow-disabled');
@@ -361,6 +366,7 @@
 			@include lineHeightRem(12, 17);
 			color: $lightblack;
 			opacity: 0.5;
+			cursor: pointer;
 
 			@include breakpoint(desktop) {
 				margin-left: 0.5rem;

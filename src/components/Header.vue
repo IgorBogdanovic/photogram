@@ -1,7 +1,7 @@
 <template>
   	<div class="o-header">
 
-        <a v-if="heading !== 'photogram'" href="javascript:history.go(-1)" class="o-header__prev-arrow  a-prev-arrow" @click="outPostDetail">
+        <a v-if="heading !== 'photogram'" href="javascript:history.go(-1)" class="o-header__prev-arrow  a-prev-arrow" @click="goBack">
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                 viewBox="0 0 240.823 240.823" style="enable-background:new 0 0 240.823 240.823;" xml:space="preserve">
             <g>
@@ -107,11 +107,30 @@
 			},
 			userAvatar() {
 				return this.$store.getters['login/userAvatar'];
-			}
+            },
+            postDetail() {
+				return this.$store.getters['nfPosts/postDetail'];
+			},
+			allComments() {
+				return this.$store.getters['nfPosts/allComments'];
+            },
+            allCommentsPostDetail() {
+				return this.$store.getters['nfPosts/allCommentsPostDetail'];
+            }
         },
         methods: {
-			outPostDetail() {
-                this.$store.dispatch('nfPosts/changePostDetail');
+			goBack() {
+                if (this.postDetail && !this.allComments) {
+                    this.$store.dispatch('nfPosts/changePostDetail');
+                } else if (this.allComments) {
+                    this.$store.dispatch('nfPosts/changeAllComments');
+                    if (this.allCommentsPostDetail) {
+                        this.$store.dispatch('nfPosts/changePostDetail');
+                        this.$store.dispatch('nfPosts/changeAllCommentsPostDetail');
+                        this.$store.dispatch('nfPosts/changeInfScrollDisable'); // to false so it can be again true on dispatch after
+                    }
+                }
+
                 this.$store.dispatch('nfPosts/changeInfScrollDisable');
                 if (this.windowWidth > this.breakpoint) {
 					$('.o-homepage').removeClass('u-overflow-disabled');

@@ -3,19 +3,25 @@
 		
 		<app-header></app-header>
 
-		<div class="o-homepage__content" v-infinite-scroll="axiosGetPosts" infinite-scroll-disabled="infScrollDisable" infinite-scroll-distance="500">
+		<div class="o-homepage__content" v-infinite-scroll="axiosGetPosts" infinite-scroll-disabled="infScrollDisable" :infinite-scroll-distance="windowHeight/3">
 
-			<div v-if="!postDetail || windowWidth > breakpoint" class="o-homepage__posts-wrapper">
-				<app-news-feed-post v-for="post in followedUsersPosts" :key="post.id" :followedUserPost="post"></app-news-feed-post>
+			<div v-if="(!postDetail && !allComments) || windowWidth > breakpoint" class="o-homepage__posts-wrapper">
+				<app-news-feed-post v-for="post in newsFeedPostsAll" :key="post.id" :followedUserPost="post"></app-news-feed-post>
 			</div>
 			
 			<!-- for mobile devices -->
 			<router-view v-if="postDetail && windowWidth < breakpoint"></router-view>
+			<router-view v-if="allComments && windowWidth < breakpoint"></router-view>
 			<!-- for all other devices -->
 			<transition mode="out-in"
-				enter-active-class="animated slideInUp"
-				leave-active-class="animated slideOutDown">
+				enter-active-class="animated slideInDown"
+				leave-active-class="animated slideOutUp">
 				<router-view v-if="postDetail && windowWidth > breakpoint"></router-view>
+			</transition>
+			<transition mode="out-in"
+				enter-active-class="animated slideInDown"
+				leave-active-class="animated slideOutUp">
+				<router-view v-if="allComments && windowWidth > breakpoint"></router-view>
 			</transition>
 
 			<app-spinner v-if="loading"></app-spinner>
@@ -52,8 +58,14 @@
 			postDetail() {
 				return this.$store.getters['nfPosts/postDetail'];
 			},
+			allComments() {
+				return this.$store.getters['nfPosts/allComments'];
+			},
 			infScrollDisable() {
 				return this.$store.getters['nfPosts/infScrollDisable'];
+			},
+			newsFeedPostsAll() {
+				return this.$store.getters['nfPosts/newsFeedPostsAll'];
 			}
 		},
 		methods: {
@@ -82,8 +94,8 @@
 			appSpinner: Spinner
 		},
 		// created() {
-		// 	console.log(this.postDetail, this.infScrollDisable);
-		// }
+        //     console.log(this.newsFeedPost);
+        // }
 	}
 </script>
 

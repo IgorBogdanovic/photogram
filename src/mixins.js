@@ -2,6 +2,7 @@ export const basicVars = {
     data () {
         return {
             windowWidth: $(window).width(),
+            windowHeight: $(window).height(),
     		breakpoint: 767
         }
     }

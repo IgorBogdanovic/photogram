@@ -12,7 +12,7 @@
             </div>
 
             <div class="o-media-detail__media  m-detail-media">
-                <a href="javascript:history.go(-1)" class="m-detail-media__close" @click="outPostDetail">
+                <a href="javascript:history.go(-1)" class="m-detail-media__close  u-only-desktop" @click="outPostDetail">
                     <icon class="icon" name="close"></icon>
                 </a>
 
@@ -78,7 +78,7 @@
                 </div>
 
                 <!-- need route path once made -->
-                <router-link to="/" class="m-detail-comments__view-all">view all comments</router-link>
+                <router-link :to="{ name: 'comments' }" tag="span" class="m-detail-comments__view-all" @click.native="viewAllComments">view all comments</router-link>
             </div>
 
             <div class="o-media-detail__comments  m-detail-comments" v-else>
@@ -111,6 +111,18 @@
             }
         },
         methods: {
+			viewAllComments() {
+				const post = this.newsFeedPost;
+				this.$store.dispatch('nfPosts/changeNewsFeedPost', post);
+				this.$store.dispatch('nfPosts/changePostDetail');
+				if (this.windowWidth > this.breakpoint) {
+					const vm = this;
+					setTimeout(function(){
+						vm.$store.dispatch('nfPosts/changeAllComments');
+					}, 800);
+				} else this.$store.dispatch('nfPosts/changeAllComments');
+				this.$store.dispatch('nfPosts/changeAllCommentsPostDetail');
+			},
             outPostDetail() {
                 this.$store.dispatch('nfPosts/changePostDetail');
                 this.$store.dispatch('nfPosts/changeInfScrollDisable');
@@ -134,7 +146,7 @@
             if (this.windowWidth > this.breakpoint) {
                 this.$store.dispatch('headings/actSetHeading', 'photogram');
             } else this.$store.dispatch('headings/actSetHeading', 'Photo');
-        },
+        }
 	}
 </script>
 
@@ -156,17 +168,17 @@
         }
 
 		&__wrapper {
-            margin-top: -0.3rem;
+			margin-top: -0.3rem;
+			margin-bottom: 1.5rem;
             
             @include breakpoint(desktop) {
                 position: absolute;
                 width: 50rem;
-                height: auto;
-                top: 19%;
-                left: 37%;
-                // top: 55%;
-                // left: 50%;
-                // transform: translate(-50%, -50%);
+				height: auto;
+				margin-bottom: 0;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
             }
         }
         
@@ -462,6 +474,7 @@
 			@include lineHeightRem(12, 17);
 			color: $lightblack;
 			opacity: 0.5;
+			cursor: pointer;
 
 			@include breakpoint(desktop) {
                 color: $white;
