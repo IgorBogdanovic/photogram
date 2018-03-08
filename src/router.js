@@ -30,6 +30,12 @@ const PostDetail = resolve => {
 	});
 };
 
+const User = resolve => {
+	require.ensure(['./components/User.vue'], () => {
+		resolve(require('./components/User.vue'));
+	});
+};
+
 const Comments = resolve => {
 	require.ensure(['./components/Comments.vue'], () => {
 		resolve(require('./components/Comments.vue'));
@@ -48,6 +54,12 @@ const routes = [
 		children: [
 			{ path: 'photo', name: 'photo', component: PostDetail },
 			{ path: 'comments', name: 'comments', component: Comments }
+		]
+	},
+	{ path: '/user_id::userId', name: 'user', props: true, component: User,
+		children: [
+			{ path: 'photo-detail', name: 'photo-detail', component: PostDetail },
+			{ path: 'comments-view', name: 'comments-view', component: Comments }
 		]
 	}
 ]

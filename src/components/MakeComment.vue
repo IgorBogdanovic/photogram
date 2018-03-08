@@ -44,10 +44,15 @@
 		        const commentData = {
 					post_id: this.newsFeedPost.id,
 					body: this.comment
-		        };
-                this.$store.dispatch('nfPosts/postComment', commentData);
-                this.$emit('commentSubmited');
-                this.comment = '';
+                };
+                this.$store.dispatch('nfPosts/postComment', commentData)
+                    .then(res => {
+                        this.$emit('commentSubmited');
+                        this.comment = '';
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
 		    }
         },
         // created() {
@@ -82,11 +87,11 @@
             width: 100%;
             height: 100%;
             stroke: $lightblack;
-            stroke-width: 0.1rem;
+            stroke-width: .1rem;
             fill: $white;
 
             @include breakpoint(desktop) {
-                stroke-width: 0.2rem;
+                stroke-width: .2rem;
             }
         }
 
@@ -125,7 +130,7 @@
             @include lineHeightRem(19, 19);
             color: $lightblack;
             position: relative;
-            bottom: 0.8rem;
+            bottom: .8rem;
             width: 68%;
             margin-left: .2rem;
             border: none;
@@ -148,7 +153,7 @@
             @include breakpoint(desktop) {
                 width: 3.8rem;
                 height: 3.8rem;
-                margin-left: 0.4rem;
+                margin-left: .4rem;
             }
 
             svg {
@@ -163,6 +168,49 @@
                 
                 svg {
                     fill: $gray;
+                }
+            }
+        }
+    }
+
+    // corrections when loaded in NewsFeedPost component
+    .m-bar__make-comment, .m-detail-bar__make-comment {
+        .m-make-comment {
+            opacity: 0;
+            position: absolute;
+            bottom: -.6rem;
+            border-top: none;
+            border-bottom: 1px solid rgba($darkgrey, .5);
+
+            &__icon {
+                @include breakpoint(mobile) {
+                    transform: scale(.78);
+                    transition: transform .5s ease-in-out;
+
+                    &.is-visible {
+                        transform: scale(1);
+                    }
+                }
+
+                @include breakpoint(desktop) {
+                    width: 2.5rem;
+                    height: 2.5rem;
+                    margin-left: 1rem;
+                    margin-bottom: .5rem;
+                }
+            }
+
+            &__input {
+                @include breakpoint(desktop) {
+                    width: 71%;
+                    bottom: .5rem;
+                }
+            }
+
+            &__submit {
+                @include breakpoint(desktop) {
+                    width: 2.5rem;
+                    height: 2.5rem;
                 }
             }
         }

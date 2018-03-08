@@ -24,9 +24,16 @@ export const store = new Vuex.Store({
 	},
 
 	plugins: [createPersistedState({
-		key: 'userAvatar',
+		key: 'user',
 		paths: [
-			'login.userAvatar'
+			'login.idUser',
+			'login.username',
+			'login.userAvatar',
+			'login.userProfile',
+			'login.userAbout',
+			'login.userPostsNo',
+			'login.userFollowersNo',
+			'login.userFollowingNo'
 		],
 		storage: {
 		  getItem: key => Cookies.get(key),

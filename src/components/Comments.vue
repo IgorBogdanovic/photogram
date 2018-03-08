@@ -6,7 +6,8 @@
             </a>
 
             <div class="o-all-comments__wrapper--sub" v-infinite-scroll="axiosGetComments" infinite-scroll-disabled="infScrollDisabled" :infinite-scroll-distance="windowHeight/3">
-                <app-comment v-for="(comment, index) in postCommentsAll" :key="comment.id + '-' + index" :comment="comment" class="o-all-comments__comment"></app-comment>
+                <app-comment v-for="(comment, index) in postCommentsAll" :key="comment.id + '-' + index" :comment="comment"
+                    @commentDeleted="refreshComments" class="o-all-comments__comment"></app-comment>
                 <app-spinner v-if="loading"></app-spinner>
             </div>
 
@@ -30,12 +31,16 @@
                 loading: false,
                 infScrollDisabled: false,
                 commentAmount: 12,
-				commentPage: 1
+                commentPage: 1,
+                prevHeading: ''
 		    }
         },
         computed: {
             token() {
 				return this.$store.getters['login/token'];
+            },
+            idUser() {
+				return this.$store.getters['login/idUser'];
             },
             newsFeedPostsAll() {
 				return this.$store.getters['nfPosts/newsFeedPostsAll'];
@@ -79,25 +84,27 @@
                 const vm = this;
                 setTimeout(function(){
                     vm.axiosGetComments();
-                }, 300);
+                }, 500);
                 // update post in NewsFeedPostsAll array
-                posts.get('', { headers: { Authorization: 'Bearer ' + this.token }, params: { amount: 1, page: 1, news_feed: 1 } })
+                posts.get('' + this.newsFeedPost.id, { headers: { Authorization: 'Bearer ' + this.token } })
                 .then(res => {
-                    const post = res.data.data[0];
+                    const post = res.data.data;
                     const postId = post.id;
                     const allPosts = this.newsFeedPostsAll;
                     const postIndex = allPosts.map(function(el) { return el.id; }).indexOf(postId);
                     const postObj = {
                         index: postIndex,
-                        post: post
+                        value: post
                     };
                     this.$store.dispatch('nfPosts/updateNewsFeedPostsAll', postObj);
+                    this.$store.dispatch('nfPosts/changeNewsFeedPost', postObj.value);
                 })
                 .catch(error => {
                     console.log(error);
                 });
             },
             closeAllComments() {
+                this.$store.dispatch('nfPosts/pushPostCommentsAll', []);
                 this.$store.dispatch('nfPosts/changeAllComments');
                 if (this.allCommentsPostDetail) {
                     if (this.windowWidth > this.breakpoint) {
@@ -113,41 +120,20 @@
                         $('.o-homepage').removeClass('u-overflow-disabled');
                     }
                 }
+                this.$store.dispatch('headings/actSetHeading', this.prevHeading);
 			}
         },
         components: {
             appComment: Comment,
             appMakeComment: MakeComment,
             appSpinner: Spinner
-		},
+        },
 		created() {
+            this.prevHeading = this.$store.getters['headings/heading'];
             if (this.windowWidth > this.breakpoint) {
                 this.$store.dispatch('headings/actSetHeading', 'photogram');
             } else this.$store.dispatch('headings/actSetHeading', 'Comments');
-            // posts.get('{ 501 }', { headers: { Authorization: 'Bearer ' + this.token } })
-            // .then(res => {
-            //     console.log(res);
-            // })
-            // .catch(error => {
-            //     console.log(error);
-            // });
-
-            // posts.get('', { headers: { Authorization: 'Bearer ' + this.token }, params: { amount: 1, page: 1, news_feed: 1 } })
-            // .then(res => {
-            //     const post = res.data.data[0];
-            //     const postId = post.id;
-            //     const allPosts = this.newsFeedPostsAll;
-            //     const postIndex = allPosts.map(function(el) { return el.id; }).indexOf(postId);
-            //     const postObj = {
-            //         index: postIndex,
-            //         post: post
-            //     };
-            //     // console.log(postObj);
-            //     this.$store.dispatch('nfPosts/updateNewsFeedPostsAll', postObj);
-            // })
-            // .catch(error => {
-            //     console.log(error);
-            // });
+            // console.log(this.comments);
         }
 	}
 </script>
@@ -176,7 +162,7 @@
                 @include breakpoint(desktop) {
                     position: absolute;
                     width: 57rem;
-                    height: 80rem;
+                    height: 74vh;
                     top: 50%;
                     left: 50%;
                     transform: translate(-50%, -50%);
@@ -189,7 +175,7 @@
                 @include breakpoint(desktop) {
                     position: absolute;
                     width: 57rem;
-                    height: 80rem;
+                    height: 74vh;
                     padding-bottom: 8rem;
                     overflow-y: auto;
                 }

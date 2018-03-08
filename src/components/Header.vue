@@ -98,6 +98,11 @@
 
     export default {
         mixins: [ mixinStorage, basicVars ],
+        data () {
+		    return {
+                prevHeading: ''
+		    }
+        },
         computed: {
             heading() {
 				return this.$store.getters['headings/heading'];
@@ -123,6 +128,7 @@
                 if (this.postDetail && !this.allComments) {
                     this.$store.dispatch('nfPosts/changePostDetail');
                 } else if (this.allComments) {
+                    this.$store.dispatch('nfPosts/pushPostCommentsAll', []);
                     this.$store.dispatch('nfPosts/changeAllComments');
                     if (this.allCommentsPostDetail) {
                         this.$store.dispatch('nfPosts/changePostDetail');
@@ -132,10 +138,14 @@
                 }
 
                 this.$store.dispatch('nfPosts/changeInfScrollDisable');
+                this.$store.dispatch('headings/actSetHeading', this.prevHeading);
                 if (this.windowWidth > this.breakpoint) {
 					$('.o-homepage').removeClass('u-overflow-disabled');
 				}
 			}
+        },
+        created() {
+            this.prevHeading = this.$store.getters['headings/heading'];
         }
 	}
 </script>

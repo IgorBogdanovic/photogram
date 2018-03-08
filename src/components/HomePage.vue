@@ -6,7 +6,7 @@
 		<div class="o-homepage__content" v-infinite-scroll="axiosGetPosts" infinite-scroll-disabled="infScrollDisable" :infinite-scroll-distance="windowHeight/3">
 
 			<div v-if="(!postDetail && !allComments) || windowWidth > breakpoint" class="o-homepage__posts-wrapper">
-				<app-news-feed-post v-for="post in newsFeedPostsAll" :key="post.id" :followedUserPost="post"></app-news-feed-post>
+				<app-news-feed-post v-for="(post, index) in newsFeedPostsAll" :key="post.id + '-' + index" :post="post"></app-news-feed-post>
 			</div>
 			
 			<!-- for mobile devices -->
@@ -47,7 +47,7 @@
 		    return {
 				followedUsersPosts: [],
 				loading: false,
-				postAmount: 8,
+				postAmount: 12,
 				postPage: 1
 		    }
 		},
@@ -83,7 +83,10 @@
 						this.$store.dispatch('nfPosts/pushNewsFeedPostsAll', this.followedUsersPosts);
 						this.$store.dispatch('nfPosts/changeInfScrollDisable');
 						this.loading = false;
-					} else console.log('empty array'); // should make some msg displays
+					} else {
+                        this.loading = false;
+                        console.log('empty array'); // should make some msg displays
+                    }
 				});
 			}
 		},
@@ -93,9 +96,17 @@
 			appNewsFeedPost: NewsFeedPost,
 			appSpinner: Spinner
 		},
-		// created() {
-        //     console.log(this.newsFeedPost);
-        // }
+		created() {
+			this.$store.dispatch('headings/actSetHeading', 'photogram');
+			// console.log(this.$route.name);
+		},
+		destroyed() {
+			// console.log(0);
+			this.$store.dispatch('nfPosts/pushNewsFeedPostsAll', []);
+			if (this.infScrollDisable) {
+				this.$store.dispatch('nfPosts/changeInfScrollDisable');
+			}
+		}
 	}
 </script>
 

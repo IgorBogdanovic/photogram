@@ -36,17 +36,21 @@
 
             <div class="o-media-detail__bar  m-detail-bar">
 
-                <div class="m-detail-bar__icon  m-detail-bar__icon--like">
+                <div class="m-detail-bar__icon  m-detail-bar__icon--like" :class="{ 'is-active': postLiked }" @click="unLikePost">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="2700.998 281.935 22.901 23.092">
                     <path id="Path_79" data-name="Path 79" class="cls-1" d="M19.339,1.1A4.1,4.1,0,0,0,13.823.959h0a5.493,5.493,0,0,1-3.337,1.318A5.225,5.225,0,0,1,6.809.959h0a4.166,4.166,0,0,0-5.448.069,4.366,4.366,0,0,0-.409,5.9h0L10.35,20.1,19.816,6.854A4.416,4.416,0,0,0,19.339,1.1Z" transform="translate(2702.004 283.205)"/>
                     </svg>
                 </div>
 
-                <div class="m-detail-bar__icon  m-detail-bar__icon--comment">
+                <div class="m-detail-bar__icon  m-detail-bar__icon--comment" @click.stop="openMakeComment">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="2736.636 282 25.678 23.277">
                     <path id="Union_15" data-name="Union 15" class="cls-1" d="M4.028,13.662a9.6,9.6,0,1,1,3.278,3.861L0,20.306Z" transform="translate(2739 283)"/>
                     </svg>
                 </div>
+
+				<div class="m-detail-bar__make-comment">
+					<app-make-comment @commentSubmited="refreshComments"></app-make-comment>
+				</div>
 
                 <div class="m-detail-bar__info-likes">
                     <div class="m-detail-bar__info-icon">
@@ -55,12 +59,12 @@
                         </svg>
                     </div>
 
-                    <p class="m-detail-bar__likes-count">{{ newsFeedPost.likes_count }}</p>
+                    <p class="m-detail-bar__likes-count">{{ likesCount }}</p>
                 </div>
                 
             </div>
 
-            <div class="o-media-detail__media-descrpt  m-detail-media-descrpt">
+            <div v-if="newsFeedPost.description" class="o-media-detail__media-descrpt  m-detail-media-descrpt">
                 <div class="m-detail-media-descrpt__avatar">
                     <img :src="storage + newsFeedPost.user_image.avatar" alt="this user avatar">
                 </div>
@@ -68,7 +72,7 @@
                 <p class="m-detail-media-descrpt__txt">{{ newsFeedPost.description }}</p>
             </div>
 
-            <div class="o-media-detail__comments  m-detail-comments" v-if="newsFeedPost.comments_count > 1">
+            <div class="o-media-detail__comments  m-detail-comments" v-if="newsFeedPost.comments_count >= 0">
                 <div class="m-detail-comments__comment-block" v-for="(comment, index) in newsFeedPost.comments" v-if="index < 1" :key="comment.id">
                     <div class="m-detail-comments__avatar">
                         <img :src="storage + comment.user_image.avatar" alt="user avatar that made this comment">
@@ -78,10 +82,13 @@
                 </div>
 
                 <!-- need route path once made -->
-                <router-link :to="{ name: 'comments' }" tag="span" class="m-detail-comments__view-all" @click.native="viewAllComments">view all comments</router-link>
+                <router-link v-if="$route.name === 'photo' && newsFeedPost.comments_count > 0"
+					:to="{ name: 'comments' }" tag="span" class="m-detail-comments__view-all" @click.native="viewAllComments">view all comments</router-link>
+				<router-link v-if="$route.name === 'photo-detail' && newsFeedPost.comments_count > 0"
+					:to="{ name: 'comments-view' }" tag="span" class="m-detail-comments__view-all" @click.native="viewAllComments">view all comments</router-link>
             </div>
 
-            <div class="o-media-detail__comments  m-detail-comments" v-else>
+            <!-- <div class="o-media-detail__comments  m-detail-comments" v-else>
                 <div class="m-detail-comments__comment-block" v-for="comment in newsFeedPost.comments" :key="comment.id">
                     <div class="m-detail-comments__avatar">
                         <img :src="storage + comment.user_image.avatar" alt="user avatar that made this comment">
@@ -89,7 +96,7 @@
 
                     <p class="m-detail-comments__txt">{{ comment.body }}</p>
                 </div>
-            </div>
+            </div> -->
 
         </div>
 
@@ -98,11 +105,30 @@
 </template>
 
 <script>
-    import { mixinStorage, basicVars } from '../mixins'
+	import { mixinStorage, basicVars } from '../mixins'
+	import { posts } from '../axios-urls'
+	import MakeComment from './MakeComment.vue'
 
     export default {
 		mixins: [ mixinStorage, basicVars ],
+		data () {
+		    return {
+				prevHeading: '',
+				postLiked: null,
+				likesCount: null
+		    }
+		},
+		watch: {
+			postLiked(e) {
+				if (e) {
+					this.likesCount += 1;
+				} else this.likesCount -= 1;
+			}
+		},
         computed: {
+			token() {
+				return this.$store.getters['login/token'];
+			},
             newsFeedPostsAll() {
 				return this.$store.getters['nfPosts/newsFeedPostsAll'];
 			},
@@ -111,6 +137,66 @@
             }
         },
         methods: {
+			openMakeComment(e) {
+				const icon = $(e.currentTarget);
+
+				if ( icon.hasClass('js-active') ) {
+					icon.next().find('.m-make-comment__icon').removeClass('is-visible');
+					icon.next().children().animate({
+						opacity: 0,
+						bottom: '-.6rem'
+					}, 500, function() {
+						icon.next().find('.m-make-comment__input').off( "focus" );
+						icon.next().hide(0);
+						icon.removeClass('js-active');
+						icon.removeClass('is-active');
+					});
+				} else {
+					const post = this.newsFeedPost;
+					this.$store.dispatch('nfPosts/changeNewsFeedPost', post);
+					icon.addClass('is-active');
+					icon.next().show(0);
+					icon.next().find('.m-make-comment__icon').addClass('is-visible');
+					icon.next().children().animate({
+						opacity: 1,
+						bottom: '3.65rem'
+					}, 500, function() {
+						icon.addClass('js-active');
+						icon.next().find('.m-make-comment__input').focus();
+					});
+				}
+			},
+			refreshComments() {
+				const icon = $('.js-active');
+
+				icon.next().children().animate({
+					opacity: 0,
+					bottom: '-.6rem'
+				}, 500, function() {
+					icon.next().find('.m-make-comment__input').off( "focus" );
+					icon.next().hide(0);
+					icon.removeClass('js-active');
+					icon.removeClass('is-active');
+				});
+				// update post in NewsFeedPostsAll array and NewsFeedPost
+                posts.get('' + this.newsFeedPost.id, { headers: { Authorization: 'Bearer ' + this.token } })
+                .then(res => {
+					const post = res.data.data;
+                    const postId = post.id;
+                    const allPosts = this.newsFeedPostsAll;
+                    const postIndex = allPosts.map(function(el) { return el.id; }).indexOf(postId);
+                    const postObj = {
+                        index: postIndex,
+                        value: post
+					};
+					// console.log(post);
+					this.$store.dispatch('nfPosts/changeNewsFeedPost', post);
+					this.$store.dispatch('nfPosts/updateNewsFeedPostsAll', postObj);
+                })
+                .catch(error => {
+                    console.log(error);
+				});
+            },
 			viewAllComments() {
 				const post = this.newsFeedPost;
 				this.$store.dispatch('nfPosts/changeNewsFeedPost', post);
@@ -125,11 +211,26 @@
 			},
             outPostDetail() {
                 this.$store.dispatch('nfPosts/changePostDetail');
-                this.$store.dispatch('nfPosts/changeInfScrollDisable');
+				this.$store.dispatch('nfPosts/changeInfScrollDisable');
+				this.$store.dispatch('headings/actSetHeading', this.prevHeading);
                 if (this.windowWidth > this.breakpoint) {
 					$('.o-homepage').removeClass('u-overflow-disabled');
 				}
 			},
+			unLikePost() {
+                const postId = this.newsFeedPost.id;
+				var likeId = null;
+                if (this.postLiked) {
+                    likeId = this.newsFeedPost.auth_like_id;
+                    this.postLiked = false;
+				} else this.postLiked = true;
+                const data = {
+                    type: 1,
+                    id: postId,
+                    likeId
+				}
+				this.$store.dispatch('nfPosts/unLike', data);
+            },
 			arrowClick(arrow) {
                 const postId = this.newsFeedPost.id;
                 const allPosts = this.newsFeedPostsAll;
@@ -142,11 +243,21 @@
                 } else return false;
             }
 		},
+		components: {
+            appMakeComment: MakeComment
+		},
         created() {
+			this.prevHeading = this.$store.getters['headings/heading'];
             if (this.windowWidth > this.breakpoint) {
                 this.$store.dispatch('headings/actSetHeading', 'photogram');
-            } else this.$store.dispatch('headings/actSetHeading', 'Photo');
-        }
+			} else this.$store.dispatch('headings/actSetHeading', 'Photo');
+			console.log(this.newsFeedPost);
+			this.postLiked = Boolean(this.newsFeedPost.auth_like_id);
+			// this below is because watch property will react on change of this.postLiked
+			if (this.postLiked) {
+				this.likesCount = this.newsFeedPost.likes_count - 1;
+			} else this.likesCount = this.newsFeedPost.likes_count + 1;
+		}
 	}
 </script>
 
@@ -291,6 +402,7 @@
 	}
 
 	.m-detail-bar {
+		position: relative;
 		height: 4.2rem;
 		border-bottom: 1px solid rgba($darkgrey, .5);
 		-webkit-background-clip: padding-box;
@@ -302,6 +414,7 @@
 			height: 2.5rem;
 			margin-top: 0.9rem;
 			margin-left: 1.3rem;
+			cursor: pointer;
 
 			@include breakpoint(desktop) {
 				margin-left: 1rem;
@@ -314,12 +427,12 @@
 			svg {
 				stroke: $lightblack;
 				stroke-width: 0.1rem;
-                fill: $white;
-                
-                @include breakpoint(desktop) {
-                    stroke: $white;
-                    stroke-width: 0.2rem;
-                    fill: transparent;
+				fill: $white;
+
+				@include breakpoint(desktop) {
+					stroke: $white;
+					stroke-width: 0.2rem;
+					fill: transparent;
                 }
 			}
 			
@@ -327,14 +440,29 @@
 				&.is-active {
 					svg {
 						stroke: $lightgreen;
-						stroke-width: 0.1rem;
-                        fill: $lightgreen;
-                        
-                        @include breakpoint(desktop) {
-							stroke-width: 0.2rem;
-						}
+						fill: $lightgreen;
 					}
 				}
+			}
+
+			&--comment {
+				&.is-active {
+					svg {
+						stroke: $gray;
+						fill: $gray;
+					}
+				}
+			}
+		}
+
+		&__make-comment {
+			display: none;
+			position: absolute;
+			right: 0;
+			width: 88%;
+
+			@include breakpoint(desktop) {
+				width: 91%;
 			}
 		}
 

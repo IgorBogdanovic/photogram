@@ -1,5 +1,5 @@
 import router from '../../router'
-import { comments } from '../../axios-urls'
+import { comments, likes } from '../../axios-urls'
 
 export const nfPosts = {
   namespaced: true,
@@ -10,6 +10,7 @@ export const nfPosts = {
     allCommentsPostDetail: false,
     newsFeedPostsAll: [],
     newsFeedPost: {},
+    user: {},
     postCommentsAll: [],
     infScrollDisable: false
   },
@@ -19,13 +20,31 @@ export const nfPosts = {
       state.newsFeedPostsAll = postsAll;
     },
     changeNewsFeedPostsAll(state, post) {
-      state.newsFeedPostsAll[post.index] = post.post;
+      const i = Object.keys(state.newsFeedPostsAll[post.index]).length;
+      const j = Object.keys(post.value).length;
+      if (i > j) {
+        for (let prop in post.value) {
+          state.newsFeedPostsAll[post.index][prop] = post.value[prop];
+        }
+      } else state.newsFeedPostsAll[post.index] = post.value;
     },
     setNewsFeedPost(state, post) {
       state.newsFeedPost = post;
     },
+    setUser(state, user) {
+      state.user = user;
+    },
     setPostCommentsAll(state, comments) {
       state.postCommentsAll = comments;
+    },
+    changePostCommentsAll(state, comment) {
+      const i = Object.keys(state.postCommentsAll[comment.index]).length;
+      const j = Object.keys(comment.value).length;
+      if (i > j) {
+        for (let prop in comment.value) {
+          state.postCommentsAll[comment.index][prop] = comment.value[prop];
+        }
+      } else state.postCommentsAll[comment.index] = comment.value;
     },
     statusPostDetail(state) {
       state.postDetail = !state.postDetail;
@@ -51,8 +70,14 @@ export const nfPosts = {
     changeNewsFeedPost({commit}, post) {
       commit('setNewsFeedPost', post);
     },
+    changeUser({commit}, user) {
+      commit('setUser', user);
+    },
     pushPostCommentsAll({commit}, comments) {
       commit('setPostCommentsAll', comments);
+    },
+    updatePostCommentsAll({commit}, comment) {
+      commit('changePostCommentsAll', comment);
     },
     changePostDetail({commit}) {
       commit('statusPostDetail');
@@ -68,14 +93,70 @@ export const nfPosts = {
     },
     postComment({commit}, data) {
       const token = localStorage.getItem('token');
-      comments.post('', { post_id: data.post_id, body: data.body },
-      { headers: { Authorization: 'Bearer ' + token } })
-        .then(res => {
-          // console.log(res);
-        })
-        .catch(error => {
-          console.log(error);
-        });
+      return comments.post('', { post_id: data.post_id, body: data.body },
+        { headers: { Authorization: 'Bearer ' + token } });
+        // .then(res => {
+        //   console.log(res);
+        // })
+        // .catch(error => {
+        //   console.log(error);
+        // });
+    },
+    deleteComment({commit}, commentId) {
+      const token = localStorage.getItem('token');
+      return comments.delete('' + commentId, { headers: { Authorization: 'Bearer ' + token } });
+        // .then(res => {
+        //   console.log(res);
+        // })
+        // .catch(error => {
+        //   console.log(error);
+        // });
+    },
+    unLike({commit, dispatch, state}, data) {
+      const token = localStorage.getItem('token');
+      if (data.likeId) {
+        return likes.delete('' + data.likeId, { headers: { Authorization: 'Bearer ' + token } })
+          .then(res => {
+            // console.log('del');
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      } else {
+        return likes.post('', { likable_id: data.id, likable_type: data.type },
+          { headers: { Authorization: 'Bearer ' + token } })
+          .then(res => {
+            const data = res.data.data;
+            const id = data.likable_id;
+            const type = data.likable_type;
+            const allPosts = state.newsFeedPostsAll;
+            const allComments = state.postCommentsAll;
+            let index;
+
+            if (type === 1) {
+              index = allPosts.map(function(el) { return el.id; }).indexOf(id);
+            } else if (type === 2) {
+              index = allComments.map(function(el) { return el.id; }).indexOf(id);
+            } else return false;
+            
+            const dataObj = {
+              index: index,
+              value: { auth_like_id: data.id }
+            };
+
+            if (type === 1) {
+              dispatch('updateNewsFeedPostsAll', dataObj);
+            } else if (type === 2) {
+              dispatch('updatePostCommentsAll', dataObj);
+            } else return false;
+
+            // console.log(allPosts[index]);
+            dispatch('changeNewsFeedPost', allPosts[index]);
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }
     }
   },
 
@@ -94,6 +175,9 @@ export const nfPosts = {
     },
     newsFeedPost(state) {
       return state.newsFeedPost;
+    },
+    user(state) {
+      return state.user;
     },
     postCommentsAll(state) {
       return state.postCommentsAll;

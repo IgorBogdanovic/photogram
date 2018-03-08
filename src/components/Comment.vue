@@ -11,10 +11,16 @@
             <span class="m-comment__reply">reply</span>
         </div>
 
-        <div class="m-comment__like" :class="{ 'is-active': comment.auth_like_id }">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="2700.998 281.935 22.901 23.092">
-            <path id="Path_79" data-name="Path 79" class="cls-1" d="M19.339,1.1A4.1,4.1,0,0,0,13.823.959h0a5.493,5.493,0,0,1-3.337,1.318A5.225,5.225,0,0,1,6.809.959h0a4.166,4.166,0,0,0-5.448.069,4.366,4.366,0,0,0-.409,5.9h0L10.35,20.1,19.816,6.854A4.416,4.416,0,0,0,19.339,1.1Z" transform="translate(2702.004 283.205)"/>
-            </svg>
+        <div class="m-comment__icons">
+            <div v-if="idUser === comment.user_id" class="m-comment__delete" @click="deleteComment">
+                <icon class="icon" name="times-circle"></icon>
+            </div>
+
+            <div class="m-comment__like" :class="{ 'is-active': commentLiked }" @click="unLikeComment">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="2700.998 281.935 22.901 23.092">
+                <path id="Path_79" data-name="Path 79" class="cls-1" d="M19.339,1.1A4.1,4.1,0,0,0,13.823.959h0a5.493,5.493,0,0,1-3.337,1.318A5.225,5.225,0,0,1,6.809.959h0a4.166,4.166,0,0,0-5.448.069,4.366,4.366,0,0,0-.409,5.9h0L10.35,20.1,19.816,6.854A4.416,4.416,0,0,0,19.339,1.1Z" transform="translate(2702.004 283.205)"/>
+                </svg>
+            </div>
         </div>
 
     </div>
@@ -25,7 +31,43 @@
 
     export default {
         mixins: [ mixinStorage ],
-        props: ['comment']
+        props: ['comment'],
+        data () {
+		    return {
+                commentLiked: Boolean(this.comment.auth_like_id)
+		    }
+        },
+        computed: {
+            idUser() {
+				return this.$store.getters['login/idUser'];
+            }
+        },
+        methods: {
+            deleteComment() {
+                const commentId = this.comment.id;
+                this.$store.dispatch('nfPosts/deleteComment', commentId)
+                    .then(res => {
+                        this.$emit('commentDeleted');
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+            },
+            unLikeComment() {
+                const commentId = this.comment.id;
+                var likeId = null;
+                if (this.commentLiked) {
+                    likeId = this.comment.auth_like_id;
+                    this.commentLiked = false;
+                } else this.commentLiked = true;
+                const data = {
+                    type: 2,
+                    id: commentId,
+                    likeId
+                }
+                this.$store.dispatch('nfPosts/unLike', data);
+            }
+        }
 	}
 </script>
 
@@ -33,17 +75,6 @@
 	@import '../scss/settings';
 
     .m-comment {
-        svg {
-            width: 100%;
-            height: 100%;
-            stroke: $lightblack;
-            stroke-width: 0.1rem;
-            fill: $white;
-
-            @include breakpoint(desktop) {
-                stroke-width: 0.2rem;
-            }
-        }
         
         &__user-img {
             display: inline-block;
@@ -70,13 +101,13 @@
             @include fontSizeRem(14, 16);
 			@include lineHeightRem(17, 19);
             display: inline-block;
-            width: 60%;
+            width: 55%;
             margin-top: 2.2rem;
             margin-left: 0.6rem;
             vertical-align: top;
 
             @include breakpoint(desktop) {
-                width: 68%;
+                width: 65%;
                 margin-top: 5.6rem;
             }
         }
@@ -97,20 +128,59 @@
             color: $lightblack;
             opacity: .5;
             text-align: right;
+            margin-top: 1rem;
+            margin-right: 1rem;
+        }
+
+        &__icons {
+            display: inline-block;
+            margin-left: 0.5rem;
+            width: 6.2rem;
+
+            @include breakpoint(desktop) {
+                position: relative;
+                top: -1.5rem;
+                width: 6.6rem;
+            }
+
+            svg {
+                width: 100%;
+                height: 100%;
+            }
+        }
+
+        &__delete {
+            float: right;
+            width: 2.7rem;
+            height: 2.7rem;
+            cursor: pointer;
+
+            @include breakpoint(desktop) {
+                width: 2.9rem;
+                height: 2.9rem;
+            }
         }
 
         &__like {
-            display: inline-block;
+            float: right;
             width: 2.5rem;
             height: 2.5rem;
-            margin-top: 2.6rem;
-            margin-left: 1.7rem;
+            margin-right: 0.5rem;
+            cursor: pointer;
 
             @include breakpoint(desktop) {
                 width: 2.7rem;
                 height: 2.7rem;
-                position: relative;
-                top: -0.4rem;
+            }
+
+            svg {
+                stroke: $lightblack;
+                stroke-width: 0.1rem;
+                fill: $white;
+
+                @include breakpoint(desktop) {
+                    stroke-width: 0.2rem;
+                }
             }
             
             &.is-active {
