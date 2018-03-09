@@ -215,4 +215,12 @@
             }
         }
     }
+
+    .m-detail-bar__make-comment {
+        .m-make-comment__input {
+            @include breakpoint(desktop) {
+                width: 82%;
+            }
+        }
+    }
 </style>

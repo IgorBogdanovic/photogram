@@ -95,67 +95,18 @@ export const nfPosts = {
       const token = localStorage.getItem('token');
       return comments.post('', { post_id: data.post_id, body: data.body },
         { headers: { Authorization: 'Bearer ' + token } });
-        // .then(res => {
-        //   console.log(res);
-        // })
-        // .catch(error => {
-        //   console.log(error);
-        // });
     },
     deleteComment({commit}, commentId) {
       const token = localStorage.getItem('token');
       return comments.delete('' + commentId, { headers: { Authorization: 'Bearer ' + token } });
-        // .then(res => {
-        //   console.log(res);
-        // })
-        // .catch(error => {
-        //   console.log(error);
-        // });
     },
     unLike({commit, dispatch, state}, data) {
       const token = localStorage.getItem('token');
       if (data.likeId) {
-        return likes.delete('' + data.likeId, { headers: { Authorization: 'Bearer ' + token } })
-          .then(res => {
-            // console.log('del');
-          })
-          .catch(error => {
-            console.log(error);
-          });
+        return likes.delete('' + data.likeId, { headers: { Authorization: 'Bearer ' + token } });
       } else {
         return likes.post('', { likable_id: data.id, likable_type: data.type },
-          { headers: { Authorization: 'Bearer ' + token } })
-          .then(res => {
-            const data = res.data.data;
-            const id = data.likable_id;
-            const type = data.likable_type;
-            const allPosts = state.newsFeedPostsAll;
-            const allComments = state.postCommentsAll;
-            let index;
-
-            if (type === 1) {
-              index = allPosts.map(function(el) { return el.id; }).indexOf(id);
-            } else if (type === 2) {
-              index = allComments.map(function(el) { return el.id; }).indexOf(id);
-            } else return false;
-            
-            const dataObj = {
-              index: index,
-              value: { auth_like_id: data.id }
-            };
-
-            if (type === 1) {
-              dispatch('updateNewsFeedPostsAll', dataObj);
-            } else if (type === 2) {
-              dispatch('updatePostCommentsAll', dataObj);
-            } else return false;
-
-            // console.log(allPosts[index]);
-            dispatch('changeNewsFeedPost', allPosts[index]);
-          })
-          .catch(error => {
-            console.log(error);
-          });
+          { headers: { Authorization: 'Bearer ' + token } });
       }
     }
   },

@@ -6,7 +6,7 @@
             </a>
 
             <div class="o-all-comments__wrapper--sub" v-infinite-scroll="axiosGetComments" infinite-scroll-disabled="infScrollDisabled" :infinite-scroll-distance="windowHeight/3">
-                <app-comment v-for="(comment, index) in postCommentsAll" :key="comment.id + '-' + index" :comment="comment"
+                <app-comment v-for="(postComment, index) in postCommentsAll" :key="postComment.id + '-' + index" :postComment="postComment"
                     @commentDeleted="refreshComments" class="o-all-comments__comment"></app-comment>
                 <app-spinner v-if="loading"></app-spinner>
             </div>

@@ -14,7 +14,7 @@ Vue.use(Vuex);
 
 export const store = new Vuex.Store({
 	state: {
-		dbStorage: 'http://192.168.0.154:8000/storage/'
+		dbStorage: 'http://54.37.227.57:80/storage/'
 	},
 
 	getters: {

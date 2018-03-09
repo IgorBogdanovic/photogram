@@ -16,7 +16,7 @@
                 <icon class="icon" name="times-circle"></icon>
             </div>
 
-            <div class="m-comment__like" :class="{ 'is-active': commentLiked }" @click="unLikeComment">
+            <div class="m-comment__like" :class="{ 'is-active': comment.auth_like_id }" @click="unLikeComment">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="2700.998 281.935 22.901 23.092">
                 <path id="Path_79" data-name="Path 79" class="cls-1" d="M19.339,1.1A4.1,4.1,0,0,0,13.823.959h0a5.493,5.493,0,0,1-3.337,1.318A5.225,5.225,0,0,1,6.809.959h0a4.166,4.166,0,0,0-5.448.069,4.366,4.366,0,0,0-.409,5.9h0L10.35,20.1,19.816,6.854A4.416,4.416,0,0,0,19.339,1.1Z" transform="translate(2702.004 283.205)"/>
                 </svg>
@@ -31,16 +31,19 @@
 
     export default {
         mixins: [ mixinStorage ],
-        props: ['comment'],
+        props: ['postComment'],
         data () {
 		    return {
-                commentLiked: Boolean(this.comment.auth_like_id)
+                comment: this.postComment
 		    }
         },
         computed: {
             idUser() {
 				return this.$store.getters['login/idUser'];
-            }
+            },
+            postCommentsAll() {
+				return this.$store.getters['nfPosts/postCommentsAll'];
+			}
         },
         methods: {
             deleteComment() {
@@ -55,17 +58,36 @@
             },
             unLikeComment() {
                 const commentId = this.comment.id;
-                var likeId = null;
-                if (this.commentLiked) {
-                    likeId = this.comment.auth_like_id;
-                    this.commentLiked = false;
-                } else this.commentLiked = true;
+                const likeId = this.comment.auth_like_id;
                 const data = {
                     type: 2,
                     id: commentId,
                     likeId
                 }
-                this.$store.dispatch('nfPosts/unLike', data);
+                this.$store.dispatch('nfPosts/unLike', data)
+                    .then(res => {
+						const data = res.data.data;
+                        const allComments = this.postCommentsAll;
+						const index = allComments.map(function(el) { return el.id; }).indexOf(commentId);
+						let dataObj;
+						
+						if (data) {
+							dataObj = {
+								index: index,
+								value: { auth_like_id: data.id }
+							};
+						} else {
+							dataObj = {
+								index: index,
+								value: { auth_like_id: null }
+							};
+						}
+                        this.$store.dispatch('nfPosts/updatePostCommentsAll', dataObj);
+                        this.comment = allComments[index];
+					})
+					.catch(error => {
+						console.log(error);
+					});
             }
         }
 	}
