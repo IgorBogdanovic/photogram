@@ -206,6 +206,7 @@
 				this.$store.dispatch('headings/actSetHeading', this.prevHeading);
                 if (this.windowWidth > this.breakpoint) {
 					$('.o-homepage').removeClass('u-overflow-disabled');
+					$('.o-user').removeClass('u-overflow-disabled');
 				}
 			},
 			unLikePost() {

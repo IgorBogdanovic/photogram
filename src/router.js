@@ -42,6 +42,12 @@ const Comments = resolve => {
 	});
 };
 
+const Upload = resolve => {
+	require.ensure(['./components/Upload.vue'], () => {
+		resolve(require('./components/Upload.vue'));
+	});
+};
+
 Vue.use(VueRouter);
 
 const routes = [
@@ -61,7 +67,8 @@ const routes = [
 			{ path: 'photo-detail', name: 'photo-detail', component: PostDetail },
 			{ path: 'comments-view', name: 'comments-view', component: Comments }
 		]
-	}
+	},
+	{ path: '/upload', name: 'upload', component: Upload }
 ]
 
 export default new VueRouter({ 

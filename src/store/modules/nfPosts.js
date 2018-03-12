@@ -1,5 +1,5 @@
 import router from '../../router'
-import { comments, likes } from '../../axios-urls'
+import { posts, comments, likes } from '../../axios-urls'
 
 export const nfPosts = {
   namespaced: true,
@@ -95,6 +95,10 @@ export const nfPosts = {
       const token = localStorage.getItem('token');
       return comments.post('', { post_id: data.post_id, body: data.body },
         { headers: { Authorization: 'Bearer ' + token } });
+    },
+    postPost({commit}, data) {
+      const token = localStorage.getItem('token');
+      return posts.post('', data, { headers: { Authorization: 'Bearer ' + token } });
     },
     deleteComment({commit}, commentId) {
       const token = localStorage.getItem('token');

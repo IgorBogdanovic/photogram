@@ -118,6 +118,7 @@
                     if (this.windowWidth > this.breakpoint) {
                         this.$store.dispatch('nfPosts/changeInfScrollDisable');
                         $('.o-homepage').removeClass('u-overflow-disabled');
+                        $('.o-user').removeClass('u-overflow-disabled');
                     }
                 }
                 this.$store.dispatch('headings/actSetHeading', this.prevHeading);

@@ -98,7 +98,9 @@
 		},
 		created() {
 			this.$store.dispatch('headings/actSetHeading', 'photogram');
-			// console.log(this.$route.name);
+			if (this.infScrollDisable) {
+				this.$store.dispatch('nfPosts/changeInfScrollDisable');
+			}
 		},
 		destroyed() {
 			// console.log(0);

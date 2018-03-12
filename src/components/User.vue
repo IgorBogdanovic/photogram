@@ -7,6 +7,7 @@
 
             <div v-if="(!postDetail && !allComments) || windowWidth > breakpoint" class="o-user__info  m-info">
                 <div class="m-info__avatar">
+                    <span v-if="windowWidth > breakpoint">{{ username }}</span>
                     <img :src="storage + profileImg" alt="user avatar">
                 </div>
 
@@ -42,7 +43,7 @@
                 </div>
             </div>
 
-            <div v-if="(!postDetail && !allComments) || windowWidth > breakpoint" class="o-user__posts-wrapper" :class="{ 'grid-view': gridViewActive, 'single-view': singleViewActive }">
+            <div v-if="(!postDetail && !allComments) || windowWidth > breakpoint" class="o-user__posts-wrapper  u-clearfix" :class="{ 'grid-view': gridViewActive, 'single-view': singleViewActive }">
                 <app-news-feed-post v-for="(post, index) in userPostsAll" :key="post.id + '-' + index" :post="post"></app-news-feed-post>
             </div>
 
@@ -217,6 +218,12 @@
             overflow: hidden;
             padding-top: 4.76rem;
             padding-bottom: 4.2rem;
+
+            @include breakpoint(desktop) {
+				width: 148rem;
+				margin: 0 auto;
+				padding-top: 8.7rem;
+			}
         }
 
         &__posts-wrapper {
@@ -226,8 +233,23 @@
 				display: -ms-flexbox;
 				display: -webkit-flex;
 				display: flex;
-				flex-wrap: wrap;
+                flex-wrap: wrap;
+                
+                @include breakpoint(desktop) {
+                    margin-top: 5.8rem;
+                }
             }
+
+            @include breakpoint(desktop) {
+				&.single-view {
+                    width: 21.7%;
+                    margin: 5.8rem auto 0 auto;
+
+                    .o-news-feed-post {
+                        width: 100%;
+                    }
+                }
+			}
         }
     }
 
@@ -237,12 +259,31 @@
         @include lineHeightRem(17, 24);
         border-bottom: 1px solid rgba($darkgrey, .5);
 
+        @include breakpoint(desktop) {
+            width: 40%;
+            margin: auto;
+            border-bottom: none;
+        }
+
         &__avatar {
             float: left;
             width: 8.7rem;
             height: 8.7rem;
             margin-top: 2.1rem;
             margin-left: 4.8rem;
+
+            @include breakpoint(desktop) {
+                width: 13.5rem;
+                height: 13.5rem;
+                margin-top: 1.8rem;
+                margin-left: 14rem;
+                text-align: center;
+            }
+
+            span {
+                display: block;
+                margin-bottom: 1rem;
+            }
 
             img {
                 width: 100%;
@@ -254,6 +295,10 @@
             display: inline-block;
             margin-top: 2.9rem;
             margin-left: 3.4rem;
+
+            @include breakpoint(desktop) {
+                margin-top: 7.7rem;
+            }
 
             li {
                 margin-bottom: 1.3rem;
@@ -268,6 +313,14 @@
         &__about-me {
             width: 82%;
             margin: 1rem auto 0 auto;
+            text-align: center;
+
+            @include breakpoint(desktop) {
+                width: 100%;
+                margin: 4rem auto 0 auto;
+                padding-right: 7rem;
+                padding-left: 7rem;
+            }
         }
 
         &__button {
@@ -278,6 +331,10 @@
             padding: .5rem 2rem;
             margin: 2.2rem auto 2.1rem auto;
             border-radius: 30px;
+
+            @include breakpoint(desktop) {
+                margin-top: 4.3rem;
+            }
 
             &--edit {
                 background-color: $lightgray;
@@ -290,6 +347,9 @@
     }
 
     .m-view {
+        @include breakpoint(desktop) {
+            text-align: center;
+        }
 
         &__icon {
             display: inline-block;
@@ -301,8 +361,17 @@
             margin-top: 1rem;
             margin-bottom: 1.1rem;
 
+            @include breakpoint(desktop) {
+                width: 2.4rem;
+                height: 2.4rem;
+            }
+
             &--single {
                 margin-left: 1.7rem;
+
+                @include breakpoint(desktop) {
+                    margin-left: 0;
+                }
 
                 .cls-1 {
                     fill: $lightblack;

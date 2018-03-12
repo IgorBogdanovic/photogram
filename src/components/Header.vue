@@ -11,8 +11,8 @@
             </g>
             </svg>
         </a>
-        
-        <div v-if="heading === 'photogram'" class="o-header__home  a-home  u-only-desktop" :class="{ 'is-active': isHomeActive }">
+
+        <router-link v-if="heading === 'photogram'" :to="{ name: 'homepage' }" tag="div" class="o-header__home  a-home  u-only-desktop" :class="{ 'is-active': isHomeActive }">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="2700 1481 29 29">
             <g id="Group_132" data-name="Group 132" transform="translate(-267 487)">
                 <ellipse id="Ellipse_18" data-name="Ellipse 18" class="cls-1" cx="14.5" cy="14.5" rx="14.5" ry="14.5" transform="translate(2967 994)"/>
@@ -20,11 +20,12 @@
                 <rect id="Rectangle_120" data-name="Rectangle 120" class="cls-1" width="3" height="5" transform="translate(2980 1010)"/>
             </g>
             </svg>
-        </div>
+        </router-link>
 
-        <div v-if="heading === 'photogram'" class="o-header__avatar  a-avatar  u-only-desktop">
+        <router-link v-if="heading === 'photogram'" :to="{ name: 'user', params: { userId: loggedUserId } }" tag="div"
+            class="o-header__avatar  a-avatar  u-only-desktop" @click.native="inUserDetail">
             <img :src="storage + userAvatar" alt="logged user avatar">
-        </div>
+        </router-link>
 
         <div v-if="heading === 'photogram'" class="o-header__upload  a-upload  u-only-desktop">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="2830.105 1480.158 29.843 29.842">
@@ -94,6 +95,7 @@
 </template>
 
 <script>
+    import { users } from '../axios-urls'
     import { mixinStorage, basicVars } from '../mixins'
 
     export default {
@@ -104,11 +106,14 @@
 		    }
         },
         computed: {
+            token() {
+				return this.$store.getters['login/token'];
+			},
             heading() {
 				return this.$store.getters['headings/heading'];
             },
             isHomeActive() {
-                return this.heading === 'photogram';
+                return this.heading === 'photogram' && this.$route.name === 'homepage';
 			},
 			userAvatar() {
 				return this.$store.getters['login/userAvatar'];
@@ -121,6 +126,9 @@
             },
             allCommentsPostDetail() {
 				return this.$store.getters['nfPosts/allCommentsPostDetail'];
+            },
+            loggedUserId() {
+				return this.$store.getters['login/idUser'];
             }
         },
         methods: {
@@ -140,8 +148,20 @@
                 this.$store.dispatch('nfPosts/changeInfScrollDisable');
                 this.$store.dispatch('headings/actSetHeading', this.prevHeading);
                 if (this.windowWidth > this.breakpoint) {
-					$('.o-homepage').removeClass('u-overflow-disabled');
+                    $('.o-homepage').removeClass('u-overflow-disabled');
+                    $('.o-user').removeClass('u-overflow-disabled');
 				}
+            },
+            inUserDetail() {
+				users.get('find?id=' + this.loggedUserId, { headers: { Authorization: 'Bearer ' + this.token } })
+                .then(res => {
+					// console.log(res);
+					const user = res.data.data;
+					this.$store.dispatch('nfPosts/changeUser', user);
+                })
+                .catch(error => {
+                    console.log(error);
+				});
 			}
         },
         created() {
@@ -186,6 +206,7 @@
             height: 4rem;
             margin-top: 1.8rem;
             margin-left: 5.9rem;
+            cursor: pointer;
         }
 		
 		& .cls-1 {
@@ -204,6 +225,8 @@
     }
     
     .a-avatar {
+        cursor: pointer;
+
         @include breakpoint(desktop) {
             float: left;
             width: 4rem;

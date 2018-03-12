@@ -235,6 +235,7 @@
 				this.$store.dispatch('nfPosts/changeInfScrollDisable');
 				if (this.windowWidth > this.breakpoint) {
 					$('.o-homepage').addClass('u-overflow-disabled');
+					$('.o-user').addClass('u-overflow-disabled');
 				}
 			},
 			inUserDetail() {
@@ -255,6 +256,7 @@
 				this.$store.dispatch('nfPosts/changeInfScrollDisable');
 				if (this.windowWidth > this.breakpoint) {
 					$('.o-homepage').addClass('u-overflow-disabled');
+					$('.o-user').addClass('u-overflow-disabled');
 				}
 			}
 		},
@@ -282,6 +284,7 @@
 
 		@include breakpoint(desktop) {
 			float: left;
+			max-width: 32rem;
 			width: 21.6%;
 			flex-grow: 1;
     		overflow: hidden;
