@@ -1,7 +1,7 @@
 <template>
   	<div class="o-news-feed-post">
 
-		<div v-if="$route.name === 'homepage'" class="o-news-feed-post__user  m-user">
+		<div v-if="$route.name === 'homepage' || $route.name === 'photo' || $route.name === 'comments'" class="o-news-feed-post__user  m-user">
 			<router-link :to="{ name: 'user', params: { userId: newsFeedPost.user_id } }" tag="div" class="m-user__link" @click.native="inUserDetail">
 				<div class="m-user__avatar">
 					<img :src="storage + newsFeedPost.user_image.avatar" alt="avatar">
@@ -78,7 +78,7 @@
 				<p class="m-comments__txt">{{ comment.body }}</p>
 			</div>
 
-			<router-link v-if="$route.name === 'homepage' && newsFeedPost.comments_count > 0"
+			<router-link v-if="($route.name === 'homepage' || $route.name === 'photo' || $route.name === 'comments') && newsFeedPost.comments_count > 0"
 				:to="{ name: 'comments' }" tag="span" class="m-comments__view-all" @click.native="viewAllComments">view all comments</router-link>
 			<router-link v-if="$route.name === 'user' && newsFeedPost.comments_count > 0"
 				:to="{ name: 'comments-view' }" tag="span" class="m-comments__view-all" @click.native="viewAllComments">view all comments</router-link>
@@ -231,8 +231,7 @@
 			inPostDetail() {
 				const post = this.newsFeedPost;
 				this.$store.dispatch('nfPosts/changeNewsFeedPost', post);
-				this.$store.dispatch('nfPosts/changePostDetail');
-				this.$store.dispatch('nfPosts/changeInfScrollDisable');
+				// this.$store.dispatch('nfPosts/changeInfScrollDisable');
 				if (this.windowWidth > this.breakpoint) {
 					$('.o-homepage').addClass('u-overflow-disabled');
 					$('.o-user').addClass('u-overflow-disabled');
@@ -252,8 +251,7 @@
 			viewAllComments() {
 				const post = this.newsFeedPost;
 				this.$store.dispatch('nfPosts/changeNewsFeedPost', post);
-				this.$store.dispatch('nfPosts/changeAllComments');
-				this.$store.dispatch('nfPosts/changeInfScrollDisable');
+				// this.$store.dispatch('nfPosts/changeInfScrollDisable');
 				if (this.windowWidth > this.breakpoint) {
 					$('.o-homepage').addClass('u-overflow-disabled');
 					$('.o-user').addClass('u-overflow-disabled');

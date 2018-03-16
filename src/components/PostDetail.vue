@@ -125,7 +125,10 @@
 			},
 			newsFeedPost() {
 				return this.$store.getters['nfPosts/newsFeedPost'];
-            }
+			},
+			infScrollDisable() {
+				return this.$store.getters['nfPosts/infScrollDisable'];
+			}
         },
         methods: {
 			openMakeComment(e) {
@@ -191,14 +194,14 @@
 			viewAllComments() {
 				const post = this.newsFeedPost;
 				this.$store.dispatch('nfPosts/changeNewsFeedPost', post);
-				this.$store.dispatch('nfPosts/changePostDetail');
+				// this.$store.dispatch('nfPosts/changePostDetail');
 				if (this.windowWidth > this.breakpoint) {
 					const vm = this;
 					setTimeout(function(){
 						vm.$store.dispatch('nfPosts/changeAllComments');
 					}, 800);
-				} else this.$store.dispatch('nfPosts/changeAllComments');
-				this.$store.dispatch('nfPosts/changeAllCommentsPostDetail');
+				}
+				// this.$store.dispatch('nfPosts/changeAllCommentsPostDetail');
 			},
             outPostDetail() {
                 this.$store.dispatch('nfPosts/changePostDetail');
@@ -264,6 +267,7 @@
             if (this.windowWidth > this.breakpoint) {
                 this.$store.dispatch('headings/actSetHeading', 'photogram');
 			} else this.$store.dispatch('headings/actSetHeading', 'Photo');
+			// console.log(this.infScrollDisable);
 		}
 	}
 </script>

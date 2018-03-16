@@ -1,8 +1,6 @@
 <template>
   	<div class="o-upload">
 		
-		<app-header></app-header>
-
 		<div class="o-upload__wrapper">
             <form @submit.prevent="submitPost">
                 <div class="o-upload__image-container">
@@ -34,16 +32,12 @@
             </form>
 		</div>
 
-		<app-footer></app-footer>
-
 	</div>
 </template>
 
 <script>
     import { required } from 'vuelidate/lib/validators';
     import { basicVars } from '../mixins'
-	import Header from './Header.vue'
-    import Footer from './Footer.vue'
     
     export default {
         mixins: [ basicVars ],
@@ -64,7 +58,13 @@
             },
             loggedUserId() {
 				return this.$store.getters['login/idUser'];
-            }
+            },
+            upload() {
+				return this.$store.getters['nfPosts/upload'];
+			},
+            infScrollDisable() {
+				return this.$store.getters['nfPosts/infScrollDisable'];
+			}
 		},
 		methods: {
 			onFileSelected(e) {
@@ -99,16 +99,17 @@
                         console.log(error);
                     });
             }
-		},
-        components: {
-			appHeader: Header,
-			appFooter: Footer
         },
+        // beforeCreate() {
+        //     if (!this.infScrollDisable) {
+        //         this.$store.dispatch('nfPosts/changeInfScrollDisable');
+        //     }
+        // },
         created() {
             if (this.windowWidth > this.breakpoint) {
                 this.$store.dispatch('headings/actSetHeading', 'photogram');
 			} else this.$store.dispatch('headings/actSetHeading', 'Upload');
-		}
+        }
 	}
 </script>
 
@@ -117,19 +118,17 @@
 
     .o-upload {
 		width: 100%;
-		height: 100vh;
-		background-color: $white;
 
-		&__wrapper {
-			padding-top: 4.76rem;
-			padding-bottom: 4.2rem;
+		// &__wrapper {
+		// 	padding-top: 4.76rem;
+		// 	padding-bottom: 4.2rem;
 
-			@include breakpoint(desktop) {
-				width: 148rem;
-				margin: 0 auto;
-				padding-top: 13.7rem;
-			}
-        }
+		// 	@include breakpoint(desktop) {
+		// 		width: 148rem;
+		// 		margin: 0 auto;
+		// 		padding-top: 13.7rem;
+		// 	}
+        // }
         
         &__image-container {
             position: relative;

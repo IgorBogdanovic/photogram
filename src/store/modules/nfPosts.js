@@ -5,14 +5,15 @@ export const nfPosts = {
   namespaced: true,
   
   state: {
-    postDetail: false,
-    allComments: false,
-    allCommentsPostDetail: false,
+    // postDetail: false,
+    // allComments: false,
+    // allCommentsPostDetail: false,
+    // upload: false,
     newsFeedPostsAll: [],
     newsFeedPost: {},
     user: {},
     postCommentsAll: [],
-    infScrollDisable: false
+    // infScrollDisable: false
   },
 
   mutations: {
@@ -46,18 +47,21 @@ export const nfPosts = {
         }
       } else state.postCommentsAll[comment.index] = comment.value;
     },
-    statusPostDetail(state) {
-      state.postDetail = !state.postDetail;
-    },
-    statusAllComments(state) {
-      state.allComments = !state.allComments;
-    },
-    statusAllCommentsPostDetail(state) {
-      state.allCommentsPostDetail = !state.allCommentsPostDetail;
-    },
-    statusInfScrollDisable(state) {
-      state.infScrollDisable = !state.infScrollDisable;
-    }
+    // statusPostDetail(state) {
+    //   state.postDetail = !state.postDetail;
+    // },
+    // statusAllComments(state) {
+    //   state.allComments = !state.allComments;
+    // },
+    // statusAllCommentsPostDetail(state) {
+    //   state.allCommentsPostDetail = !state.allCommentsPostDetail;
+    // },
+    // statusUpload(state) {
+    //   state.upload = !state.upload;
+    // },
+    // statusInfScrollDisable(state) {
+    //   state.infScrollDisable = !state.infScrollDisable;
+    // }
   },
 
   actions: {
@@ -79,18 +83,21 @@ export const nfPosts = {
     updatePostCommentsAll({commit}, comment) {
       commit('changePostCommentsAll', comment);
     },
-    changePostDetail({commit}) {
-      commit('statusPostDetail');
-    },
-    changeAllComments({commit}) {
-      commit('statusAllComments');
-    },
-    changeAllCommentsPostDetail({commit}) {
-      commit('statusAllCommentsPostDetail');
-    },
-    changeInfScrollDisable({commit}) {
-      commit('statusInfScrollDisable');
-    },
+    // changePostDetail({commit}) {
+    //   commit('statusPostDetail');
+    // },
+    // changeAllComments({commit}) {
+    //   commit('statusAllComments');
+    // },
+    // changeAllCommentsPostDetail({commit}) {
+    //   commit('statusAllCommentsPostDetail');
+    // },
+    // changeUpload({commit}) {
+    //   commit('statusUpload');
+    // },
+    // changeInfScrollDisable({commit}) {
+    //   commit('statusInfScrollDisable');
+    // },
     postComment({commit}, data) {
       const token = localStorage.getItem('token');
       return comments.post('', { post_id: data.post_id, body: data.body },
@@ -116,15 +123,18 @@ export const nfPosts = {
   },
 
   getters: {
-    postDetail(state) {
-      return state.postDetail;
-    },
-    allComments(state) {
-      return state.allComments;
-    },
-    allCommentsPostDetail(state) {
-      return state.allCommentsPostDetail;
-    },
+    // postDetail(state) {
+    //   return state.postDetail;
+    // },
+    // allComments(state) {
+    //   return state.allComments;
+    // },
+    // allCommentsPostDetail(state) {
+    //   return state.allCommentsPostDetail;
+    // },
+    // upload(state) {
+    //   return state.upload;
+    // },
     newsFeedPostsAll(state) {
       return state.newsFeedPostsAll;
     },
@@ -137,8 +147,8 @@ export const nfPosts = {
     postCommentsAll(state) {
       return state.postCommentsAll;
     },
-    infScrollDisable(state) {
-      return state.infScrollDisable;
-    }
+    // infScrollDisable(state) {
+    //   return state.infScrollDisable;
+    // }
   }
 };

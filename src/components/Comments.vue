@@ -53,7 +53,10 @@
 			},
             allCommentsPostDetail() {
 				return this.$store.getters['nfPosts/allCommentsPostDetail'];
-            }
+            },
+            infScrollDisable() {
+				return this.$store.getters['nfPosts/infScrollDisable'];
+			}
         },
         methods: {
 			axiosGetComments() {
@@ -65,7 +68,6 @@
 						for (let i = 0; i < res.data.data.length; i++) {
                             this.comments.push(res.data.data[i]);
                         }
-                        // console.log(this.comments);
                         this.commentPage++;
                         this.$store.dispatch('nfPosts/pushPostCommentsAll', this.comments);
                         this.loading = false;
@@ -134,7 +136,10 @@
             if (this.windowWidth > this.breakpoint) {
                 this.$store.dispatch('headings/actSetHeading', 'photogram');
             } else this.$store.dispatch('headings/actSetHeading', 'Comments');
-            // console.log(this.comments);
+            // console.log(this.infScrollDisable);
+        },
+        destroyed() {
+            this.$store.dispatch('nfPosts/pushPostCommentsAll', []);
         }
 	}
 </script>

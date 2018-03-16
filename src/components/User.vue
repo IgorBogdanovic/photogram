@@ -1,11 +1,9 @@
 <template>
     <div class="o-user">
 
-        <app-header></app-header>
-
         <div class="o-user__content" v-infinite-scroll="axiosGetPosts" infinite-scroll-disabled="infScrollDisable" :infinite-scroll-distance="windowHeight/3">
 
-            <div v-if="(!postDetail && !allComments) || windowWidth > breakpoint" class="o-user__info  m-info">
+            <div v-if="(!postDetail && !allComments && !upload) || windowWidth > breakpoint" class="o-user__info  m-info">
                 <div class="m-info__avatar">
                     <span v-if="windowWidth > breakpoint">{{ username }}</span>
                     <img :src="storage + profileImg" alt="user avatar">
@@ -25,14 +23,14 @@
                 <button v-if="user.auth_follow" class="m-info__button  m-info__button--following">Following</button>
             </div>
 
-            <div v-if="(!postDetail && !allComments) || windowWidth > breakpoint" class="o-user__view  m-view">
-                <div class="m-view__icon  m-view__icon--single is-active" @click.stop="activateSingleView">
+            <div v-if="(!postDetail && !allComments && !upload) || windowWidth > breakpoint" class="o-user__view  m-view">
+                <div class="m-view__icon  m-view__icon--single" :class="{ 'is-active': singleViewActive }" @click.stop="activateSingleView">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="3119 923 17 17">
                         <path id="Path_101" data-name="Path 101" class="cls-1" d="M0,0H17V17H0Z" transform="translate(3119 923)"/>
                     </svg>
                 </div>
 
-                <div class="m-view__icon  m-view__icon--grid" @click.stop="activateGridView">
+                <div class="m-view__icon  m-view__icon--grid" :class="{ 'is-active': gridViewActive }" @click.stop="activateGridView">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="3142 111 17 17.111">
                         <g id="Group_305" data-name="Group 305" transform="translate(3094 -156)">
                             <path id="Path_102" data-name="Path 102" class="cls-1" d="M.5.5h16v16H.5Z" transform="translate(48 267)"/>
@@ -43,13 +41,15 @@
                 </div>
             </div>
 
-            <div v-if="(!postDetail && !allComments) || windowWidth > breakpoint" class="o-user__posts-wrapper  u-clearfix" :class="{ 'grid-view': gridViewActive, 'single-view': singleViewActive }">
+            <div v-if="(!postDetail && !allComments && !upload) || windowWidth > breakpoint"
+                class="o-user__posts-wrapper  u-clearfix" :class="{ 'grid-view': gridViewActive, 'single-view': singleViewActive }">
                 <app-news-feed-post v-for="(post, index) in userPostsAll" :key="post.id + '-' + index" :post="post"></app-news-feed-post>
             </div>
 
             <!-- for mobile devices -->
 			<router-view v-if="postDetail && windowWidth < breakpoint"></router-view>
 			<router-view v-if="allComments && windowWidth < breakpoint"></router-view>
+            <router-view v-if="upload && windowWidth < breakpoint"></router-view>
 			<!-- for all other devices -->
 			<transition mode="out-in"
 				enter-active-class="animated slideInDown"
@@ -66,16 +66,12 @@
 
         </div>
 
-        <app-footer></app-footer>
-
     </div>
 </template>
 
 <script>
     import { mixinStorage, basicVars } from '../mixins'
     import { posts } from '../axios-urls'
-    import Header from './Header.vue'
-    import Footer from './Footer.vue'
     import NewsFeedPost from './NewsFeedPost.vue'
 	import Spinner from './Spinner.vue'
 
@@ -102,6 +98,9 @@
 			},
 			allComments() {
 				return this.$store.getters['nfPosts/allComments'];
+            },
+            upload() {
+				return this.$store.getters['nfPosts/upload'];
 			},
 			infScrollDisable() {
 				return this.$store.getters['nfPosts/infScrollDisable'];
@@ -146,6 +145,39 @@
                 } else return this.user.following_count;
             }
         },
+        watch: {
+            '$route.params.userId': function(userId) {
+                this.userPostsAll.length = 0;
+                this.postPage = 1;
+
+                if (this.loggedUserId === userId) {
+                    this.isLoggedUser = true;
+                } else this.isLoggedUser = false;
+
+                if (this.infScrollDisable) {
+				    this.$store.dispatch('nfPosts/changeInfScrollDisable');
+                }
+                if (this.postDetail) {
+                    this.$store.dispatch('nfPosts/changePostDetail');
+                }
+                if (this.allComments) {
+                    this.$store.dispatch('nfPosts/changeAllComments');
+                }
+                // if (this.upload) {
+                //     this.$store.dispatch('nfPosts/changeUpload');
+                // }
+
+                if (this.windowWidth > this.breakpoint) {
+                    this.$store.dispatch('headings/actSetHeading', 'photogram');
+                } else this.$store.dispatch('headings/actSetHeading', this.username);
+
+                // needed to put this cause for some reason inf-scroll do not work if you are coming from same comp in which you didn't scroll a bit
+                // i guess it's plugin bug
+                if (!this.userPostsAll.length) {
+                    this.axiosGetPosts();
+                }
+            }
+        },
         methods: {
 			axiosGetPosts() {
                 this.loading = true;
@@ -157,7 +189,7 @@
 						for (let i = 0; i < res.data.data.length; i++) {
 							this.userPostsAll.push(res.data.data[i]);
 						}
-						// console.log(this.userPostsAll);
+						// console.log(this.postDetail, this.allComments, this.upload);
 						this.postPage++;
                         this.$store.dispatch('nfPosts/pushNewsFeedPostsAll', this.userPostsAll);
                         this.$store.dispatch('nfPosts/changeInfScrollDisable');
@@ -170,38 +202,59 @@
 			},
             activateSingleView(e) {
                 let thisViewIcon = $(e.currentTarget);
-                thisViewIcon.addClass('is-active').next().removeClass('is-active');
                 this.singleViewActive = true;
                 this.gridViewActive = false;
             },
             activateGridView(e) {
                 let thisViewIcon = $(e.currentTarget);
-                thisViewIcon.addClass('is-active').prev().removeClass('is-active');
                 this.gridViewActive = true;
                 this.singleViewActive = false;
             }
 		},
         components: {
-			appHeader: Header,
-            appFooter: Footer,
-            appNewsFeedPost: NewsFeedPost,
+			appNewsFeedPost: NewsFeedPost,
 			appSpinner: Spinner
+        },
+        beforeCreate() {
+			// better safe then sorry :) => empty NewsFeedPostsAll array
+            this.$store.dispatch('nfPosts/pushNewsFeedPostsAll', []);
         },
         created() {
             if (this.loggedUserId === this.userId) {
                 this.isLoggedUser = true;
             } else this.isLoggedUser = false;
 
+            if (this.infScrollDisable) {
+				this.$store.dispatch('nfPosts/changeInfScrollDisable');
+            }
+            if (this.postDetail) {
+				this.$store.dispatch('nfPosts/changePostDetail');
+            }
+            if (this.allComments) {
+				this.$store.dispatch('nfPosts/changeAllComments');
+            }
+            // if (this.upload) {
+			// 	this.$store.dispatch('nfPosts/changeUpload');
+            // }
+            // console.log([this.postDetail, this.allComments, this.upload, this.infScrollDisable]);
+
             if (this.windowWidth > this.breakpoint) {
                 this.$store.dispatch('headings/actSetHeading', 'photogram');
             } else this.$store.dispatch('headings/actSetHeading', this.username);
-            // console.log(this.user);
+            // console.log(this.username);
+        },
+        beforeMount() {
+            // needed to put this cause for some reason inf-scroll do not work if you are coming from 'upload' comp
+            // i guess it's plugin bug
+            if (!this.userPostsAll.length) {
+                this.axiosGetPosts();
+            }
         },
         destroyed() {
-            this.$store.dispatch('nfPosts/pushNewsFeedPostsAll', []);
+            // this.$store.dispatch('nfPosts/pushNewsFeedPostsAll', []);
             if (this.infScrollDisable) {
 				this.$store.dispatch('nfPosts/changeInfScrollDisable');
-			}
+            }
 		}
 	}
 </script>

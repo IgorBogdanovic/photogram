@@ -100,11 +100,6 @@
 
     export default {
         mixins: [ mixinStorage, basicVars ],
-        data () {
-		    return {
-                prevHeading: ''
-		    }
-        },
         computed: {
             token() {
 				return this.$store.getters['login/token'];
@@ -129,24 +124,47 @@
             },
             loggedUserId() {
 				return this.$store.getters['login/idUser'];
-            }
+            },
+            upload() {
+				return this.$store.getters['nfPosts/upload'];
+            },
+            user() {
+				return this.$store.getters['nfPosts/user'];
+			}
         },
         methods: {
 			goBack() {
-                if (this.postDetail && !this.allComments) {
-                    this.$store.dispatch('nfPosts/changePostDetail');
-                } else if (this.allComments) {
-                    this.$store.dispatch('nfPosts/pushPostCommentsAll', []);
-                    this.$store.dispatch('nfPosts/changeAllComments');
-                    if (this.allCommentsPostDetail) {
-                        this.$store.dispatch('nfPosts/changePostDetail');
-                        this.$store.dispatch('nfPosts/changeAllCommentsPostDetail');
-                        this.$store.dispatch('nfPosts/changeInfScrollDisable'); // to false so it can be again true on dispatch after
-                    }
-                }
+                // if (this.postDetail && !this.allComments) {
+                //     // this.$store.dispatch('nfPosts/changePostDetail');
+                    
+                //     if (this.$route.name === 'photo') {
+                //         this.$store.dispatch('headings/actSetHeading', 'photogram');
+                //     } else if (this.$route.name === 'photo-detail') {
+                //         this.$store.dispatch('headings/actSetHeading', this.user.username);
+                //     }
+                // } else if (this.allComments) {
+                //     // this.$store.dispatch('nfPosts/pushPostCommentsAll', []);
+                //     // this.$store.dispatch('nfPosts/changeAllComments');
+                    
+                //     if (this.$route.name === 'comments') {
+                //         this.$store.dispatch('headings/actSetHeading', 'photogram');
+                //     } else if (this.$route.name === 'comments-view') {
+                //         this.$store.dispatch('headings/actSetHeading', this.user.username);
+                //     }
 
-                this.$store.dispatch('nfPosts/changeInfScrollDisable');
-                this.$store.dispatch('headings/actSetHeading', this.prevHeading);
+                //     if (this.allCommentsPostDetail) {
+                //         // this.$store.dispatch('nfPosts/changePostDetail');
+                //         // this.$store.dispatch('nfPosts/changeAllCommentsPostDetail');
+                //         // this.$store.dispatch('nfPosts/changeInfScrollDisable'); // to false so it can be again true on dispatch after
+                //     }
+                // } else if (this.upload) {
+                //     this.$store.dispatch('nfPosts/changeUpload');
+                // } else if (this.$route.name === 'user' && !this.upload) {
+                //     this.$store.dispatch('nfPosts/changeUpload');
+                //     // this.$store.dispatch('headings/actSetHeading', 'Upload');
+                // }
+                
+                // this.$store.dispatch('nfPosts/changeInfScrollDisable');
                 if (this.windowWidth > this.breakpoint) {
                     $('.o-homepage').removeClass('u-overflow-disabled');
                     $('.o-user').removeClass('u-overflow-disabled');
@@ -163,9 +181,6 @@
                     console.log(error);
 				});
 			}
-        },
-        created() {
-            this.prevHeading = this.$store.getters['headings/heading'];
         }
 	}
 </script>

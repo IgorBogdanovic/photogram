@@ -1,7 +1,7 @@
 <template>
   	<div class="o-footer  u-only-mobile">
 		
-		<router-link :to="{ name: 'homepage' }" tag="div" class="o-footer__home  a-home" :class="{ 'is-active': isHomeActive }">
+		<router-link :to="{ name: 'homepage' }" tag="div" class="o-footer__home  a-home" :class="{ 'is-active': isHomeActive }" @click.native="goHome">
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="2700 1481 29 29">
 			<g id="Group_132" data-name="Group 132" transform="translate(-267 487)">
 				<ellipse id="Ellipse_18" data-name="Ellipse 18" class="cls-1" cx="14.5" cy="14.5" rx="14.5" ry="14.5" transform="translate(2967 994)"/>
@@ -16,7 +16,8 @@
 			<img :src="storage + userAvatar" alt="logged user avatar">
 		</router-link>
 
-		<router-link :to="{ name: 'upload' }" tag="div" class="o-footer__upload  a-upload" :class="{ 'is-active': isUploadActive }">
+		<router-link :to="{ name: 'upload', params: { userId: loggedUserId } }" tag="div"
+		class="o-footer__upload  a-upload" :class="{ 'is-active': isUploadActive }"  @click.native="inUserUpload">
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="2830.105 1480.158 29.843 29.842">
 			<g id="Group_370" data-name="Group 370" transform="translate(2620.228 1461.233)">
 				<g id="Ellipse_170" data-name="Ellipse 170" class="cls-1" transform="translate(209.876 18.925)">
@@ -33,10 +34,10 @@
 
 <script>
 	import { users } from '../axios-urls'
-	import { mixinStorage } from '../mixins'
+	import { mixinStorage, basicVars } from '../mixins'
 
     export default {
-		mixins: [ mixinStorage ],
+		mixins: [ mixinStorage, basicVars ],
         computed: {
 			token() {
 				return this.$store.getters['login/token'];
@@ -50,15 +51,36 @@
 			isUploadActive() {
                 return this.$route.name === 'upload';
 			},
+			user() {
+				return this.$store.getters['nfPosts/user'];
+			},
 			userAvatar() {
 				return this.$store.getters['login/userAvatar'];
 			},
 			loggedUserId() {
 				return this.$store.getters['login/idUser'];
-            }
+			},
+			postDetail() {
+				return this.$store.getters['nfPosts/postDetail'];
+			},
+			allComments() {
+				return this.$store.getters['nfPosts/allComments'];
+            },
+            allCommentsPostDetail() {
+				return this.$store.getters['nfPosts/allCommentsPostDetail'];
+            },
+            upload() {
+				return this.$store.getters['nfPosts/upload'];
+			},
+			infScrollDisable() {
+				return this.$store.getters['nfPosts/infScrollDisable'];
+			},
+			newsFeedPostsAll() {
+				return this.$store.getters['nfPosts/newsFeedPostsAll'];
+			}
 		},
 		methods: {
-			goBack() {
+			goHome() {
                 if (this.postDetail && !this.allComments) {
                     this.$store.dispatch('nfPosts/changePostDetail');
                 } else if (this.allComments) {
@@ -69,10 +91,12 @@
                         this.$store.dispatch('nfPosts/changeAllCommentsPostDetail');
                         this.$store.dispatch('nfPosts/changeInfScrollDisable'); // to false so it can be again true on dispatch after
                     }
+                } else if (this.upload) {
+                    this.$store.dispatch('nfPosts/changeUpload');
                 }
 
                 this.$store.dispatch('nfPosts/changeInfScrollDisable');
-                this.$store.dispatch('headings/actSetHeading', this.prevHeading);
+                this.$store.dispatch('headings/actSetHeading', 'photogram');
                 if (this.windowWidth > this.breakpoint) {
                     $('.o-homepage').removeClass('u-overflow-disabled');
                     $('.o-user').removeClass('u-overflow-disabled');
@@ -84,12 +108,38 @@
 					// console.log(res);
 					const user = res.data.data;
 					this.$store.dispatch('nfPosts/changeUser', user);
+
+					if (this.postDetail && !this.allComments) {
+						this.$store.dispatch('nfPosts/changePostDetail');
+					} else if (this.allComments) {
+						this.$store.dispatch('nfPosts/pushPostCommentsAll', []);
+						this.$store.dispatch('nfPosts/changeAllComments');
+						if (this.allCommentsPostDetail) {
+							this.$store.dispatch('nfPosts/changePostDetail');
+							this.$store.dispatch('nfPosts/changeAllCommentsPostDetail');
+						}
+					} else if (this.upload) {
+						this.$store.dispatch('nfPosts/changeUpload');
+					}
+
+					if (this.windowWidth > this.breakpoint) {
+						this.$store.dispatch('headings/actSetHeading', 'photogram');
+					} else this.$store.dispatch('headings/actSetHeading', this.user.username);
+
+					// console.log(this.newsFeedPostsAll);
                 })
                 .catch(error => {
                     console.log(error);
 				});
+			},
+			inUserUpload() {
+				this.$store.dispatch('nfPosts/changeUpload');
+				if (this.windowWidth > this.breakpoint) {
+					$('.o-homepage').addClass('u-overflow-disabled');
+					$('.o-user').addClass('u-overflow-disabled');
+				}
 			}
-        }
+		}
 	}
 </script>
 

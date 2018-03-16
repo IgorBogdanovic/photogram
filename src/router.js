@@ -58,26 +58,40 @@ const routes = [
 	{ path: '/terms', name: 'terms', component: Terms },
 	{ path: '/homepage', name: 'homepage', component: HomePage,
 		children: [
-			{ path: 'photo', name: 'photo', component: PostDetail },
-			{ path: 'comments', name: 'comments', component: Comments }
+			{ path: 'photo', name: 'photo', component: PostDetail, meta: { requiresAuth: true } },
+			{ path: 'comments', name: 'comments', component: Comments, meta: { requiresAuth: true } }
 		]
 	},
 	{ path: '/user_id::userId', name: 'user', props: true, component: User,
 		children: [
-			{ path: 'photo-detail', name: 'photo-detail', component: PostDetail },
-			{ path: 'comments-view', name: 'comments-view', component: Comments }
+			{ path: 'photo-detail', name: 'photo-detail', component: PostDetail, meta: { requiresAuth: true } },
+			{ path: 'comments-view', name: 'comments-view', component: Comments, meta: { requiresAuth: true } },
+			{ path: 'upload', name: 'upload', component: Upload, meta: { requiresAuth: true } }
 		]
-	},
-	{ path: '/upload', name: 'upload', component: Upload }
+	}
 ]
 
 export default new VueRouter({ 
 	mode: 'history',
 	routes,
-	scrollBehavior(to, from, savedPosition) {
+	scrollBehavior (to, from, savedPosition) {
 		if (savedPosition) {
 			return savedPosition;
+		} else {
+		  	return { x: 0, y: 0 };
 		}
-		return { x: 0, y: 0 };
+		// if (savedPosition) {
+		// 	return new Promise((resolve, reject) => {
+		// 		setTimeout(() => {
+		// 			resolve(savedPosition)
+		// 		}, 1000)
+		// 	});
+		// } else {
+		// 	return new Promise((resolve, reject) => {
+		// 		setTimeout(() => {
+		// 			resolve({ x: 0, y: 0 })
+		// 		}, 1000)
+		// 	});
+		// }
 	}
 });
