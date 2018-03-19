@@ -111,11 +111,6 @@
 
     export default {
 		mixins: [ mixinStorage, basicVars ],
-		data () {
-		    return {
-				prevHeading: ''
-		    }
-		},
         computed: {
 			token() {
 				return this.$store.getters['login/token'];
@@ -125,9 +120,6 @@
 			},
 			newsFeedPost() {
 				return this.$store.getters['nfPosts/newsFeedPost'];
-			},
-			infScrollDisable() {
-				return this.$store.getters['nfPosts/infScrollDisable'];
 			}
         },
         methods: {
@@ -183,7 +175,6 @@
                         index: postIndex,
                         value: post
 					};
-					// console.log(post);
 					this.$store.dispatch('nfPosts/changeNewsFeedPost', post);
 					this.$store.dispatch('nfPosts/updateNewsFeedPostsAll', postObj);
                 })
@@ -194,19 +185,8 @@
 			viewAllComments() {
 				const post = this.newsFeedPost;
 				this.$store.dispatch('nfPosts/changeNewsFeedPost', post);
-				// this.$store.dispatch('nfPosts/changePostDetail');
-				if (this.windowWidth > this.breakpoint) {
-					const vm = this;
-					setTimeout(function(){
-						vm.$store.dispatch('nfPosts/changeAllComments');
-					}, 800);
-				}
-				// this.$store.dispatch('nfPosts/changeAllCommentsPostDetail');
 			},
             outPostDetail() {
-                this.$store.dispatch('nfPosts/changePostDetail');
-				this.$store.dispatch('nfPosts/changeInfScrollDisable');
-				this.$store.dispatch('headings/actSetHeading', this.prevHeading);
                 if (this.windowWidth > this.breakpoint) {
 					$('.o-homepage').removeClass('u-overflow-disabled');
 					$('.o-user').removeClass('u-overflow-disabled');
@@ -263,11 +243,9 @@
             appMakeComment: MakeComment
 		},
         created() {
-			this.prevHeading = this.$store.getters['headings/heading'];
             if (this.windowWidth > this.breakpoint) {
                 this.$store.dispatch('headings/actSetHeading', 'photogram');
 			} else this.$store.dispatch('headings/actSetHeading', 'Photo');
-			// console.log(this.infScrollDisable);
 		}
 	}
 </script>

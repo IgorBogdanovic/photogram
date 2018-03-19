@@ -27,13 +27,7 @@ export const store = new Vuex.Store({
 		key: 'user',
 		paths: [
 			'login.idUser',
-			'login.username',
-			'login.userAvatar',
-			'login.userProfile',
-			'login.userAbout',
-			'login.userPostsNo',
-			'login.userFollowersNo',
-			'login.userFollowingNo'
+			'login.userAvatar'
 		],
 		storage: {
 		  getItem: key => Cookies.get(key),

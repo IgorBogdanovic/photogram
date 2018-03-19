@@ -58,13 +58,7 @@
             },
             loggedUserId() {
 				return this.$store.getters['login/idUser'];
-            },
-            upload() {
-				return this.$store.getters['nfPosts/upload'];
-			},
-            infScrollDisable() {
-				return this.$store.getters['nfPosts/infScrollDisable'];
-			}
+            }
 		},
 		methods: {
 			onFileSelected(e) {
@@ -90,8 +84,6 @@
                 postData.append('description', this.description);
                 this.$store.dispatch('nfPosts/postPost', postData)
                     .then(res => {
-                        // console.log(res);
-                        // this.$emit('commentSubmited');
                         this.description = '';
                         this.$router.push({ name: 'user', params: { userId: this.loggedUserId } });
                     })
@@ -100,11 +92,6 @@
                     });
             }
         },
-        // beforeCreate() {
-        //     if (!this.infScrollDisable) {
-        //         this.$store.dispatch('nfPosts/changeInfScrollDisable');
-        //     }
-        // },
         created() {
             if (this.windowWidth > this.breakpoint) {
                 this.$store.dispatch('headings/actSetHeading', 'photogram');
@@ -192,6 +179,7 @@
             @include fontSizeRem(16, 16);
             @include lineHeightRem(19, 19);
             width: 85%;
+            border: none;
         }
 
         &__submit {

@@ -12,13 +12,13 @@
 			<router-view v-if="allCommentsView && windowWidth < breakpoint"></router-view>
 			<!-- for all other devices -->
 			<transition mode="out-in"
-				enter-active-class="animated slideInDown"
-				leave-active-class="animated slideOutUp">
+				enter-active-class="animated slideInLeft"
+				leave-active-class="animated slideOutRight">
 				<router-view v-if="postDetailView && windowWidth > breakpoint"></router-view>
 			</transition>
 			<transition mode="out-in"
-				enter-active-class="animated slideInDown"
-				leave-active-class="animated slideOutUp">
+				enter-active-class="animated slideInLeft"
+				leave-active-class="animated slideOutRight">
 				<router-view v-if="allCommentsView && windowWidth > breakpoint"></router-view>
 			</transition>
 
@@ -52,15 +52,6 @@
             token() {
 				return this.$store.getters['login/token'];
 			},
-			// postDetail() {
-			// 	return this.$store.getters['nfPosts/postDetail'];
-			// },
-			// allComments() {
-			// 	return this.$store.getters['nfPosts/allComments'];
-			// },
-			// infScrollDisable() {
-			// 	return this.$store.getters['nfPosts/infScrollDisable'];
-			// },
 			newsFeedPostsAll() {
 				return this.$store.getters['nfPosts/newsFeedPostsAll'];
 			}
@@ -111,7 +102,7 @@
 						for (let i = 0; i < res.data.data.length; i++) {
 							this.followedUsersPosts.push(res.data.data[i]);
 						}
-						console.log(this.followedUsersPosts);
+						// console.log(this.followedUsersPosts);
 						this.postPage++;
 						this.$store.dispatch('nfPosts/pushNewsFeedPostsAll', this.followedUsersPosts);
 						this.infScrollDisable = false;
@@ -129,17 +120,16 @@
 		},
 		beforeCreate() {
 			// better safe then sorry :) => empty NewsFeedPostsAll array
-            this.$store.dispatch('nfPosts/pushNewsFeedPostsAll', []);
+			this.$store.dispatch('nfPosts/pushNewsFeedPostsAll', []);
+			this.$store.dispatch('nfPosts/pushPostCommentsAll', []);
         },
 		created() {
 			this.$store.dispatch('headings/actSetHeading', 'photogram');
 		},
 		destroyed() {
 			// console.log(0);
-			// this.$store.dispatch('nfPosts/pushNewsFeedPostsAll', []);
-			// if (this.infScrollDisable) {
-			// 	this.$store.dispatch('nfPosts/changeInfScrollDisable');
-			// }
+			this.$store.dispatch('nfPosts/pushNewsFeedPostsAll', []);
+			this.$store.dispatch('nfPosts/pushPostCommentsAll', []);
 		}
 	}
 </script>

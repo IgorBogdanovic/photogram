@@ -3,27 +3,27 @@
 
         <div class="o-user__content" v-infinite-scroll="axiosGetPosts" infinite-scroll-disabled="infScrollDisable" :infinite-scroll-distance="windowHeight/3">
 
-            <div v-if="(!postDetail && !allComments && !upload) || windowWidth > breakpoint" class="o-user__info  m-info">
+            <div v-if="(!postDetailView && !allCommentsView && !upload) || windowWidth > breakpoint" class="o-user__info  m-info">
                 <div class="m-info__avatar">
-                    <span v-if="windowWidth > breakpoint">{{ username }}</span>
-                    <img :src="storage + profileImg" alt="user avatar">
+                    <span v-if="windowWidth > breakpoint">{{ user.username }}</span>
+                    <img :src="storage + user.image.profile" alt="user avatar">
                 </div>
 
                 <div class="m-info__list">
                     <ul>
-                        <li><span>{{ postsNo }}</span> posts</li>
-                        <li><span>{{ followersNo }}</span> followers</li>
-                        <li><span>{{ followingNo }}</span> following</li>
+                        <li><span>{{ user.posts_count }}</span> posts</li>
+                        <li><span>{{ user.followers_count }}</span> followers</li>
+                        <li><span>{{ user.following_count }}</span> following</li>
                     </ul>
                 </div>
 
-                <p class="m-info__about-me">{{ about }}</p>
+                <p class="m-info__about-me">{{ user.about }}</p>
 
                 <router-link v-if="isLoggedUser" to="/" tag="button" class="m-info__button  m-info__button--edit">Edit Profile</router-link>
-                <button v-if="user.auth_follow" class="m-info__button  m-info__button--following">Following</button>
+                <button v-if="!isLoggedUser && user.auth_follow" class="m-info__button  m-info__button--following">Following</button>
             </div>
 
-            <div v-if="(!postDetail && !allComments && !upload) || windowWidth > breakpoint" class="o-user__view  m-view">
+            <div v-if="(!postDetailView && !allCommentsView && !upload) || windowWidth > breakpoint" class="o-user__view  m-view">
                 <div class="m-view__icon  m-view__icon--single" :class="{ 'is-active': singleViewActive }" @click.stop="activateSingleView">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="3119 923 17 17">
                         <path id="Path_101" data-name="Path 101" class="cls-1" d="M0,0H17V17H0Z" transform="translate(3119 923)"/>
@@ -41,25 +41,25 @@
                 </div>
             </div>
 
-            <div v-if="(!postDetail && !allComments && !upload) || windowWidth > breakpoint"
+            <div v-if="(!postDetailView && !allCommentsView && !upload) || windowWidth > breakpoint"
                 class="o-user__posts-wrapper  u-clearfix" :class="{ 'grid-view': gridViewActive, 'single-view': singleViewActive }">
                 <app-news-feed-post v-for="(post, index) in userPostsAll" :key="post.id + '-' + index" :post="post"></app-news-feed-post>
             </div>
 
             <!-- for mobile devices -->
-			<router-view v-if="postDetail && windowWidth < breakpoint"></router-view>
-			<router-view v-if="allComments && windowWidth < breakpoint"></router-view>
+			<router-view v-if="postDetailView && windowWidth < breakpoint"></router-view>
+			<router-view v-if="allCommentsView && windowWidth < breakpoint"></router-view>
             <router-view v-if="upload && windowWidth < breakpoint"></router-view>
 			<!-- for all other devices -->
 			<transition mode="out-in"
 				enter-active-class="animated slideInDown"
 				leave-active-class="animated slideOutUp">
-				<router-view v-if="postDetail && windowWidth > breakpoint"></router-view>
+				<router-view v-if="postDetailView && windowWidth > breakpoint"></router-view>
 			</transition>
 			<transition mode="out-in"
 				enter-active-class="animated slideInDown"
 				leave-active-class="animated slideOutUp">
-				<router-view v-if="allComments && windowWidth > breakpoint"></router-view>
+				<router-view v-if="allCommentsView && windowWidth > breakpoint"></router-view>
 			</transition>
 
             <app-spinner v-if="loading"></app-spinner>
@@ -71,7 +71,7 @@
 
 <script>
     import { mixinStorage, basicVars } from '../mixins'
-    import { posts } from '../axios-urls'
+    import { users, posts } from '../axios-urls'
     import NewsFeedPost from './NewsFeedPost.vue'
 	import Spinner from './Spinner.vue'
 
@@ -80,9 +80,12 @@
         mixins: [ mixinStorage, basicVars ],
         data () {
 		    return {
-                isLoggedUser: false,
                 userPostsAll: [],
-                loading: false,
+                postDetailView: false,
+                allCommentsView: false,
+                upload: false,
+				loading: false,
+				infScrollDisable: false,
 				postAmount: 12,
 				postPage: 1,
                 gridViewActive: false,
@@ -93,96 +96,105 @@
 			token() {
 				return this.$store.getters['login/token'];
             },
-            postDetail() {
-				return this.$store.getters['nfPosts/postDetail'];
-			},
-			allComments() {
-				return this.$store.getters['nfPosts/allComments'];
-            },
-            upload() {
-				return this.$store.getters['nfPosts/upload'];
-			},
-			infScrollDisable() {
-				return this.$store.getters['nfPosts/infScrollDisable'];
-			},
 			newsFeedPostsAll() {
 				return this.$store.getters['nfPosts/newsFeedPostsAll'];
-			},
-            user() {
-				return this.$store.getters['nfPosts/user'];
-			},
+            },
             loggedUserId() {
 				return this.$store.getters['login/idUser'];
             },
-			username() {
-                if (this.isLoggedUser) {
-                    return this.$store.getters['login/username'];
-                } else return this.user.username;
+            user() {
+				return this.$store.getters['nfPosts/user'];
             },
-            profileImg() {
-                if (this.isLoggedUser) {
-                    return this.$store.getters['login/userProfile'];
-                } else return this.user.image.profile;
-            },
-            about() {
-                if (this.isLoggedUser) {
-                    return this.$store.getters['login/userAbout'];
-                } else return this.user.about;
-            },
-            postsNo() {
-                if (this.isLoggedUser) {
-                    return this.$store.getters['login/userPostsNo'];
-                } else return this.user.posts_count;
-            },
-            followersNo() {
-                if (this.isLoggedUser) {
-                    return this.$store.getters['login/userFollowersNo'];
-                } else return this.user.followers_count;
-            },
-            followingNo() {
-                if (this.isLoggedUser) {
-                    return this.$store.getters['login/userFollowingNo'];
-                } else return this.user.following_count;
+            isLoggedUser() {
+                return this.loggedUserId === this.userId;
             }
         },
         watch: {
+            '$route.name': function() {
+				switch (this.$route.name) {
+					case 'photo-detail':
+						if (!this.infScrollDisable) {
+							this.infScrollDisable = !this.infScrollDisable;
+						}
+						if (this.allCommentsView) {
+							this.allCommentsView = !this.allCommentsView;
+                        }
+                        if (this.upload) {
+							this.upload = !this.upload;
+						}
+						this.postDetailView = !this.postDetailView;
+						this.$store.dispatch('headings/actSetHeading', 'Photo');
+						break;
+					case 'comments-view':
+						if (!this.infScrollDisable) {
+							this.infScrollDisable = !this.infScrollDisable;
+						}
+						if (this.postDetailView) {
+							this.postDetailView = !this.postDetailView;
+                        }
+                        if (this.upload) {
+							this.upload = !this.upload;
+						}
+						this.allCommentsView = !this.allCommentsView;
+						this.$store.dispatch('headings/actSetHeading', 'Comments');
+                        break;
+                    case 'upload':
+						if (!this.infScrollDisable) {
+							this.infScrollDisable = !this.infScrollDisable;
+						}
+						if (this.postDetailView) {
+							this.postDetailView = !this.postDetailView;
+                        }
+                        if (this.allCommentsView) {
+							this.allCommentsView = !this.allCommentsView;
+                        }
+						this.upload = !this.upload;
+						this.$store.dispatch('headings/actSetHeading', 'Upload');
+						break;
+                    case 'user':
+						if (this.infScrollDisable) {
+							this.infScrollDisable = !this.infScrollDisable;
+						}
+						if (this.postDetailView) {
+							this.postDetailView = !this.postDetailView;
+						} else if (this.allCommentsView) {
+							this.allCommentsView = !this.allCommentsView;
+						} else if (this.upload) {
+							this.upload = !this.upload;
+						}
+						this.$store.dispatch('headings/actSetHeading', this.user.username);
+				}
+            },
             '$route.params.userId': function(userId) {
-                this.userPostsAll.length = 0;
-                this.postPage = 1;
+                switch (this.$route.name) {
+                    case 'user':
+                        this.userPostsAll.length = 0;
+                        this.postPage = 1;
+                        users.get('find?id=' + userId, { headers: { Authorization: 'Bearer ' + this.token } })
+                        .then(res => {
+                            const user = res.data.data;
+                            this.$store.dispatch('nfPosts/changeUser', user);
+                            
+                            if (this.windowWidth > this.breakpoint) {
+                                this.$store.dispatch('headings/actSetHeading', 'photogram');
+                            } else this.$store.dispatch('headings/actSetHeading', user.username);
 
-                if (this.loggedUserId === userId) {
-                    this.isLoggedUser = true;
-                } else this.isLoggedUser = false;
-
-                if (this.infScrollDisable) {
-				    this.$store.dispatch('nfPosts/changeInfScrollDisable');
-                }
-                if (this.postDetail) {
-                    this.$store.dispatch('nfPosts/changePostDetail');
-                }
-                if (this.allComments) {
-                    this.$store.dispatch('nfPosts/changeAllComments');
-                }
-                // if (this.upload) {
-                //     this.$store.dispatch('nfPosts/changeUpload');
-                // }
-
-                if (this.windowWidth > this.breakpoint) {
-                    this.$store.dispatch('headings/actSetHeading', 'photogram');
-                } else this.$store.dispatch('headings/actSetHeading', this.username);
-
-                // needed to put this cause for some reason inf-scroll do not work if you are coming from same comp in which you didn't scroll a bit
-                // i guess it's plugin bug
-                if (!this.userPostsAll.length) {
-                    this.axiosGetPosts();
+                            // needed to put this cause for some reason inf-scroll do not work if you are coming from same route (diff. user)
+                            // i guess it's plugin bug
+                            if (!this.userPostsAll.length) {
+                                this.axiosGetPosts();
+                            }
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        });
                 }
             }
         },
         methods: {
 			axiosGetPosts() {
                 this.loading = true;
-
-				this.$store.dispatch('nfPosts/changeInfScrollDisable');
+				this.infScrollDisable = true;
 				posts.get('', { headers: { Authorization: 'Bearer ' + this.token }, params: { amount: this.postAmount, page: this.postPage, user_id: this.userId } })
 				.then(res => {
 					if (res.data.data.length > 0) {
@@ -192,7 +204,7 @@
 						// console.log(this.postDetail, this.allComments, this.upload);
 						this.postPage++;
                         this.$store.dispatch('nfPosts/pushNewsFeedPostsAll', this.userPostsAll);
-                        this.$store.dispatch('nfPosts/changeInfScrollDisable');
+                        this.infScrollDisable = false;
 						this.loading = false;
                     } else {
                         this.loading = false;
@@ -218,43 +230,46 @@
         beforeCreate() {
 			// better safe then sorry :) => empty NewsFeedPostsAll array
             this.$store.dispatch('nfPosts/pushNewsFeedPostsAll', []);
+            this.$store.dispatch('nfPosts/pushPostCommentsAll', []);
         },
         created() {
-            if (this.loggedUserId === this.userId) {
-                this.isLoggedUser = true;
-            } else this.isLoggedUser = false;
-
-            if (this.infScrollDisable) {
-				this.$store.dispatch('nfPosts/changeInfScrollDisable');
-            }
-            if (this.postDetail) {
-				this.$store.dispatch('nfPosts/changePostDetail');
-            }
-            if (this.allComments) {
-				this.$store.dispatch('nfPosts/changeAllComments');
-            }
-            // if (this.upload) {
-			// 	this.$store.dispatch('nfPosts/changeUpload');
-            // }
-            // console.log([this.postDetail, this.allComments, this.upload, this.infScrollDisable]);
-
             if (this.windowWidth > this.breakpoint) {
                 this.$store.dispatch('headings/actSetHeading', 'photogram');
-            } else this.$store.dispatch('headings/actSetHeading', this.username);
-            // console.log(this.username);
-        },
-        beforeMount() {
-            // needed to put this cause for some reason inf-scroll do not work if you are coming from 'upload' comp
-            // i guess it's plugin bug
-            if (!this.userPostsAll.length) {
-                this.axiosGetPosts();
+            } else this.$store.dispatch('headings/actSetHeading', this.user.username);
+
+            // watch only works when in route and then to watch for changes
+            // that's why this check is needed in created (because of possible direct access to upload from link in footer)
+            switch (this.$route.name) {
+                case 'upload':
+                    if (!this.infScrollDisable) {
+                        this.infScrollDisable = !this.infScrollDisable;
+                    }
+                    if (this.postDetailView) {
+                        this.postDetailView = !this.postDetailView;
+                    }
+                    if (this.allCommentsView) {
+                        this.allCommentsView = !this.allCommentsView;
+                    }
+                    this.upload = !this.upload;
+                    this.$store.dispatch('headings/actSetHeading', 'Upload');
+                    break;
+                case 'user':
+                    if (this.infScrollDisable) {
+                        this.infScrollDisable = !this.infScrollDisable;
+                    }
+                    if (this.postDetailView) {
+                        this.postDetailView = !this.postDetailView;
+                    } else if (this.allCommentsView) {
+                        this.allCommentsView = !this.allCommentsView;
+                    } else if (this.upload) {
+                        this.upload = !this.upload;
+                    }
+                    this.$store.dispatch('headings/actSetHeading', this.user.username);
             }
         },
         destroyed() {
-            // this.$store.dispatch('nfPosts/pushNewsFeedPostsAll', []);
-            if (this.infScrollDisable) {
-				this.$store.dispatch('nfPosts/changeInfScrollDisable');
-            }
+            this.$store.dispatch('nfPosts/pushNewsFeedPostsAll', []);
+            this.$store.dispatch('nfPosts/pushPostCommentsAll', []);
 		}
 	}
 </script>

@@ -5,7 +5,7 @@
                 <icon class="icon" name="close"></icon>
             </a>
 
-            <div class="o-all-comments__wrapper--sub" v-infinite-scroll="axiosGetComments" infinite-scroll-disabled="infScrollDisabled" :infinite-scroll-distance="windowHeight/3">
+            <div class="o-all-comments__wrapper--sub" v-infinite-scroll="axiosGetComments" infinite-scroll-disabled="infScrollDisable" :infinite-scroll-distance="windowHeight/3">
                 <app-comment v-for="(postComment, index) in postCommentsAll" :key="postComment.id + '-' + index" :postComment="postComment"
                     @commentDeleted="refreshComments" class="o-all-comments__comment"></app-comment>
                 <app-spinner v-if="loading"></app-spinner>
@@ -29,10 +29,9 @@
 		    return {
                 comments: [],
                 loading: false,
-                infScrollDisabled: false,
+                infScrollDisable: false,
                 commentAmount: 12,
-                commentPage: 1,
-                prevHeading: ''
+                commentPage: 1
 		    }
         },
         computed: {
@@ -50,18 +49,12 @@
             },
             postCommentsAll() {
 				return this.$store.getters['nfPosts/postCommentsAll'];
-			},
-            allCommentsPostDetail() {
-				return this.$store.getters['nfPosts/allCommentsPostDetail'];
-            },
-            infScrollDisable() {
-				return this.$store.getters['nfPosts/infScrollDisable'];
 			}
         },
         methods: {
 			axiosGetComments() {
                 this.loading = true;
-                this.infScrollDisabled = true;
+                this.infScrollDisable = true;
 				comments.get('', { headers: { Authorization: 'Bearer ' + this.token }, params: { post_id: this.newsFeedPost.id, amount: this.commentAmount, page: this.commentPage } })
 				.then(res => {
 					if (res.data.data.length > 0) {
@@ -71,10 +64,10 @@
                         this.commentPage++;
                         this.$store.dispatch('nfPosts/pushPostCommentsAll', this.comments);
                         this.loading = false;
-                        this.infScrollDisabled = false;
+                        this.infScrollDisable = false;
                     } else {
                         this.loading = false;
-                        this.infScrollDisabled = true;
+                        this.infScrollDisable = true;
                         console.log('empty array'); // should make some msg displays
                     }
                 });
@@ -106,24 +99,14 @@
                 });
             },
             closeAllComments() {
-                this.$store.dispatch('nfPosts/pushPostCommentsAll', []);
-                this.$store.dispatch('nfPosts/changeAllComments');
-                if (this.allCommentsPostDetail) {
-                    if (this.windowWidth > this.breakpoint) {
-                        const vm = this;
-                        setTimeout(function(){
-                            vm.$store.dispatch('nfPosts/changePostDetail');
-                        }, 800);
-                    } else this.$store.dispatch('nfPosts/changePostDetail');
-                    this.$store.dispatch('nfPosts/changeAllCommentsPostDetail');
-                } else {
-                    if (this.windowWidth > this.breakpoint) {
-                        this.$store.dispatch('nfPosts/changeInfScrollDisable');
-                        $('.o-homepage').removeClass('u-overflow-disabled');
-                        $('.o-user').removeClass('u-overflow-disabled');
-                    }
+                if (this.windowWidth > this.breakpoint) {
+                    $('.o-homepage').removeClass('u-overflow-disabled');
+                    $('.o-user').removeClass('u-overflow-disabled');
+                    const vm = this;
+                    setTimeout(function(){
+                        vm.$store.dispatch('nfPosts/pushPostCommentsAll', []);
+                    }, 500);
                 }
-                this.$store.dispatch('headings/actSetHeading', this.prevHeading);
 			}
         },
         components: {
@@ -132,11 +115,9 @@
             appSpinner: Spinner
         },
 		created() {
-            this.prevHeading = this.$store.getters['headings/heading'];
             if (this.windowWidth > this.breakpoint) {
                 this.$store.dispatch('headings/actSetHeading', 'photogram');
             } else this.$store.dispatch('headings/actSetHeading', 'Comments');
-            // console.log(this.infScrollDisable);
         },
         destroyed() {
             this.$store.dispatch('nfPosts/pushPostCommentsAll', []);

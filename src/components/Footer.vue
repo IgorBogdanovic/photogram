@@ -60,43 +60,12 @@
 			loggedUserId() {
 				return this.$store.getters['login/idUser'];
 			},
-			postDetail() {
-				return this.$store.getters['nfPosts/postDetail'];
-			},
-			allComments() {
-				return this.$store.getters['nfPosts/allComments'];
-            },
-            allCommentsPostDetail() {
-				return this.$store.getters['nfPosts/allCommentsPostDetail'];
-            },
-            upload() {
-				return this.$store.getters['nfPosts/upload'];
-			},
-			infScrollDisable() {
-				return this.$store.getters['nfPosts/infScrollDisable'];
-			},
 			newsFeedPostsAll() {
 				return this.$store.getters['nfPosts/newsFeedPostsAll'];
 			}
 		},
 		methods: {
 			goHome() {
-                if (this.postDetail && !this.allComments) {
-                    this.$store.dispatch('nfPosts/changePostDetail');
-                } else if (this.allComments) {
-                    this.$store.dispatch('nfPosts/pushPostCommentsAll', []);
-                    this.$store.dispatch('nfPosts/changeAllComments');
-                    if (this.allCommentsPostDetail) {
-                        this.$store.dispatch('nfPosts/changePostDetail');
-                        this.$store.dispatch('nfPosts/changeAllCommentsPostDetail');
-                        this.$store.dispatch('nfPosts/changeInfScrollDisable'); // to false so it can be again true on dispatch after
-                    }
-                } else if (this.upload) {
-                    this.$store.dispatch('nfPosts/changeUpload');
-                }
-
-                this.$store.dispatch('nfPosts/changeInfScrollDisable');
-                this.$store.dispatch('headings/actSetHeading', 'photogram');
                 if (this.windowWidth > this.breakpoint) {
                     $('.o-homepage').removeClass('u-overflow-disabled');
                     $('.o-user').removeClass('u-overflow-disabled');
@@ -105,39 +74,27 @@
             inUserDetail() {
 				users.get('find?id=' + this.loggedUserId, { headers: { Authorization: 'Bearer ' + this.token } })
                 .then(res => {
-					// console.log(res);
 					const user = res.data.data;
 					this.$store.dispatch('nfPosts/changeUser', user);
-
-					if (this.postDetail && !this.allComments) {
-						this.$store.dispatch('nfPosts/changePostDetail');
-					} else if (this.allComments) {
-						this.$store.dispatch('nfPosts/pushPostCommentsAll', []);
-						this.$store.dispatch('nfPosts/changeAllComments');
-						if (this.allCommentsPostDetail) {
-							this.$store.dispatch('nfPosts/changePostDetail');
-							this.$store.dispatch('nfPosts/changeAllCommentsPostDetail');
-						}
-					} else if (this.upload) {
-						this.$store.dispatch('nfPosts/changeUpload');
-					}
-
-					if (this.windowWidth > this.breakpoint) {
-						this.$store.dispatch('headings/actSetHeading', 'photogram');
-					} else this.$store.dispatch('headings/actSetHeading', this.user.username);
-
-					// console.log(this.newsFeedPostsAll);
                 })
                 .catch(error => {
                     console.log(error);
 				});
 			},
 			inUserUpload() {
-				this.$store.dispatch('nfPosts/changeUpload');
-				if (this.windowWidth > this.breakpoint) {
-					$('.o-homepage').addClass('u-overflow-disabled');
-					$('.o-user').addClass('u-overflow-disabled');
-				}
+				users.get('find?id=' + this.loggedUserId, { headers: { Authorization: 'Bearer ' + this.token } })
+                .then(res => {
+					const user = res.data.data;
+					this.$store.dispatch('nfPosts/changeUser', user);
+
+					if (this.windowWidth > this.breakpoint) {
+						$('.o-homepage').addClass('u-overflow-disabled');
+						$('.o-user').addClass('u-overflow-disabled');
+					}
+                })
+                .catch(error => {
+                    console.log(error);
+				});
 			}
 		}
 	}

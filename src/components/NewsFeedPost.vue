@@ -110,6 +110,11 @@
 				newsFeedPost: this.post
 		    }
 		},
+		watch: {
+			post: function() {
+				this.newsFeedPost = this.post;
+            }
+		},
 		computed: {
 			token() {
 				return this.$store.getters['login/token'];
@@ -231,7 +236,6 @@
 			inPostDetail() {
 				const post = this.newsFeedPost;
 				this.$store.dispatch('nfPosts/changeNewsFeedPost', post);
-				// this.$store.dispatch('nfPosts/changeInfScrollDisable');
 				if (this.windowWidth > this.breakpoint) {
 					$('.o-homepage').addClass('u-overflow-disabled');
 					$('.o-user').addClass('u-overflow-disabled');
@@ -251,7 +255,6 @@
 			viewAllComments() {
 				const post = this.newsFeedPost;
 				this.$store.dispatch('nfPosts/changeNewsFeedPost', post);
-				// this.$store.dispatch('nfPosts/changeInfScrollDisable');
 				if (this.windowWidth > this.breakpoint) {
 					$('.o-homepage').addClass('u-overflow-disabled');
 					$('.o-user').addClass('u-overflow-disabled');
@@ -262,13 +265,8 @@
             appMakeComment: MakeComment
 		},
 		// created() {
-
-		// },
-		// updated() {
-		// 	console.log('u');
 		// },
 		// destroyed() {
-		// 	console.log(0);
 		// }
 	}
 </script>
