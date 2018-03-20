@@ -2,6 +2,7 @@
   	<div class="o-upload">
 		
 		<div class="o-upload__wrapper">
+            <h3 class="o-upload__small-heading  u-only-desktop">Upload Photo</h3>
             <form @submit.prevent="submitPost">
                 <div class="o-upload__image-container">
                     <input type="file"
@@ -11,6 +12,7 @@
                         ref="fileInput">
                     <div class="o-upload__icon">
                         <icon class="icon" name="cloud-upload"></icon>
+                        <span class="u-only-desktop">drag and drop</span>
                     </div>
                     <img class="o-upload__image" src="#" alt="image to upload">
                 </div>
@@ -85,6 +87,7 @@
                 this.$store.dispatch('nfPosts/postPost', postData)
                     .then(res => {
                         this.description = '';
+                        this.$store.dispatch('nfPosts/pushNewsFeedPostsAll', []);
                         this.$router.push({ name: 'user', params: { userId: this.loggedUserId } });
                     })
                     .catch(error => {
@@ -104,18 +107,36 @@
 	@import '../scss/settings';
 
     .o-upload {
-		width: 100%;
+        width: 100%;
+        height: 100%;
+        
+        @include breakpoint(desktop) {
+            z-index: 9;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: rgba($lightblack, .9);
+        }
 
-		// &__wrapper {
-		// 	padding-top: 4.76rem;
-		// 	padding-bottom: 4.2rem;
+        &__small-heading {
+            font-family: 'HelveticaNeue', sans-serif;
+            @include fontSizeRem(0, 26);
+            @include lineHeightRem(0, 32);
+            text-align: center;
+            color: $white;
+        }
 
-		// 	@include breakpoint(desktop) {
-		// 		width: 148rem;
-		// 		margin: 0 auto;
-		// 		padding-top: 13.7rem;
-		// 	}
-        // }
+		&__wrapper {
+            @include breakpoint(desktop) {
+                position: absolute;
+                width: 50rem;
+				height: auto;
+				margin-bottom: 0;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+        }
         
         &__image-container {
             position: relative;
@@ -123,6 +144,12 @@
             width: 100%;
             height: 32rem;
             margin-top: 3.3rem;
+
+            @include breakpoint(desktop) {
+                background-color: $white;
+                height: 50rem;
+                margin-top: 5vh;
+            }
         }
 
         &__image {
@@ -140,10 +167,32 @@
             width: 4.4rem;
             height: 4.4rem;
 
+            @include breakpoint(desktop) {
+                width: 6.4rem;
+                height: 6.4rem;
+            }
+
             svg {
                 fill: $white;
                 width: 100%;
                 height: 100%;
+
+                @include breakpoint(desktop) {
+                    fill: $lightblack;
+                }
+            }
+
+            span {
+                font-family: 'HelveticaNeue', sans-serif;
+                @include fontSizeRem(0, 16);
+                @include lineHeightRem(0, 18);
+                text-align: center;
+                color: $lightblack;
+                opacity: .5;
+                position: absolute;
+                width: 50rem;
+                left: 50%;
+                transform: translateX(-50%);
             }
         }
 
@@ -151,6 +200,11 @@
             text-align: center;
             margin-top: 1.7rem;
             margin-bottom: 9.5rem;
+
+            @include breakpoint(desktop) {
+                margin-top: 1.7vh;
+                margin-bottom: 8.8vh;
+            }
 
             button {
                 background-color: $lightblack;
@@ -161,6 +215,11 @@
                 padding: .5rem 1.4rem;
                 border-radius: 30px;
                 cursor: pointer;
+
+                @include breakpoint(desktop) {
+                    background-color: $white;
+                    color: $lightblack;
+                }
             }
         }
 
@@ -172,6 +231,10 @@
             padding: 1rem;
             background-color: $white;
             border-top: 1px solid rgba($darkgrey, .5);
+
+            @include breakpoint(desktop) {
+                bottom: 2vh;
+            }
         }
 
         &__description-input {

@@ -17,7 +17,7 @@
 		</router-link>
 
 		<router-link :to="{ name: 'upload', params: { userId: loggedUserId } }" tag="div"
-		class="o-footer__upload  a-upload" :class="{ 'is-active': isUploadActive }"  @click.native="inUserUpload">
+		class="o-footer__upload  a-upload" :class="{ 'is-active': isUploadActive }" @click.native="inUserUpload">
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="2830.105 1480.158 29.843 29.842">
 			<g id="Group_370" data-name="Group 370" transform="translate(2620.228 1461.233)">
 				<g id="Ellipse_170" data-name="Ellipse 170" class="cls-1" transform="translate(209.876 18.925)">
@@ -46,7 +46,7 @@
 				return this.$store.getters['headings/heading'];
 			},
             isHomeActive() {
-                return this.heading === 'photogram' && this.$route.name === 'homepage';
+                return this.$route.name === 'homepage';
 			},
 			isUploadActive() {
                 return this.$route.name === 'upload';
@@ -86,11 +86,6 @@
                 .then(res => {
 					const user = res.data.data;
 					this.$store.dispatch('nfPosts/changeUser', user);
-
-					if (this.windowWidth > this.breakpoint) {
-						$('.o-homepage').addClass('u-overflow-disabled');
-						$('.o-user').addClass('u-overflow-disabled');
-					}
                 })
                 .catch(error => {
                     console.log(error);

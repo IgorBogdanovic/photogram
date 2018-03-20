@@ -20,7 +20,7 @@
 				</video>
 			</template>
 		</router-link>
-		<router-link v-if="$route.name === 'user' || $route.name === 'photo-detail' || $route.name === 'comments-view'" :to="{ name: 'photo-detail' }" tag="div" class="o-news-feed-post__media  m-media" @click.native="inPostDetail">
+		<router-link v-if="$route.name === 'user' || $route.name === 'photo-detail' || $route.name === 'comments-view' || $route.name === 'upload'" :to="{ name: 'photo-detail' }" tag="div" class="o-news-feed-post__media  m-media" @click.native="inPostDetail">
 			<template v-if="newsFeedPost.type_id == 1">
 				<img :src="storage + newsFeedPost.media.large" alt="news feed post image">
 			</template>

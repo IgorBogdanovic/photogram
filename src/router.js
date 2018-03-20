@@ -48,6 +48,12 @@ const Upload = resolve => {
 	});
 };
 
+const EditProfile = resolve => {
+	require.ensure(['./components/EditProfile.vue'], () => {
+		resolve(require('./components/EditProfile.vue'));
+	});
+};
+
 Vue.use(VueRouter);
 
 const routes = [
@@ -68,7 +74,8 @@ const routes = [
 			{ path: 'comments-view', name: 'comments-view', component: Comments, meta: { requiresAuth: true } },
 			{ path: 'upload', name: 'upload', component: Upload, meta: { requiresAuth: true } }
 		]
-	}
+	},
+	{ path: '/edit-profile', name: 'edit-profile', component: EditProfile }
 ]
 
 export default new VueRouter({ 

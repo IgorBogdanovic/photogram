@@ -19,7 +19,7 @@
 
                 <p class="m-info__about-me">{{ user.about }}</p>
 
-                <router-link v-if="isLoggedUser" to="/" tag="button" class="m-info__button  m-info__button--edit">Edit Profile</router-link>
+                <router-link v-if="isLoggedUser" :to="{ name: 'edit-profile' }" tag="button" class="m-info__button  m-info__button--edit">Edit Profile</router-link>
                 <button v-if="!isLoggedUser && user.auth_follow" class="m-info__button  m-info__button--following">Following</button>
             </div>
 
@@ -52,14 +52,19 @@
             <router-view v-if="upload && windowWidth < breakpoint"></router-view>
 			<!-- for all other devices -->
 			<transition mode="out-in"
-				enter-active-class="animated slideInDown"
-				leave-active-class="animated slideOutUp">
+				enter-active-class="animated slideInLeft"
+				leave-active-class="animated slideOutRight">
 				<router-view v-if="postDetailView && windowWidth > breakpoint"></router-view>
 			</transition>
 			<transition mode="out-in"
-				enter-active-class="animated slideInDown"
-				leave-active-class="animated slideOutUp">
+				enter-active-class="animated slideInLeft"
+				leave-active-class="animated slideOutRight">
 				<router-view v-if="allCommentsView && windowWidth > breakpoint"></router-view>
+			</transition>
+            <transition mode="out-in"
+				enter-active-class="animated slideInLeft"
+				leave-active-class="animated slideOutRight">
+				<router-view v-if="upload && windowWidth > breakpoint"></router-view>
 			</transition>
 
             <app-spinner v-if="loading"></app-spinner>
@@ -122,8 +127,10 @@
                         if (this.upload) {
 							this.upload = !this.upload;
 						}
-						this.postDetailView = !this.postDetailView;
-						this.$store.dispatch('headings/actSetHeading', 'Photo');
+                        this.postDetailView = !this.postDetailView;
+                        if (this.windowWidth > this.breakpoint) {
+                            this.$store.dispatch('headings/actSetHeading', 'photogram');
+                        } else this.$store.dispatch('headings/actSetHeading', 'Photo');
 						break;
 					case 'comments-view':
 						if (!this.infScrollDisable) {
@@ -135,8 +142,10 @@
                         if (this.upload) {
 							this.upload = !this.upload;
 						}
-						this.allCommentsView = !this.allCommentsView;
-						this.$store.dispatch('headings/actSetHeading', 'Comments');
+                        this.allCommentsView = !this.allCommentsView;
+                        if (this.windowWidth > this.breakpoint) {
+                            this.$store.dispatch('headings/actSetHeading', 'photogram');
+                        } else this.$store.dispatch('headings/actSetHeading', 'Comments');
                         break;
                     case 'upload':
 						if (!this.infScrollDisable) {
@@ -149,9 +158,16 @@
 							this.allCommentsView = !this.allCommentsView;
                         }
 						this.upload = !this.upload;
-						this.$store.dispatch('headings/actSetHeading', 'Upload');
+						if (this.windowWidth > this.breakpoint) {
+                            this.$store.dispatch('headings/actSetHeading', 'photogram');
+                        } else this.$store.dispatch('headings/actSetHeading', 'Upload');
 						break;
                     case 'user':
+                        // this check is in case user posted new post so it can refresh all posts
+                        if (this.newsFeedPostsAll.length !== this.userPostsAll.length) {
+                            this.userPostsAll.length = 0;
+                            this.postPage = 1;
+                        }
 						if (this.infScrollDisable) {
 							this.infScrollDisable = !this.infScrollDisable;
 						}
@@ -161,33 +177,37 @@
 							this.allCommentsView = !this.allCommentsView;
 						} else if (this.upload) {
 							this.upload = !this.upload;
-						}
-						this.$store.dispatch('headings/actSetHeading', this.user.username);
+                        }
+                        if (this.windowWidth > this.breakpoint) {
+                            this.$store.dispatch('headings/actSetHeading', 'photogram');
+                        } else this.$store.dispatch('headings/actSetHeading', this.user.username);
 				}
             },
             '$route.params.userId': function(userId) {
-                switch (this.$route.name) {
-                    case 'user':
-                        this.userPostsAll.length = 0;
-                        this.postPage = 1;
-                        users.get('find?id=' + userId, { headers: { Authorization: 'Bearer ' + this.token } })
-                        .then(res => {
-                            const user = res.data.data;
-                            this.$store.dispatch('nfPosts/changeUser', user);
-                            
-                            if (this.windowWidth > this.breakpoint) {
-                                this.$store.dispatch('headings/actSetHeading', 'photogram');
-                            } else this.$store.dispatch('headings/actSetHeading', user.username);
+                if (this.user.id != userId) {
+                    switch (this.$route.name) {
+                        case 'user':
+                            this.userPostsAll.length = 0;
+                            this.postPage = 1;
+                            users.get('find?id=' + userId, { headers: { Authorization: 'Bearer ' + this.token } })
+                            .then(res => {
+                                const user = res.data.data;
+                                this.$store.dispatch('nfPosts/changeUser', user);
+                                
+                                if (this.windowWidth > this.breakpoint) {
+                                    this.$store.dispatch('headings/actSetHeading', 'photogram');
+                                } else this.$store.dispatch('headings/actSetHeading', user.username);
 
-                            // needed to put this cause for some reason inf-scroll do not work if you are coming from same route (diff. user)
-                            // i guess it's plugin bug
-                            if (!this.userPostsAll.length) {
-                                this.axiosGetPosts();
-                            }
-                        })
-                        .catch(error => {
-                            console.log(error);
-                        });
+                                // needed to put this cause for some reason inf-scroll do not work if you are coming from same route (diff. user)
+                                // i guess it's plugin bug
+                                if (!this.userPostsAll.length) {
+                                    this.axiosGetPosts();
+                                }
+                            })
+                            .catch(error => {
+                                console.log(error);
+                            });
+                    }
                 }
             }
         },
@@ -233,10 +253,6 @@
             this.$store.dispatch('nfPosts/pushPostCommentsAll', []);
         },
         created() {
-            if (this.windowWidth > this.breakpoint) {
-                this.$store.dispatch('headings/actSetHeading', 'photogram');
-            } else this.$store.dispatch('headings/actSetHeading', this.user.username);
-
             // watch only works when in route and then to watch for changes
             // that's why this check is needed in created (because of possible direct access to upload from link in footer)
             switch (this.$route.name) {
@@ -251,7 +267,9 @@
                         this.allCommentsView = !this.allCommentsView;
                     }
                     this.upload = !this.upload;
-                    this.$store.dispatch('headings/actSetHeading', 'Upload');
+                    if (this.windowWidth > this.breakpoint) {
+                        this.$store.dispatch('headings/actSetHeading', 'photogram');
+                    } else this.$store.dispatch('headings/actSetHeading', 'Upload');
                     break;
                 case 'user':
                     if (this.infScrollDisable) {
@@ -264,7 +282,9 @@
                     } else if (this.upload) {
                         this.upload = !this.upload;
                     }
-                    this.$store.dispatch('headings/actSetHeading', this.user.username);
+                    if (this.windowWidth > this.breakpoint) {
+                        this.$store.dispatch('headings/actSetHeading', 'photogram');
+                    } else this.$store.dispatch('headings/actSetHeading', this.user.username);
             }
         },
         destroyed() {
