@@ -42,6 +42,12 @@ const Comments = resolve => {
 	});
 };
 
+const Likes = resolve => {
+	require.ensure(['./components/Likes.vue'], () => {
+		resolve(require('./components/Likes.vue'));
+	});
+};
+
 const Upload = resolve => {
 	require.ensure(['./components/Upload.vue'], () => {
 		resolve(require('./components/Upload.vue'));
@@ -51,6 +57,12 @@ const Upload = resolve => {
 const EditProfile = resolve => {
 	require.ensure(['./components/EditProfile.vue'], () => {
 		resolve(require('./components/EditProfile.vue'));
+	});
+};
+
+const EditPost = resolve => {
+	require.ensure(['./components/EditPost.vue'], () => {
+		resolve(require('./components/EditPost.vue'));
 	});
 };
 
@@ -65,17 +77,19 @@ const routes = [
 	{ path: '/homepage', name: 'homepage', component: HomePage,
 		children: [
 			{ path: 'photo', name: 'photo', component: PostDetail, meta: { requiresAuth: true } },
-			{ path: 'comments', name: 'comments', component: Comments, meta: { requiresAuth: true } }
+			{ path: 'comments', name: 'comments', component: Comments, meta: { requiresAuth: true } },
+			{ path: 'likes', name: 'likes', props: true, component: Likes, meta: { requiresAuth: true } }
 		]
 	},
-	{ path: '/user_id::userId', name: 'user', props: true, component: User,
+	{ path: '/user-id.:userId', name: 'user', props: true, component: User,
 		children: [
 			{ path: 'photo-detail', name: 'photo-detail', component: PostDetail, meta: { requiresAuth: true } },
 			{ path: 'comments-view', name: 'comments-view', component: Comments, meta: { requiresAuth: true } },
 			{ path: 'upload', name: 'upload', component: Upload, meta: { requiresAuth: true } }
 		]
 	},
-	{ path: '/edit-profile', name: 'edit-profile', component: EditProfile }
+	{ path: '/edit-profile', name: 'edit-profile', component: EditProfile },
+	{ path: '/edit-post.:postId', name: 'edit-post', props: true, component: EditPost }
 ]
 
 export default new VueRouter({ 

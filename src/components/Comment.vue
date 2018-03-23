@@ -12,7 +12,7 @@
         </div>
 
         <div class="m-comment__icons">
-            <div v-if="idUser === comment.user_id" class="m-comment__delete" @click="deleteComment">
+            <div v-if="idUser === comment.user_id || $route.name === 'edit-post'" class="m-comment__delete" @click="deleteComment">
                 <icon class="icon" name="times-circle"></icon>
             </div>
 
@@ -97,12 +97,11 @@
 	@import '../scss/settings';
 
     .m-comment {
-        
         &__user-img {
             display: inline-block;
             width: 4.1rem;
             height: 4.1rem;
-            margin-top: 0.9rem;
+            margin-top: .9rem;
             margin-left: 1.5rem;
 
             @include breakpoint(desktop) {
@@ -125,7 +124,7 @@
             display: inline-block;
             width: 55%;
             margin-top: 2.2rem;
-            margin-left: 0.6rem;
+            margin-left: .6rem;
             vertical-align: top;
 
             @include breakpoint(desktop) {
@@ -136,7 +135,7 @@
 
         &__username {
             font-family: 'Roboto-Bold', sans-serif;
-            margin-right: 0.5rem;
+            margin-right: .5rem;
         }
 
         &__body {
@@ -156,7 +155,8 @@
 
         &__icons {
             display: inline-block;
-            margin-left: 0.5rem;
+            margin-left: .5rem;
+            margin-bottom: .3rem;
             width: 6.2rem;
 
             @include breakpoint(desktop) {
@@ -187,7 +187,7 @@
             float: right;
             width: 2.5rem;
             height: 2.5rem;
-            margin-right: 0.5rem;
+            margin-right: .5rem;
             cursor: pointer;
 
             @include breakpoint(desktop) {
@@ -197,22 +197,22 @@
 
             svg {
                 stroke: $lightblack;
-                stroke-width: 0.1rem;
+                stroke-width: .1rem;
                 fill: $white;
 
                 @include breakpoint(desktop) {
-                    stroke-width: 0.2rem;
+                    stroke-width: .2rem;
                 }
             }
             
             &.is-active {
                 svg {
                     stroke: $lightgreen;
-                    stroke-width: 0.1rem;
+                    stroke-width: .1rem;
                     fill: $lightgreen;
 
                     @include breakpoint(desktop) {
-                        stroke-width: 0.2rem;
+                        stroke-width: .2rem;
                     }
                 }
             }

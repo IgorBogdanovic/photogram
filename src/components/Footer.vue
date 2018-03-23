@@ -164,14 +164,14 @@
 		float: right;
 		width: 2.9rem;
 		height: 2.9rem;
-		background-color: burlywood;
-		border-radius: 50%;
 		margin-top: 0.6rem;
 		margin-right: 1.5rem;
 		cursor: pointer;
 		
 		img {
-			width: 100%;
-		}
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
 	}
 </style>

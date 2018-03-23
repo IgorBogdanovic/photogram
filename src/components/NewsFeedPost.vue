@@ -1,7 +1,7 @@
 <template>
   	<div class="o-news-feed-post">
 
-		<div v-if="$route.name === 'homepage' || $route.name === 'photo' || $route.name === 'comments'" class="o-news-feed-post__user  m-user">
+		<div v-if="$route.name === 'homepage' || $route.name === 'photo' || $route.name === 'comments' || $route.name === 'likes'" class="o-news-feed-post__user  m-user">
 			<router-link :to="{ name: 'user', params: { userId: newsFeedPost.user_id } }" tag="div" class="m-user__link" @click.native="inUserDetail">
 				<div class="m-user__avatar">
 					<img :src="storage + newsFeedPost.user_image.avatar" alt="avatar">
@@ -10,23 +10,41 @@
 			</router-link>
 		</div>
 
-		<router-link v-if="$route.name === 'homepage' || $route.name === 'photo' || $route.name === 'comments'" :to="{ name: 'photo' }" tag="div" class="o-news-feed-post__media  m-media" @click.native="inPostDetail">
+		<router-link v-if="$route.name === 'homepage' || $route.name === 'photo' || $route.name === 'comments' || $route.name === 'likes'" :to="{ name: 'photo' }" tag="div" class="o-news-feed-post__media  m-media" @click.native="inPostDetail">
 			<template v-if="newsFeedPost.type_id == 1">
 				<img :src="storage + newsFeedPost.media.large" alt="news feed post image">
 			</template>
 			<template v-else>
 				<video controls>
 					<source :src="storage + newsFeedPost.media" type="video/mp4">
+					<source :src="storage + newsFeedPost.media" type="video/flv">
+					<source :src="storage + newsFeedPost.media" type="video/wmv">
+					<source :src="storage + newsFeedPost.media" type="video/avi">
+					<source :src="storage + newsFeedPost.media" type="video/mpeg">
+					<source :src="storage + newsFeedPost.media" type="video/qt">
 				</video>
 			</template>
 		</router-link>
 		<router-link v-if="$route.name === 'user' || $route.name === 'photo-detail' || $route.name === 'comments-view' || $route.name === 'upload'" :to="{ name: 'photo-detail' }" tag="div" class="o-news-feed-post__media  m-media" @click.native="inPostDetail">
+			<ul class="m-media__post-edit  c-post-edit" @click="openList">
+				<icon class="icon" name="ellipsis-h"></icon>
+				<router-link :to="{ name: 'edit-post', params: { postId: newsFeedPost.id, post: newsFeedPost } }" tag="li"
+					class="m-media__icon  m-media__icon--edit  c-post-edit__icon  c-post-edit__icon--edit">
+					<icon class="icon" name="edit"></icon>
+				</router-link>
+				<li class="m-media__icon  m-media__icon--delete  c-post-edit__icon  c-post-edit__icon--delete" @click="deletePost"><icon class="icon" name="trash-o"></icon></li>
+			</ul>
 			<template v-if="newsFeedPost.type_id == 1">
 				<img :src="storage + newsFeedPost.media.large" alt="news feed post image">
 			</template>
 			<template v-else>
 				<video controls>
 					<source :src="storage + newsFeedPost.media" type="video/mp4">
+					<source :src="storage + newsFeedPost.media" type="video/flv">
+					<source :src="storage + newsFeedPost.media" type="video/wmv">
+					<source :src="storage + newsFeedPost.media" type="video/avi">
+					<source :src="storage + newsFeedPost.media" type="video/mpeg">
+					<source :src="storage + newsFeedPost.media" type="video/qt">
 				</video>
 			</template>
 		</router-link>
@@ -49,7 +67,7 @@
 				<app-make-comment @commentSubmited="refreshComments"></app-make-comment>
 			</div>
 
-			<div class="m-bar__info-likes">
+			<router-link :to="{ name: 'likes', params: { typeId: 1 } }" tag="div" class="m-bar__info-likes" @click.native="viewCommentsOrLikes">
 				<div class="m-bar__info-icon">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="2700.998 281.935 22.901 23.092">
 					<path id="Path_79" data-name="Path 79" class="cls-1" d="M19.339,1.1A4.1,4.1,0,0,0,13.823.959h0a5.493,5.493,0,0,1-3.337,1.318A5.225,5.225,0,0,1,6.809.959h0a4.166,4.166,0,0,0-5.448.069,4.366,4.366,0,0,0-.409,5.9h0L10.35,20.1,19.816,6.854A4.416,4.416,0,0,0,19.339,1.1Z" transform="translate(2702.004 283.205)"/>
@@ -57,7 +75,7 @@
 				</div>
 
 				<p class="m-bar__likes-count">{{ newsFeedPost.likes_count }}</p>
-			</div>
+			</router-link>
 			
 		</div>
 
@@ -78,21 +96,11 @@
 				<p class="m-comments__txt">{{ comment.body }}</p>
 			</div>
 
-			<router-link v-if="($route.name === 'homepage' || $route.name === 'photo' || $route.name === 'comments') && newsFeedPost.comments_count > 0"
-				:to="{ name: 'comments' }" tag="span" class="m-comments__view-all" @click.native="viewAllComments">view all comments</router-link>
+			<router-link v-if="($route.name === 'homepage' || $route.name === 'photo' || $route.name === 'comments' || $route.name === 'likes') && newsFeedPost.comments_count > 0"
+				:to="{ name: 'comments' }" tag="span" class="m-comments__view-all" @click.native="viewCommentsOrLikes">view all comments</router-link>
 			<router-link v-if="$route.name === 'user' && newsFeedPost.comments_count > 0"
-				:to="{ name: 'comments-view' }" tag="span" class="m-comments__view-all" @click.native="viewAllComments">view all comments</router-link>
+				:to="{ name: 'comments-view' }" tag="span" class="m-comments__view-all" @click.native="viewCommentsOrLikes">view all comments</router-link>
 		</div>
-
-		<!-- <div class="o-news-feed-post__comments  m-comments" v-else>
-			<div class="m-comments__comment-block" v-for="comment in newsFeedPost.comments" :key="comment.id">
-				<div class="m-comments__avatar">
-					<img :src="storage + comment.user_image.avatar" alt="user avatar that made this comment">
-				</div>
-
-				<p class="m-comments__txt">{{ comment.body }}</p>
-			</div>
-		</div> -->
 
     </div>
 </template>
@@ -124,6 +132,29 @@
 			}
 		},
 		methods: {
+			openList(e) {
+				e.stopPropagation();
+				const anyIconPostEdit = $('.m-media__post-edit');
+				const iconPostEdit = $(e.currentTarget);
+				if ( anyIconPostEdit.hasClass('js-active') && !iconPostEdit.hasClass('js-active') ) {
+					anyIconPostEdit.removeClass('js-active').find('.m-media__icon').slideUp(300);
+				}
+				iconPostEdit.addClass('js-active').find('.m-media__icon').slideToggle(300);
+			},
+			deletePost() {
+				const postId = this.newsFeedPost.id;
+                this.$store.dispatch('nfPosts/deletePost', postId)
+                    .then(res => {
+                        const allPosts = this.newsFeedPostsAll;
+						const postIndex = allPosts.map(function(el) { return el.id; }).indexOf(postId);
+						if (postIndex > -1) {
+							allPosts.splice(postIndex, 1);
+						}
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+            },
 			openMakeComment(e) {
 				const anyIcon = $('.m-bar__icon--comment');
 				const icon = $(e.currentTarget);
@@ -147,7 +178,7 @@
 							opacity: 0,
 							bottom: '-.6rem'
 						});
-						anyIcon.next().find('.m-make-comment__input').off( 'focus' );
+						anyIcon.next().find('.m-make-comment__input').off('focus');
 						anyIcon.next().hide(0);
 						anyIcon.removeClass('js-active');
 						anyIcon.removeClass('is-active');
@@ -252,7 +283,7 @@
                     console.log(error);
 				});
 			},
-			viewAllComments() {
+			viewCommentsOrLikes() {
 				const post = this.newsFeedPost;
 				this.$store.dispatch('nfPosts/changeNewsFeedPost', post);
 				if (this.windowWidth > this.breakpoint) {
@@ -265,6 +296,7 @@
             appMakeComment: MakeComment
 		},
 		// created() {
+		// 	console.log(this.newsFeedPost);
 		// },
 		// destroyed() {
 		// }
@@ -558,7 +590,7 @@
 		}
 	}
 
-	// corrections when loaded in User component
+	// corrections when loaded in User component (for grid-view)
 	.o-user__posts-wrapper.grid-view {
 		.o-news-feed-post {
 			@include breakpoint(mobile) {

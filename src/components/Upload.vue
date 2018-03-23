@@ -2,9 +2,9 @@
   	<div class="o-upload">
 		
 		<div class="o-upload__wrapper">
-            <h3 class="o-upload__small-heading  u-only-desktop">Upload Photo</h3>
+            <h3 class="o-upload__small-heading  u-only-desktop">Upload Photo or Video</h3>
             <form @submit.prevent="submitPost">
-                <div class="o-upload__image-container">
+                <div class="o-upload__media-container">
                     <input type="file"
                         style="display: none"
                         @change="onFileSelected"
@@ -15,6 +15,7 @@
                         <span class="u-only-desktop">drag and drop</span>
                     </div>
                     <img class="o-upload__image" src="#" alt="image to upload">
+                    <video class="o-upload__video" controls></video>
                 </div>
 
                 <div class="o-upload__upload-button">
@@ -66,23 +67,45 @@
 			onFileSelected(e) {
                 const input = e.target;
                 this.selectedFile = e.target.files[0];
+
                 if (input.files && input.files[0]) {
                     const reader = new FileReader();
-                    reader.onload = function(e) {
-                        $('.o-upload__image')
-                            .attr('src', e.target.result)
-                            .show(0);
-                        $('.o-upload__icon').hide(0);
-                    };
+                    const validImageTypes = ['image/gif', 'image/jpeg', 'image/png'];
+                    const validVideoTypes = ['video/mp4', 'video/flv', 'video/wmv', 'video/avi', 'video/mpeg', 'video/qt'];
+
+                    if ($.inArray(this.selectedFile.type, validImageTypes) >= 0) {
+                        reader.onload = function(e) {
+                            $('.o-upload__icon').hide(0);
+                            $('.o-upload__video').hide(0);
+                            $('.o-upload__image')
+                                .attr('src', e.target.result)
+                                .show(0);
+                        };
+                    } else if ($.inArray(this.selectedFile.type, validVideoTypes) >= 0) {
+                        reader.onload = function(e) {
+                            $('.o-upload__icon').hide(0);
+                            $('.o-upload__image').hide(0);
+                            $('.o-upload__video')
+                                .attr('src', e.target.result)
+                                .show(0);
+                        };
+                    }
                     reader.readAsDataURL(input.files[0]);
                 } else {
+                    $('.o-upload__video').hide(0);
                     $('.o-upload__image').hide(0);
                     $('.o-upload__icon').show(0);
                 }
             },
             submitPost() {
                 const postData = new FormData();
-                postData.append('image', this.selectedFile);
+                const validImageTypes = ['image/gif', 'image/jpeg', 'image/png'];
+                const validVideoTypes = ['video/mp4', 'video/flv', 'video/wmv', 'video/avi', 'video/mpeg', 'video/qt'];
+                if ($.inArray(this.selectedFile.type, validImageTypes) >= 0) {
+                    postData.append('image', this.selectedFile);
+                } else if ($.inArray(this.selectedFile.type, validVideoTypes) >= 0) {
+                    postData.append('video', this.selectedFile);
+                }
                 postData.append('description', this.description);
                 this.$store.dispatch('nfPosts/postPost', postData)
                     .then(res => {
@@ -119,7 +142,7 @@
         }
 
         &__small-heading {
-            font-family: 'HelveticaNeue', sans-serif;
+            font-family: 'HelveticaNeue-Thin', sans-serif;
             @include fontSizeRem(0, 26);
             @include lineHeightRem(0, 32);
             text-align: center;
@@ -138,7 +161,7 @@
             }
         }
         
-        &__image-container {
+        &__media-container {
             position: relative;
             background-color: $lightblack;
             width: 100%;
@@ -156,6 +179,14 @@
             display: none;
             width: 100%;
             height: 100%;
+            object-fit: cover;
+        }
+
+        &__video {
+            display: none;
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
         }
 
         &__icon {
@@ -183,7 +214,7 @@
             }
 
             span {
-                font-family: 'HelveticaNeue', sans-serif;
+                font-family: 'HelveticaNeue-Thin', sans-serif;
                 @include fontSizeRem(0, 16);
                 @include lineHeightRem(0, 18);
                 text-align: center;

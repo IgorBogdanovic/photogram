@@ -29,4 +29,9 @@
 <style lang="scss">
 	@import '../node_modules/animate.css/animate.css';
 	@import './scss/main';
+
+	// animation durations changes
+	.zoomOut, .zoomIn, .slideInLeft, .slideInLeft {
+		animation-duration: .5s;
+	}
 </style>

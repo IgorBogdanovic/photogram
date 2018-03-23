@@ -19,3 +19,11 @@ export const comments = axios.create({
 export const likes = axios.create({
 	baseURL: 'http://54.37.227.57:80/api/likes/'
 });
+
+export const followers = axios.create({
+	baseURL: 'http://54.37.227.57:80/api/followers/'
+});
+
+export const followings = axios.create({
+	baseURL: 'http://54.37.227.57:80/api/followings/'
+});

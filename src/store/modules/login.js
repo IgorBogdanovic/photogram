@@ -19,6 +19,10 @@ export const login = {
       state.userAvatar = userData.avatar;
       state.userProfile = userData.profile;
     },
+    changeUser(state, userData) {
+      state.userAvatar = userData.avatar;
+      state.userProfile = userData.profile;
+    },
     autologAuthUser(state, userData) {
       state.idToken = userData.token;
     },
@@ -35,7 +39,7 @@ export const login = {
           returnSecureToken: true
         })
           .then(res => {
-            console.log(res);
+            // console.log(res);
             commit('authUser', {
               token: res.data.token,
               id: res.data.data.id,
@@ -61,6 +65,9 @@ export const login = {
         token
       });
     },
+    editUser({commit}, userData) {
+      commit('changeUser', userData);
+    }
   },
 
   getters: {

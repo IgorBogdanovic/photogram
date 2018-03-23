@@ -16,12 +16,23 @@
                     <icon class="icon" name="close"></icon>
                 </a>
 
+				<ul v-if="$route.name === 'photo-detail'" class="m-detail-media__post-edit  c-post-edit" @click="openList">
+					<icon class="icon" name="ellipsis-h"></icon>
+					<li class="m-detail-media__icon  m-detail-media__icon--edit  c-post-edit__icon  c-post-edit__icon--edit"><icon class="icon" name="edit"></icon></li>
+					<li class="m-detail-media__icon  m-detail-media__icon--delete  c-post-edit__icon  c-post-edit__icon--delete" @click="deletePost"><icon class="icon" name="trash-o"></icon></li>
+				</ul>
+
                 <template v-if="newsFeedPost.type_id == 1">
                     <img :src="storage + newsFeedPost.media.large" alt="news feed post image">
                 </template>
                 <template v-else>
                     <video controls>
                         <source :src="storage + newsFeedPost.media" type="video/mp4">
+						<source :src="storage + newsFeedPost.media" type="video/flv">
+						<source :src="storage + newsFeedPost.media" type="video/wmv">
+						<source :src="storage + newsFeedPost.media" type="video/avi">
+						<source :src="storage + newsFeedPost.media" type="video/mpeg">
+						<source :src="storage + newsFeedPost.media" type="video/qt">
                     </video>
                 </template>
 
@@ -123,6 +134,26 @@
 			}
         },
         methods: {
+			openList(e) {
+				e.stopPropagation();
+				const iconPostEdit = $(e.currentTarget);
+				iconPostEdit.addClass('js-active').find('.m-detail-media__icon').slideToggle(300);
+			},
+			deletePost() {
+				const postId = this.newsFeedPost.id;
+                this.$store.dispatch('nfPosts/deletePost', postId)
+                    .then(res => {
+                        const allPosts = this.newsFeedPostsAll;
+						const postIndex = allPosts.map(function(el) { return el.id; }).indexOf(postId);
+						if (postIndex > -1) {
+							allPosts.splice(postIndex, 1);
+							this.$store.dispatch('nfPosts/changeNewsFeedPost', allPosts[postIndex]);
+						}
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+            },
 			openMakeComment(e) {
 				const icon = $(e.currentTarget);
 
@@ -228,6 +259,22 @@
 					});
             },
 			arrowClick(arrow) {
+				const iconPostEdit = $('.m-detail-media__post-edit');
+				if ( iconPostEdit.hasClass('js-active') ) {
+					iconPostEdit.removeClass('js-active').find('.m-detail-media__icon').hide(0);
+				}
+				const iconComment = $('.m-detail-bar__icon--comment');
+				if ( iconComment.hasClass('js-active') ) {
+					iconComment.next().find('.m-make-comment__icon').removeClass('is-visible');
+					iconComment.next().children().css({
+						opacity: 0,
+						bottom: '-.6rem'
+					});
+					iconComment.next().find('.m-make-comment__input').off( 'focus' );
+					iconComment.next().hide(0);
+					iconComment.removeClass('js-active');
+					iconComment.removeClass('is-active');
+				}
                 const postId = this.newsFeedPost.id;
                 const allPosts = this.newsFeedPostsAll;
                 const postIndex = allPosts.map(function(el) { return el.id; }).indexOf(postId);
@@ -328,6 +375,13 @@
 	.m-detail-media {
 		position: relative;
         width: 100%;
+
+		&__post-edit {
+			@include breakpoint(desktop) {
+				width: 3.5rem;
+				height: 3.5rem;
+			}
+		}
 
 		// Initializing 1:1 ratio
 		&:after{

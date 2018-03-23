@@ -3,13 +3,14 @@
 		
 		<div class="o-homepage__content" v-infinite-scroll="axiosGetPosts" infinite-scroll-disabled="infScrollDisable" :infinite-scroll-distance="windowHeight/3">
 
-			<div v-if="(!postDetailView && !allCommentsView) || windowWidth > breakpoint" class="o-homepage__posts-wrapper">
+			<div v-if="(!postDetailView && !allCommentsView && !likesView) || windowWidth > breakpoint" class="o-homepage__posts-wrapper">
 				<app-news-feed-post v-for="(post, index) in newsFeedPostsAll" :key="post.id + '-' + index" :post="post"></app-news-feed-post>
 			</div>
 			
 			<!-- for mobile devices -->
 			<router-view v-if="postDetailView && windowWidth < breakpoint"></router-view>
 			<router-view v-if="allCommentsView && windowWidth < breakpoint"></router-view>
+			<router-view v-if="likesView && windowWidth < breakpoint"></router-view>
 			<!-- for all other devices -->
 			<transition mode="out-in"
 				enter-active-class="animated slideInLeft"
@@ -20,6 +21,11 @@
 				enter-active-class="animated slideInLeft"
 				leave-active-class="animated slideOutRight">
 				<router-view v-if="allCommentsView && windowWidth > breakpoint"></router-view>
+			</transition>
+			<transition mode="out-in"
+				enter-active-class="animated slideInLeft"
+				leave-active-class="animated slideOutRight">
+				<router-view v-if="likesView && windowWidth > breakpoint"></router-view>
 			</transition>
 
 			<app-spinner v-if="loading"></app-spinner>
@@ -42,6 +48,7 @@
 				followedUsersPosts: [],
 				postDetailView: false,
 				allCommentsView: false,
+				likesView: false,
 				loading: false,
 				infScrollDisable: false,
 				postAmount: 12,
@@ -66,6 +73,9 @@
 						if (this.allCommentsView) {
 							this.allCommentsView = !this.allCommentsView;
 						}
+						if (this.likesView) {
+							this.likesView = !this.likesView;
+						}
 						this.postDetailView = !this.postDetailView;
 						this.$store.dispatch('headings/actSetHeading', 'Photo');
 						break;
@@ -76,8 +86,24 @@
 						if (this.postDetailView) {
 							this.postDetailView = !this.postDetailView;
 						}
+						if (this.likesView) {
+							this.likesView = !this.likesView;
+						}
 						this.allCommentsView = !this.allCommentsView;
 						this.$store.dispatch('headings/actSetHeading', 'Comments');
+						break;
+					case 'likes':
+						if (!this.infScrollDisable) {
+							this.infScrollDisable = !this.infScrollDisable;
+						}
+						if (this.postDetailView) {
+							this.postDetailView = !this.postDetailView;
+						}
+						if (this.allCommentsView) {
+							this.allCommentsView = !this.allCommentsView;
+						}
+						this.likesView = !this.likesView;
+						this.$store.dispatch('headings/actSetHeading', 'Likes');
 						break;
 					case 'homepage':
 						if (this.infScrollDisable) {
@@ -87,6 +113,8 @@
 							this.postDetailView = !this.postDetailView;
 						} else if (this.allCommentsView) {
 							this.allCommentsView = !this.allCommentsView;
+						} else if (this.likesView) {
+							this.likesView = !this.likesView;
 						}
 						this.$store.dispatch('headings/actSetHeading', 'photogram');
 				}
