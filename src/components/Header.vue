@@ -1,7 +1,7 @@
 <template>
   	<div class="o-header">
 
-        <a v-if="heading !== 'photogram'" href="javascript:history.go(-1)" class="o-header__prev-arrow  a-prev-arrow" @click="goBack">
+        <a v-if="heading !== 'photogram'" href="javascript:history.go(-1)" class="o-header__prev-arrow  a-prev-arrow">
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                 viewBox="0 0 240.823 240.823" style="enable-background:new 0 0 240.823 240.823;" xml:space="preserve">
             <g>
@@ -125,12 +125,6 @@
 			}
         },
         methods: {
-			goBack() {
-                if (this.windowWidth > this.breakpoint) {
-                    $('.o-homepage').removeClass('u-overflow-disabled');
-                    $('.o-user').removeClass('u-overflow-disabled');
-				}
-            },
             inUserDetail() {
 				users.get('find?id=' + this.loggedUserId, { headers: { Authorization: 'Bearer ' + this.token } })
                 .then(res => {

@@ -66,14 +66,10 @@
                     });
             },
             closeLikes() {
-                if (this.windowWidth > this.breakpoint) {
-                    $('.o-homepage').removeClass('u-overflow-disabled');
-                    $('.o-user').removeClass('u-overflow-disabled');
-                    const vm = this;
-                    setTimeout(function(){
-                        vm.$store.dispatch('nfPosts/pushLikes', []);
-                    }, 500);
-                }
+                const vm = this;
+                setTimeout(function(){
+                    vm.$store.dispatch('nfPosts/pushLikes', []);
+                }, 500);
 			}
         },
         components: {
@@ -116,7 +112,7 @@
                     position: absolute;
                     width: 57rem;
                     height: 74vh;
-                    top: 50%;
+                    top: 55%;
                     left: 50%;
                     transform: translate(-50%, -50%);
                 }

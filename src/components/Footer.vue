@@ -1,7 +1,7 @@
 <template>
   	<div class="o-footer  u-only-mobile">
 		
-		<router-link :to="{ name: 'homepage' }" tag="div" class="o-footer__home  a-home" :class="{ 'is-active': isHomeActive }" @click.native="goHome">
+		<router-link :to="{ name: 'homepage' }" tag="div" class="o-footer__home  a-home" :class="{ 'is-active': isHomeActive }">
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="2700 1481 29 29">
 			<g id="Group_132" data-name="Group 132" transform="translate(-267 487)">
 				<ellipse id="Ellipse_18" data-name="Ellipse 18" class="cls-1" cx="14.5" cy="14.5" rx="14.5" ry="14.5" transform="translate(2967 994)"/>
@@ -65,12 +65,6 @@
 			}
 		},
 		methods: {
-			goHome() {
-                if (this.windowWidth > this.breakpoint) {
-                    $('.o-homepage').removeClass('u-overflow-disabled');
-                    $('.o-user').removeClass('u-overflow-disabled');
-				}
-            },
             inUserDetail() {
 				users.get('find?id=' + this.loggedUserId, { headers: { Authorization: 'Bearer ' + this.token } })
                 .then(res => {

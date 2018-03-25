@@ -20,7 +20,8 @@
                 <p class="m-info__about-me">{{ user.about }}</p>
 
                 <router-link v-if="isLoggedUser" :to="{ name: 'edit-profile' }" tag="button" class="m-info__button  m-info__button--edit">Edit Profile</router-link>
-                <button v-if="!isLoggedUser && user.auth_follow" class="m-info__button  m-info__button--following">Following</button>
+                <button v-if="!isLoggedUser && userAuth_follow" class="m-info__button  m-info__button--unfollow" @click="unfollowUser">Unfollow</button>
+                <button v-if="!isLoggedUser && !userAuth_follow" class="m-info__button  m-info__button--follow" @click="followUser">Follow</button>
             </div>
 
             <div v-if="(!postDetailView && !allCommentsView && !upload) || windowWidth > breakpoint" class="o-user__view  m-view">
@@ -49,6 +50,7 @@
             <!-- for mobile devices -->
 			<router-view v-if="postDetailView && windowWidth < breakpoint"></router-view>
 			<router-view v-if="allCommentsView && windowWidth < breakpoint"></router-view>
+            <router-view v-if="likesView && windowWidth < breakpoint"></router-view>
             <router-view v-if="upload && windowWidth < breakpoint"></router-view>
 			<!-- for all other devices -->
 			<transition mode="out-in"
@@ -60,6 +62,11 @@
 				enter-active-class="animated slideInLeft"
 				leave-active-class="animated slideOutRight">
 				<router-view v-if="allCommentsView && windowWidth > breakpoint"></router-view>
+			</transition>
+            <transition mode="out-in"
+				enter-active-class="animated slideInLeft"
+				leave-active-class="animated slideOutRight">
+				<router-view v-if="likesView && windowWidth > breakpoint"></router-view>
 			</transition>
             <transition mode="out-in"
 				enter-active-class="animated slideInLeft"
@@ -86,8 +93,10 @@
         data () {
 		    return {
                 userPostsAll: [],
+                userAuth_follow: null,
                 postDetailView: false,
                 allCommentsView: false,
+                likesView: false,
                 upload: false,
 				loading: false,
 				infScrollDisable: false,
@@ -111,18 +120,24 @@
 				return this.$store.getters['nfPosts/user'];
             },
             isLoggedUser() {
-                return this.loggedUserId === this.userId;
+                return this.loggedUserId == this.userId;
             }
         },
         watch: {
             '$route.name': function() {
 				switch (this.$route.name) {
-					case 'photo-detail':
+                    case 'photo-detail':
+                        if (this.windowWidth > this.breakpoint) {
+							$('body').addClass('u-overflow-disabled');
+						}
 						if (!this.infScrollDisable) {
 							this.infScrollDisable = !this.infScrollDisable;
 						}
 						if (this.allCommentsView) {
 							this.allCommentsView = !this.allCommentsView;
+                        }
+                        if (this.likesView) {
+							this.likesView = !this.likesView;
                         }
                         if (this.upload) {
 							this.upload = !this.upload;
@@ -132,12 +147,18 @@
                             this.$store.dispatch('headings/actSetHeading', 'photogram');
                         } else this.$store.dispatch('headings/actSetHeading', 'Photo');
 						break;
-					case 'comments-view':
+                    case 'comments-view':
+                        if (this.windowWidth > this.breakpoint) {
+							$('body').addClass('u-overflow-disabled');
+						}
 						if (!this.infScrollDisable) {
 							this.infScrollDisable = !this.infScrollDisable;
 						}
 						if (this.postDetailView) {
 							this.postDetailView = !this.postDetailView;
+                        }
+                        if (this.likesView) {
+							this.likesView = !this.likesView;
                         }
                         if (this.upload) {
 							this.upload = !this.upload;
@@ -147,7 +168,10 @@
                             this.$store.dispatch('headings/actSetHeading', 'photogram');
                         } else this.$store.dispatch('headings/actSetHeading', 'Comments');
                         break;
-                    case 'upload':
+                    case 'likes-view':
+                        if (this.windowWidth > this.breakpoint) {
+							$('body').addClass('u-overflow-disabled');
+						}
 						if (!this.infScrollDisable) {
 							this.infScrollDisable = !this.infScrollDisable;
 						}
@@ -157,12 +181,39 @@
                         if (this.allCommentsView) {
 							this.allCommentsView = !this.allCommentsView;
                         }
+                        if (this.upload) {
+							this.upload = !this.upload;
+						}
+                        this.likesView = !this.likesView;
+                        if (this.windowWidth > this.breakpoint) {
+                            this.$store.dispatch('headings/actSetHeading', 'photogram');
+                        } else this.$store.dispatch('headings/actSetHeading', 'Likes');
+                        break;
+                    case 'upload':
+                        if (this.windowWidth > this.breakpoint) {
+							$('body').addClass('u-overflow-disabled');
+						}
+						if (!this.infScrollDisable) {
+							this.infScrollDisable = !this.infScrollDisable;
+						}
+						if (this.postDetailView) {
+							this.postDetailView = !this.postDetailView;
+                        }
+                        if (this.allCommentsView) {
+							this.allCommentsView = !this.allCommentsView;
+                        }
+                        if (this.likesView) {
+							this.likesView = !this.likesView;
+                        }
 						this.upload = !this.upload;
 						if (this.windowWidth > this.breakpoint) {
                             this.$store.dispatch('headings/actSetHeading', 'photogram');
                         } else this.$store.dispatch('headings/actSetHeading', 'Upload');
 						break;
                     case 'user':
+                        if (this.windowWidth > this.breakpoint) {
+                            $('body').removeClass('u-overflow-disabled');
+                        }
                         // this check is in case user posted new post so it can refresh all posts
                         if (this.newsFeedPostsAll.length !== this.userPostsAll.length) {
                             this.userPostsAll.length = 0;
@@ -175,7 +226,9 @@
 							this.postDetailView = !this.postDetailView;
 						} else if (this.allCommentsView) {
 							this.allCommentsView = !this.allCommentsView;
-						} else if (this.upload) {
+                        } else if (this.likesView) {
+							this.likesView = !this.likesView;
+                        } else if (this.upload) {
 							this.upload = !this.upload;
                         }
                         if (this.windowWidth > this.breakpoint) {
@@ -241,6 +294,26 @@
                 let thisViewIcon = $(e.currentTarget);
                 this.gridViewActive = true;
                 this.singleViewActive = false;
+            },
+            followUser() {
+                this.$store.dispatch('nfPosts/followUser', this.userId)
+                    .then(res => {
+                        // console.log(res);
+                        this.userAuth_follow = true;
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+            },
+            unfollowUser() {
+                this.$store.dispatch('nfPosts/unfollowUser', this.userId)
+                    .then(res => {
+                        // console.log(res);
+                        this.userAuth_follow = false;
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
             }
 		},
         components: {
@@ -248,15 +321,16 @@
 			appSpinner: Spinner
         },
         beforeCreate() {
-			// better safe then sorry :) => empty NewsFeedPostsAll array
             this.$store.dispatch('nfPosts/pushNewsFeedPostsAll', []);
-            this.$store.dispatch('nfPosts/pushPostCommentsAll', []);
         },
         created() {
             // watch only works when in route and then to watch for changes
             // that's why this check is needed in created (because of possible direct access to upload from link in footer)
             switch (this.$route.name) {
                 case 'upload':
+                    if (this.windowWidth > this.breakpoint) {
+                        $('body').addClass('u-overflow-disabled');
+                    }
                     if (!this.infScrollDisable) {
                         this.infScrollDisable = !this.infScrollDisable;
                     }
@@ -266,12 +340,19 @@
                     if (this.allCommentsView) {
                         this.allCommentsView = !this.allCommentsView;
                     }
+                    if (this.likesView) {
+                        this.likesView = !this.likesView;
+                    }
                     this.upload = !this.upload;
                     if (this.windowWidth > this.breakpoint) {
                         this.$store.dispatch('headings/actSetHeading', 'photogram');
                     } else this.$store.dispatch('headings/actSetHeading', 'Upload');
                     break;
                 case 'user':
+                    this.userAuth_follow = this.user.auth_follow;
+                    if (this.windowWidth > this.breakpoint) {
+                        $('body').removeClass('u-overflow-disabled');
+                    }
                     if (this.infScrollDisable) {
                         this.infScrollDisable = !this.infScrollDisable;
                     }
@@ -279,6 +360,8 @@
                         this.postDetailView = !this.postDetailView;
                     } else if (this.allCommentsView) {
                         this.allCommentsView = !this.allCommentsView;
+                    } else if (this.likesView) {
+                        this.likesView = !this.likesView;
                     } else if (this.upload) {
                         this.upload = !this.upload;
                     }
@@ -289,7 +372,6 @@
         },
         destroyed() {
             this.$store.dispatch('nfPosts/pushNewsFeedPostsAll', []);
-            this.$store.dispatch('nfPosts/pushPostCommentsAll', []);
 		}
 	}
 </script>
@@ -429,7 +511,11 @@
                 background-color: $lightgray;
             }
 
-            &--following {
+            &--unfollow {
+                background-color: $darkgrey;
+            }
+
+            &--follow {
                 background-color: $lightblack;
             }
         }

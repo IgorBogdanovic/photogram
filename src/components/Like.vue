@@ -1,17 +1,19 @@
 <template>
     <div class="m-like">
 
-        <div class="m-like__user-img">
+        <router-link :to="{ name: 'user', params: { userId: like.id } }" tag="div" class="m-like__user-img" @click.native="inUserDetail(like.id)">
             <img :src="storage + like.image.avatar" alt="user avatar that made this comment">
-        </div>
+        </router-link>
 
         <div class="m-like__content">
-            <span class="m-like__username">{{ like.username }}</span>
+            <router-link :to="{ name: 'user', params: { userId: like.id } }" tag="span" class="m-like__username" @click.native="inUserDetail(like.id)">
+                {{ like.username }}
+            </router-link>
             <p class="m-like__txt">liked this post</p>
         </div>
 
         <div class="m-like__button">
-            <button v-if="!like.auth_follow && like.id != idUser" class="m-like__btn  m-like__btn--follow" type="button" @click="followUser">Follow</button>
+            <button v-if="!like.auth_follow && like.id != loggedUserId" class="m-like__btn  m-like__btn--follow" type="button" @click="followUser">Follow</button>
             <button v-if="like.auth_follow" class="m-like__btn  m-like__btn--unfollow" type="button" @click="unfollowUser">Unfollow</button>
         </div>
 
@@ -19,10 +21,10 @@
 </template>
 
 <script>
-    import { mixinStorage } from '../mixins'
+    import { mixinStorage, inUserDetail } from '../mixins'
 
     export default {
-        mixins: [ mixinStorage ],
+        mixins: [ mixinStorage, inUserDetail ],
         props: ['likeObj'],
         data () {
 		    return {
@@ -30,7 +32,10 @@
 		    }
         },
         computed: {
-            idUser() {
+            token() {
+				return this.$store.getters['login/token'];
+			},
+            loggedUserId() {
 				return this.$store.getters['login/idUser'];
             }
         },
@@ -71,6 +76,7 @@
             height: 4.1rem;
             margin-top: .9rem;
             margin-left: 1.5rem;
+            cursor: pointer;
 
             @include breakpoint(desktop) {
                 width: 4.6rem;
@@ -103,6 +109,7 @@
 
         &__username {
             font-family: 'Roboto-Bold', sans-serif;
+            cursor: pointer;
         }
 
         &__txt {

@@ -24,6 +24,7 @@
     import Spinner from './Spinner.vue'
 
     export default {
+        props: ['postId'],
         mixins: [ basicVars ],
         data () {
 		    return {
@@ -38,15 +39,9 @@
             token() {
 				return this.$store.getters['login/token'];
             },
-            idUser() {
-				return this.$store.getters['login/idUser'];
-            },
             newsFeedPostsAll() {
 				return this.$store.getters['nfPosts/newsFeedPostsAll'];
 			},
-            newsFeedPost() {
-				return this.$store.getters['nfPosts/newsFeedPost'];
-            },
             postCommentsAll() {
 				return this.$store.getters['nfPosts/postCommentsAll'];
 			}
@@ -55,7 +50,7 @@
 			axiosGetComments() {
                 this.loading = true;
                 this.infScrollDisable = true;
-				comments.get('', { headers: { Authorization: 'Bearer ' + this.token }, params: { post_id: this.newsFeedPost.id, amount: this.commentAmount, page: this.commentPage } })
+				comments.get('', { headers: { Authorization: 'Bearer ' + this.token }, params: { post_id: this.postId, amount: this.commentAmount, page: this.commentPage } })
 				.then(res => {
 					if (res.data.data.length > 0) {
 						for (let i = 0; i < res.data.data.length; i++) {
@@ -79,9 +74,9 @@
                 const vm = this;
                 setTimeout(function(){
                     vm.axiosGetComments();
-                }, 500);
+                }, 300);
                 // update post in NewsFeedPostsAll array
-                posts.get('' + this.newsFeedPost.id, { headers: { Authorization: 'Bearer ' + this.token } })
+                posts.get('' + this.postId, { headers: { Authorization: 'Bearer ' + this.token } })
                 .then(res => {
                     const post = res.data.data;
                     const postId = post.id;
@@ -99,14 +94,10 @@
                 });
             },
             closeAllComments() {
-                if (this.windowWidth > this.breakpoint) {
-                    $('.o-homepage').removeClass('u-overflow-disabled');
-                    $('.o-user').removeClass('u-overflow-disabled');
-                    const vm = this;
-                    setTimeout(function(){
-                        vm.$store.dispatch('nfPosts/pushPostCommentsAll', []);
-                    }, 500);
-                }
+                const vm = this;
+                setTimeout(function(){
+                    vm.$store.dispatch('nfPosts/pushPostCommentsAll', []);
+                }, 300);
 			}
         },
         components: {
@@ -114,7 +105,11 @@
             appMakeComment: MakeComment,
             appSpinner: Spinner
         },
+        beforeCreate() {
+            this.$store.dispatch('nfPosts/pushPostCommentsAll', []);
+        },
 		created() {
+            // console.log(this.newsFeedPost.id);
             if (this.windowWidth > this.breakpoint) {
                 this.$store.dispatch('headings/actSetHeading', 'photogram');
             } else this.$store.dispatch('headings/actSetHeading', 'Comments');
@@ -150,7 +145,7 @@
                     position: absolute;
                     width: 57rem;
                     height: 74vh;
-                    top: 50%;
+                    top: 55%;
                     left: 50%;
                     transform: translate(-50%, -50%);
                 }

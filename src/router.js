@@ -76,15 +76,16 @@ const routes = [
 	{ path: '/terms', name: 'terms', component: Terms },
 	{ path: '/homepage', name: 'homepage', component: HomePage,
 		children: [
-			{ path: 'photo', name: 'photo', component: PostDetail, meta: { requiresAuth: true } },
-			{ path: 'comments', name: 'comments', component: Comments, meta: { requiresAuth: true } },
-			{ path: 'likes', name: 'likes', props: true, component: Likes, meta: { requiresAuth: true } }
+			{ path: 'photo.:postId', name: 'photo', props: true, component: PostDetail, meta: { requiresAuth: true } },
+			{ path: 'comments.:postId', name: 'comments', props: true, component: Comments, meta: { requiresAuth: true } },
+			{ path: 'likes.:postId.:typeId', name: 'likes', props: true, component: Likes, meta: { requiresAuth: true } }
 		]
 	},
 	{ path: '/user-id.:userId', name: 'user', props: true, component: User,
 		children: [
-			{ path: 'photo-detail', name: 'photo-detail', component: PostDetail, meta: { requiresAuth: true } },
-			{ path: 'comments-view', name: 'comments-view', component: Comments, meta: { requiresAuth: true } },
+			{ path: 'photo-detail.:postId', name: 'photo-detail', props: true, component: PostDetail, meta: { requiresAuth: true } },
+			{ path: 'comments-view.:postId', name: 'comments-view', props: true, component: Comments, meta: { requiresAuth: true } },
+			{ path: 'likes-view.:postId.:typeId', name: 'likes-view', props: true, component: Likes, meta: { requiresAuth: true } },
 			{ path: 'upload', name: 'upload', component: Upload, meta: { requiresAuth: true } }
 		]
 	},

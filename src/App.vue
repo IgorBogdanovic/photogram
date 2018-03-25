@@ -32,6 +32,6 @@
 
 	// animation durations changes
 	.zoomOut, .zoomIn, .slideInLeft, .slideInLeft {
-		animation-duration: .5s;
+		animation-duration: .6s;
 	}
 </style>

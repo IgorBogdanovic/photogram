@@ -67,6 +67,9 @@
             '$route.name': function() {
 				switch (this.$route.name) {
 					case 'photo':
+						if (this.windowWidth > this.breakpoint) {
+							$('body').addClass('u-overflow-disabled');
+						}
 						if (!this.infScrollDisable) {
 							this.infScrollDisable = !this.infScrollDisable;
 						}
@@ -80,6 +83,9 @@
 						this.$store.dispatch('headings/actSetHeading', 'Photo');
 						break;
 					case 'comments':
+						if (this.windowWidth > this.breakpoint) {
+							$('body').addClass('u-overflow-disabled');
+						}
 						if (!this.infScrollDisable) {
 							this.infScrollDisable = !this.infScrollDisable;
 						}
@@ -93,6 +99,9 @@
 						this.$store.dispatch('headings/actSetHeading', 'Comments');
 						break;
 					case 'likes':
+						if (this.windowWidth > this.breakpoint) {
+							$('body').addClass('u-overflow-disabled');
+						}
 						if (!this.infScrollDisable) {
 							this.infScrollDisable = !this.infScrollDisable;
 						}
@@ -106,6 +115,9 @@
 						this.$store.dispatch('headings/actSetHeading', 'Likes');
 						break;
 					case 'homepage':
+						if (this.windowWidth > this.breakpoint) {
+							$('body').removeClass('u-overflow-disabled');
+						}
 						if (this.infScrollDisable) {
 							this.infScrollDisable = !this.infScrollDisable;
 						}
@@ -147,17 +159,26 @@
 			appSpinner: Spinner
 		},
 		beforeCreate() {
-			// better safe then sorry :) => empty NewsFeedPostsAll array
 			this.$store.dispatch('nfPosts/pushNewsFeedPostsAll', []);
-			this.$store.dispatch('nfPosts/pushPostCommentsAll', []);
         },
 		created() {
+			if (this.windowWidth > this.breakpoint) {
+				$('body').removeClass('u-overflow-disabled');
+			}
+			if (this.infScrollDisable) {
+				this.infScrollDisable = !this.infScrollDisable;
+			}
+			if (this.postDetailView) {
+				this.postDetailView = !this.postDetailView;
+			} else if (this.allCommentsView) {
+				this.allCommentsView = !this.allCommentsView;
+			} else if (this.likesView) {
+				this.likesView = !this.likesView;
+			}
 			this.$store.dispatch('headings/actSetHeading', 'photogram');
 		},
 		destroyed() {
-			// console.log(0);
 			this.$store.dispatch('nfPosts/pushNewsFeedPostsAll', []);
-			this.$store.dispatch('nfPosts/pushPostCommentsAll', []);
 		}
 	}
 </script>

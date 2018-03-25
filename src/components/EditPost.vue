@@ -114,6 +114,14 @@
                 const iconDescEdit = $(e.currentTarget);
                 const iconDescDelete = $('.o-edit-post__delete');
                 const iconDescSubmit = $('.o-edit-post__submit');
+                if (iconDescEdit.hasClass('is-active')) {
+                    iconDescEdit.removeClass('is-active');
+                    this.descriptionDisabled = true;
+                    $('.o-edit-post__description-input').off('focus');
+                    iconDescDelete.show(0);
+                    iconDescSubmit.hide(0);
+                    return;
+                }
                 iconDescEdit.addClass('is-active');
                 this.descriptionDisabled = false;
                 setTimeout(function(){
@@ -239,7 +247,7 @@
                     position: absolute;
                     width: 57rem;
                     height: 74vh;
-                    top: 50%;
+                    top: 55%;
                     left: 40%;
                     transform: translate(-50%, -50%);
                 }
@@ -318,6 +326,10 @@
                 width: 80%;
                 border: none;
                 outline: none;
+
+                &:disabled {
+                    background-color: $white;
+                }
             }
         }
 
@@ -389,7 +401,7 @@
             width: 4rem;
             height: 4rem;
             color: $white;
-            top: -5%;
+            top: -5.5%;
             right: -7%;
             cursor: pointer;
 
@@ -403,7 +415,7 @@
             position: absolute;
             width: 50rem;
             height: 50rem;
-            top: 13%;
+            top: 18%;
             right: 17%;
             border: 1px solid $darkgrey;
 

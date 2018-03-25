@@ -1,12 +1,14 @@
 <template>
     <div class="m-comment">
 
-        <div class="m-comment__user-img">
+        <router-link :to="{ name: 'user', params: { userId: comment.user_id } }" tag="div" class="m-comment__user-img" @click.native="inUserDetail(comment.user_id)">
             <img :src="storage + comment.user_image.avatar" alt="user avatar that made this comment">
-        </div>
+        </router-link>
 
         <div class="m-comment__content">
-            <span class="m-comment__username">{{ comment.username }}</span>
+            <router-link :to="{ name: 'user', params: { userId: comment.user_id } }" tag="span" class="m-comment__username" @click.native="inUserDetail(comment.user_id)">
+                {{ comment.username }}
+            </router-link>
             <p class="m-comment__body">{{ comment.body }}</p>
             <span class="m-comment__reply">reply</span>
         </div>
@@ -27,10 +29,10 @@
 </template>
 
 <script>
-    import { mixinStorage } from '../mixins'
+    import { mixinStorage, inUserDetail } from '../mixins'
 
     export default {
-        mixins: [ mixinStorage ],
+        mixins: [ mixinStorage, inUserDetail ],
         props: ['postComment'],
         data () {
 		    return {
@@ -38,6 +40,9 @@
 		    }
         },
         computed: {
+            token() {
+				return this.$store.getters['login/token'];
+			},
             idUser() {
 				return this.$store.getters['login/idUser'];
             },
@@ -103,6 +108,7 @@
             height: 4.1rem;
             margin-top: .9rem;
             margin-left: 1.5rem;
+            cursor: pointer;
 
             @include breakpoint(desktop) {
                 width: 4.6rem;
@@ -136,6 +142,7 @@
         &__username {
             font-family: 'Roboto-Bold', sans-serif;
             margin-right: .5rem;
+            cursor: pointer;
         }
 
         &__body {

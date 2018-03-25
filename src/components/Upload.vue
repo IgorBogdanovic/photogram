@@ -4,7 +4,7 @@
 		<div class="o-upload__wrapper">
             <h3 class="o-upload__small-heading  u-only-desktop">Upload Photo or Video</h3>
             <form @submit.prevent="submitPost">
-                <div class="o-upload__media-container">
+                <div class="o-upload__media-container" @dragover.prevent @drop.stop.prevent="onDrop($event)">
                     <input type="file"
                         style="display: none"
                         @change="onFileSelected"
@@ -64,6 +64,13 @@
             }
 		},
 		methods: {
+            onDrop(e) {
+                // e.stopPropagation();
+                // e.preventDefault();
+                // var files = e.dataTransfer.files;
+                // this.createFile(files[0]);
+                console.log(e.dataTransfer.files['0']);
+            },
 			onFileSelected(e) {
                 const input = e.target;
                 this.selectedFile = e.target.files[0];
