@@ -1,5 +1,5 @@
-import { auth } from '../../axios-urls'
-import router from '../../router'
+import { auth } from '../../axios-urls';
+import router from '../../router';
 
 export const login = {
   namespaced: true,
@@ -65,7 +65,7 @@ export const login = {
         token
       });
     },
-    editUser({commit}, userData) {
+    editUser({commit, state}, userData) {
       commit('changeUser', userData);
     }
   },

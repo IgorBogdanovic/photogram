@@ -9,8 +9,18 @@
             <router-link :to="{ name: 'user', params: { userId: comment.user_id } }" tag="span" class="m-comment__username" @click.native="inUserDetail(comment.user_id)">
                 {{ comment.username }}
             </router-link>
-            <p class="m-comment__body">{{ comment.body }}</p>
-            <span class="m-comment__reply">reply</span>
+            <form v-if="idUser === comment.user_id || $route.name === 'edit-post'" @submit.prevent="submitComment($event)" class="m-comment__form">
+                <input type="text"
+                    placeholder="Comment"
+                    v-model="commentBody"
+                    class="m-comment__body--input">
+            </form>
+            <p v-if="idUser === comment.user_id || $route.name === 'edit-post'" class="m-comment__submit-notification">Comment change successfull</p>
+            <p class="m-comment__body--txt">{{ commentBody }}</p>
+            <div class="m-comment__links  u-clearfix">
+                <span class="m-comment__reply-link" @click="commentReply">reply</span>
+                <span v-if="idUser === comment.user_id" class="m-comment__edit-link" @click="commentEdit($event)">edit</span>
+            </div>
         </div>
 
         <div class="m-comment__icons">
@@ -29,6 +39,7 @@
 </template>
 
 <script>
+    import { comments } from '../axios-urls'
     import { mixinStorage, inUserDetail } from '../mixins'
 
     export default {
@@ -36,7 +47,8 @@
         props: ['postComment'],
         data () {
 		    return {
-                comment: this.postComment
+                comment: this.postComment,
+                commentBody: this.postComment.body
 		    }
         },
         computed: {
@@ -55,7 +67,7 @@
                 const commentId = this.comment.id;
                 this.$store.dispatch('nfPosts/deleteComment', commentId)
                     .then(res => {
-                        this.$emit('commentDeleted');
+                        this.$emit('commentEdited');
                     })
                     .catch(error => {
                         console.log(error);
@@ -93,6 +105,44 @@
 					.catch(error => {
 						console.log(error);
 					});
+            },
+            submitComment(e) {
+                const vm = this;
+                const form = $(e.target);
+                comments.patch('' + this.comment.id, { body: this.commentBody }, { headers: { Authorization: 'Bearer ' + this.token } })
+                    .then(res => {
+                        form.find('.m-comment__body--input').off('focus');
+                        form.siblings('.m-comment__submit-notification').show(0).animate({
+                            opacity: 1,
+                            top: '-2rem'
+                        }, 1500, function() {
+                            form.siblings('.m-comment__submit-notification').hide(0).css({
+                                opacity: 0,
+                                top: '2rem'
+                            });
+                            form.find('.m-comment__body--input').hide(0);
+                            form.siblings('.m-comment__body--txt').show(0);
+                        });
+                        setTimeout(function() { vm.$emit('commentEdited'); }, 1600);
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+            },
+            commentEdit(e) {
+                const editLink = $(e.target);
+                if ( editLink.hasClass('js-active') ) {
+                    editLink.removeClass('js-active');
+                    editLink.parents('.m-comment__content').find('.m-comment__form').find('.m-comment__body--input').hide(0).off('focus');
+                    editLink.parents('.m-comment__content').find('.m-comment__body--txt').show(0);
+                } else {
+                    editLink.addClass('js-active');
+                    editLink.parents('.m-comment__content').find('.m-comment__body--txt').hide(0);
+                    editLink.parents('.m-comment__content').find('.m-comment__form').find('.m-comment__body--input').show(0).focus();
+                }
+            },
+            commentReply() {
+                $('.m-make-comment__input').focus().val('@' + this.comment.username + ' ');
             }
         }
 	}
@@ -126,7 +176,8 @@
 
         &__content {
             @include fontSizeRem(14, 16);
-			@include lineHeightRem(17, 19);
+            @include lineHeightRem(17, 19);
+            position: relative;
             display: inline-block;
             width: 55%;
             margin-top: 2.2rem;
@@ -145,31 +196,64 @@
             cursor: pointer;
         }
 
-        &__body {
+        &__form {
             display: inline;
         }
 
-        &__reply {
-            @include fontSizeRem(10, 16);
-            @include lineHeightRem(12, 19);
-            display: block;
-            color: $lightblack;
-            opacity: .5;
-            text-align: right;
-            margin-top: 1rem;
-            margin-right: 1rem;
+        &__body--input {
+            @include fontSizeRem(14, 16);
+            @include lineHeightRem(17, 19);
+            display: none;
+            width: 80%;
+            outline: none;
+            background-color: $white;
+            border-radius: 5px;
+
+            @include breakpoint(desktop) {
+                width: 85%;
+            }
+
+            &:focus {
+                background-color: $lightgray;
+            }
+        }
+
+        &__body--txt {
+            display: inline;
+        }
+
+        &__submit-notification {
+            display: none;
+            position: absolute;
+            top: 2rem;
+            width: 75vw;
+            opacity: 0;
+            color: $lightgreen;
+        }
+
+        &__links {
+            span {
+                @include fontSizeRem(10, 16);
+                @include lineHeightRem(12, 19);
+                color: $lightblack;
+                opacity: .5;
+                float: right;
+                margin-top: 1rem;
+                margin-right: 1rem;
+                cursor: pointer;
+            }
         }
 
         &__icons {
             display: inline-block;
-            margin-left: .5rem;
+            margin-right: .5rem;
             margin-bottom: .3rem;
             width: 6.2rem;
 
             @include breakpoint(desktop) {
                 position: relative;
                 top: -1.5rem;
-                width: 6.6rem;
+                width: 8.6rem;
             }
 
             svg {
@@ -178,7 +262,7 @@
             }
         }
 
-        &__delete {
+        &__delete, &__edit {
             float: right;
             width: 2.7rem;
             height: 2.7rem;

@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from 'axios';
 
 export const auth = axios.create({
 	baseURL: 'http://54.37.227.57:80/api/auth/'

@@ -1,9 +1,17 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
+import Vue from 'vue';
+import VueRouter from 'vue-router';
 
-import { store } from './store/store'
+import { store } from './store/store';
 
-import LogIn from './components/LogIn.vue'
+import LogIn from './components/LogIn.vue';
+
+function tokenCheck(to, from, next) {
+	if (!localStorage.getItem('token')) {
+		next('login');
+		return false;
+	}
+	next();
+}
 
 // LAZY LOADING
 const SignUp = resolve => {
@@ -66,32 +74,85 @@ const EditPost = resolve => {
 	});
 };
 
+const MyNotification = resolve => {
+	require.ensure(['./components/MyNotification.vue'], () => {
+		resolve(require('./components/MyNotification.vue'));
+	});
+};
+
 Vue.use(VueRouter);
 
 const routes = [
-	{ path: '*', redirect: '/login' },
-	{ path: '/', redirect: '/login' },
+	{ path: '*', redirect: '/homepage' },
+	{ path: '/', redirect: '/homepage' },
 	{ path: '/login', name: 'login', component: LogIn },
 	{ path: '/signup', name: 'signup', component: SignUp },
 	{ path: '/terms', name: 'terms', component: Terms },
 	{ path: '/homepage', name: 'homepage', component: HomePage,
 		children: [
-			{ path: 'photo.:postId', name: 'photo', props: true, component: PostDetail, meta: { requiresAuth: true } },
-			{ path: 'comments.:postId', name: 'comments', props: true, component: Comments, meta: { requiresAuth: true } },
-			{ path: 'likes.:postId.:typeId', name: 'likes', props: true, component: Likes, meta: { requiresAuth: true } }
-		]
+			{ path: 'photo.:postId', name: 'photo', props: true, component: PostDetail, meta: { requiresAuth: true },
+				beforeEnter: (to, from, next) => {
+					tokenCheck(to, from, next);
+				}
+			},
+			{ path: 'comments.:postId', name: 'comments', props: true, component: Comments, meta: { requiresAuth: true },
+				beforeEnter: (to, from, next) => {
+					tokenCheck(to, from, next);
+				}
+			},
+			{ path: 'likes.:postId.:typeId', name: 'likes', props: true, component: Likes, meta: { requiresAuth: true },
+				beforeEnter: (to, from, next) => {
+					tokenCheck(to, from, next);
+				}
+			},
+		],
+		beforeEnter: (to, from, next) => {
+			tokenCheck(to, from, next);
+		}
 	},
 	{ path: '/user-id.:userId', name: 'user', props: true, component: User,
 		children: [
-			{ path: 'photo-detail.:postId', name: 'photo-detail', props: true, component: PostDetail, meta: { requiresAuth: true } },
-			{ path: 'comments-view.:postId', name: 'comments-view', props: true, component: Comments, meta: { requiresAuth: true } },
-			{ path: 'likes-view.:postId.:typeId', name: 'likes-view', props: true, component: Likes, meta: { requiresAuth: true } },
-			{ path: 'upload', name: 'upload', component: Upload, meta: { requiresAuth: true } }
-		]
+			{ path: 'photo-detail.:postId', name: 'photo-detail', props: true, component: PostDetail, meta: { requiresAuth: true },
+				beforeEnter: (to, from, next) => {
+					tokenCheck(to, from, next);
+				}
+			},
+			{ path: 'comments-view.:postId', name: 'comments-view', props: true, component: Comments, meta: { requiresAuth: true },
+				beforeEnter: (to, from, next) => {
+					tokenCheck(to, from, next);
+				}
+			},
+			{ path: 'likes-view.:postId.:typeId', name: 'likes-view', props: true, component: Likes, meta: { requiresAuth: true },
+				beforeEnter: (to, from, next) => {
+					tokenCheck(to, from, next);
+				}
+			},
+			{ path: 'upload', name: 'upload', component: Upload, meta: { requiresAuth: true },
+				beforeEnter: (to, from, next) => {
+					tokenCheck(to, from, next);
+				}
+			}
+		],
+		beforeEnter: (to, from, next) => {
+			tokenCheck(to, from, next);
+		}
 	},
-	{ path: '/edit-profile', name: 'edit-profile', component: EditProfile },
-	{ path: '/edit-post.:postId', name: 'edit-post', props: true, component: EditPost }
-]
+	{ path: '/edit-profile', name: 'edit-profile', component: EditProfile,
+		beforeEnter: (to, from, next) => {
+			tokenCheck(to, from, next);
+		}
+	},
+	{ path: '/edit-post.:postId', name: 'edit-post', props: true, component: EditPost,
+		beforeEnter: (to, from, next) => {
+			tokenCheck(to, from, next);
+		}
+	},
+	{ path: '/my-notification', name: 'my-notification', component: MyNotification,
+		beforeEnter: (to, from, next) => {
+			tokenCheck(to, from, next);
+		}
+	},
+];
 
 export default new VueRouter({ 
 	mode: 'history',

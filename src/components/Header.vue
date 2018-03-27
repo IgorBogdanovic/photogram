@@ -53,13 +53,13 @@
             </svg>
         </div>
 
-        <div v-if="heading !== 'Terms and Conditions'" class="o-header__bulb  a-bulb">
+        <router-link v-if="heading !== 'Terms and Conditions'" :to="{ name: 'my-notification' }" tag="div" class="o-header__bulb  a-bulb" :class="{ 'is-active': isNotificationActive }">
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                 viewBox="0 0 438.536 438.536" style="enable-background:new 0 0 438.536 438.536;"
                 xml:space="preserve">
             <g>
                 <g>
-                    <path d="M352.733,75.226c-8.466-16.271-19.599-29.787-33.394-40.541c-13.801-10.752-29.413-19.223-46.821-25.41
+                    <path class="cls-1" d="M352.733,75.226c-8.466-16.271-19.599-29.787-33.394-40.541c-13.801-10.752-29.413-19.223-46.821-25.41
                         C255.1,3.094,237.349,0,219.266,0s-35.832,3.09-53.247,9.276c-17.417,6.187-33.025,14.657-46.826,25.41
                         c-13.796,10.754-24.932,24.267-33.402,40.541c-8.47,16.274-12.703,33.83-12.703,52.677c0,29.502,9.805,55.006,29.409,76.516
                         c8.567,9.324,15.656,17.604,21.271,24.838c5.617,7.228,11.279,16.316,16.989,27.261c5.708,10.944,8.945,21.176,9.707,30.696
@@ -77,7 +77,7 @@
                         c10.562-7.521,22.266-13.418,35.116-17.701c12.847-4.286,25.837-6.423,38.972-6.423s26.125,2.137,38.971,6.423
                         c12.847,4.283,24.551,10.181,35.115,17.701c10.561,7.52,19.13,17.181,25.693,28.979c6.563,11.803,9.853,24.556,9.853,38.262
                         C328.898,147.124,322.427,164.255,309.484,179.292z"/>
-                    <path d="M247.674,86.795c-9.418-3.046-18.891-4.57-28.404-4.57c-2.474,0-4.615,0.9-6.423,2.712
+                    <path class="cls-2" d="M247.674,86.795c-9.418-3.046-18.891-4.57-28.404-4.57c-2.474,0-4.615,0.9-6.423,2.712
                         c-1.809,1.809-2.712,3.949-2.712,6.423s0.904,4.615,2.712,6.423c1.809,1.805,3.949,2.712,6.423,2.712
                         c9.9,0,19.985,2.38,30.272,7.135c10.273,4.758,15.406,11.516,15.406,20.273c0,2.473,0.9,4.618,2.711,6.423
                         c1.813,1.804,3.949,2.708,6.42,2.708c2.478,0,4.616-0.901,6.427-2.708c1.811-1.809,2.71-3.951,2.71-6.423
@@ -85,7 +85,7 @@
                 </g>
             </g>
             </svg>
-        </div>
+        </router-link>
 
         <h1 v-if="heading === 'photogram'" class="o-header__heading--main  a-heading--main">photo<span>gram</span></h1>
         <h1 v-else class="o-header__heading  a-heading">{{ heading }}</h1>
@@ -114,6 +114,9 @@
             isUploadActive() {
                 return this.$route.name === 'upload';
 			},
+            isNotificationActive() {
+                return this.$route.name === 'my-notification';
+            },
 			userAvatar() {
 				return this.$store.getters['login/userAvatar'];
             },
@@ -141,11 +144,6 @@
                 .then(res => {
 					const user = res.data.data;
 					this.$store.dispatch('nfPosts/changeUser', user);
-
-					// if (this.windowWidth > this.breakpoint) {
-					// 	$('.o-homepage').addClass('u-overflow-disabled');
-					// 	$('.o-user').addClass('u-overflow-disabled');
-					// }
                 })
                 .catch(error => {
                     console.log(error);
@@ -302,6 +300,7 @@
         margin-right: 1.5rem;
         border-radius: 50%;
         background-color: $black;
+        cursor: pointer;
 
         @include breakpoint(desktop) {
             float: left;
@@ -324,6 +323,12 @@
                 height: 3.5rem;
             }
         }
+
+        &.is-active {
+			svg .cls-1 {
+				fill: $lightgreen;
+			}
+		}
     }
 
     .a-hr {

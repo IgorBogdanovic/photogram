@@ -1,4 +1,4 @@
-import { users } from './axios-urls'
+import { users } from './axios-urls';
 
 export const basicVars = {
     data () {
@@ -6,9 +6,9 @@ export const basicVars = {
             windowWidth: $(window).width(),
             windowHeight: $(window).height(),
     		breakpoint: 767
-        }
+        };
     }
-}
+};
 
 export const mixinStorage = {
     computed: {
@@ -16,7 +16,7 @@ export const mixinStorage = {
             return this.$store.getters.dbStorage;
         }
     }
-}
+};
 
 export const inUserDetail = {
     methods: {
@@ -32,4 +32,4 @@ export const inUserDetail = {
             });
         }
     }
-}
+};

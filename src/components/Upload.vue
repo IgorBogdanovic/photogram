@@ -4,7 +4,7 @@
 		<div class="o-upload__wrapper">
             <h3 class="o-upload__small-heading  u-only-desktop">Upload Photo or Video</h3>
             <form @submit.prevent="submitPost">
-                <div class="o-upload__media-container" @dragover.prevent @drop.stop.prevent="onDrop($event)">
+                <div class="o-upload__media-container" @dragover.prevent @drop.stop.prevent="onFileSelected($event)">
                     <input type="file"
                         style="display: none"
                         @change="onFileSelected"
@@ -64,18 +64,16 @@
             }
 		},
 		methods: {
-            onDrop(e) {
-                // e.stopPropagation();
-                // e.preventDefault();
-                // var files = e.dataTransfer.files;
-                // this.createFile(files[0]);
-                console.log(e.dataTransfer.files['0']);
-            },
 			onFileSelected(e) {
-                const input = e.target;
-                this.selectedFile = e.target.files[0];
+                if (e.type === 'change') {
+                    var input = e.target;
+                    this.selectedFile = e.target.files[0];
+                } else if (e.type === 'drop') {
+                    var input = e.dataTransfer;
+                    this.selectedFile = e.dataTransfer.files['0'];
+                }
 
-                if (input.files && input.files[0]) {
+                if ( input.files && (input.files[0] || input.files['0']) ) {
                     const reader = new FileReader();
                     const validImageTypes = ['image/gif', 'image/jpeg', 'image/png'];
                     const validVideoTypes = ['video/mp4', 'video/flv', 'video/wmv', 'video/avi', 'video/mpeg', 'video/qt'];

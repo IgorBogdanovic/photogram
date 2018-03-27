@@ -41,12 +41,21 @@
         },
         methods: {
 		    submitComment() {
-		        const commentData = {
-					post_id: this.newsFeedPost.id,
-					body: this.comment
+                var txtSplited = this.comment.split(' ');
+                if ( txtSplited[0].indexOf('@') > -1 ) {
+                    var username = txtSplited[0].replace('@', '');
+                }
+                var txtJoined = txtSplited.join(' ');
+
+                const commentData = {
+                    post_id: this.newsFeedPost.id,
+                    reply_username: username,
+					body: txtJoined
                 };
+                console.log(commentData);
                 this.$store.dispatch('nfPosts/postComment', commentData)
                     .then(res => {
+                        console.log(res);
                         this.$emit('commentSubmited');
                         this.comment = '';
                     })
@@ -134,11 +143,16 @@
             width: 68%;
             margin-left: .2rem;
             border: none;
+            border-radius: 5px;
 
             @include breakpoint(desktop) {
                 width: 73%;
                 bottom: 1.2rem;
                 margin-left: .7rem;
+            }
+
+            &:focus {
+                background-color: $lightgray;
             }
         }
 

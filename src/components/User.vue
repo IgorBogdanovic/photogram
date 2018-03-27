@@ -349,6 +349,7 @@
                     } else this.$store.dispatch('headings/actSetHeading', 'Upload');
                     break;
                 case 'user':
+                console.log(0);
                     this.userAuth_follow = this.user.auth_follow;
                     if (this.windowWidth > this.breakpoint) {
                         $('body').removeClass('u-overflow-disabled');

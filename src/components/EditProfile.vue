@@ -131,7 +131,10 @@
         computed: {
 			token() {
 				return this.$store.getters['login/token'];
-			},
+            },
+            loggedUserId() {
+				return this.$store.getters['login/idUser'];
+            },
 			userProfile() {
 				return this.$store.getters['login/userProfile'];
             },
@@ -172,6 +175,9 @@
                 }, { headers: { Authorization: 'Bearer ' + this.token } })
                     .then(res => {
                         // console.log(res);
+                        const user = res.data.data;
+                        this.$store.dispatch('nfPosts/changeUser', user);
+                        
                         if (this.selectedFile.type) {
                             const postData = new FormData();
                             postData.append('image', this.selectedFile);
@@ -185,13 +191,14 @@
                                             large: res.data.data.image.profile_large
                                         }
                                     }
-                                    console.log(data);
                                     this.$store.dispatch('login/editUser', data);
                                 })
                                 .catch(error => {
                                     console.log(error);
                                 });
                         }
+
+                        this.$router.push({ name: 'user', params: { userId: this.loggedUserId } });
                     })
                     .catch(error => {
                         console.log(error);
@@ -199,6 +206,7 @@
             }
         },
         created() {
+            // console.log(this.user);
             if (this.windowWidth > this.breakpoint) {
                 this.$store.dispatch('headings/actSetHeading', 'photogram');
             } else this.$store.dispatch('headings/actSetHeading', 'Edit Profile');

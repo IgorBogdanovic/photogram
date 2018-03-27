@@ -1,5 +1,5 @@
-import { auth } from '../../axios-urls'
-import router from '../../router'
+import { auth } from '../../axios-urls';
+import router from '../../router';
 
 export const signup = {
   namespaced: true,

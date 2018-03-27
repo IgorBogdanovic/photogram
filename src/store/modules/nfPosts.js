@@ -1,5 +1,5 @@
-import router from '../../router'
-import { posts, comments, likes, followers } from '../../axios-urls'
+import router from '../../router';
+import { posts, comments, likes, followers } from '../../axios-urls';
 
 export const nfPosts = {
   namespaced: true,
@@ -29,7 +29,13 @@ export const nfPosts = {
       state.newsFeedPost = post;
     },
     setUser(state, user) {
-      state.user = user;
+      const i = Object.keys(state.user).length;
+      const j = Object.keys(user).length;
+      if (i > j) {
+        for (let prop in user) {
+          state.user[prop] = user[prop];
+        }
+      } else state.user = user;
     },
     setPostCommentsAll(state, comments) {
       state.postCommentsAll = comments;
@@ -72,8 +78,13 @@ export const nfPosts = {
     },
     postComment({commit}, data) {
       const token = localStorage.getItem('token');
-      return comments.post('', { post_id: data.post_id, body: data.body },
+      if (data.reply_username) {
+        return comments.post('', { post_id: data.post_id, reply_username: data.reply_username, body: data.body },
         { headers: { Authorization: 'Bearer ' + token } });
+      } else {
+        return comments.post('', { post_id: data.post_id, body: data.body },
+        { headers: { Authorization: 'Bearer ' + token } });
+      }
     },
     postPost({commit}, data) {
       const token = localStorage.getItem('token');

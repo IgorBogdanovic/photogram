@@ -7,7 +7,7 @@
 
             <div class="o-all-comments__wrapper--sub" v-infinite-scroll="axiosGetComments" infinite-scroll-disabled="infScrollDisable" :infinite-scroll-distance="windowHeight/3">
                 <app-comment v-for="(postComment, index) in postCommentsAll" :key="postComment.id + '-' + index" :postComment="postComment"
-                    @commentDeleted="refreshComments" class="o-all-comments__comment"></app-comment>
+                    @commentEdited="refreshComments" class="o-all-comments__comment"></app-comment>
                 <app-spinner v-if="loading"></app-spinner>
             </div>
 
@@ -115,6 +115,8 @@
             } else this.$store.dispatch('headings/actSetHeading', 'Comments');
         },
         destroyed() {
+            // clear MakeComment component input field
+            $('.m-make-comment__input').val('');
             this.$store.dispatch('nfPosts/pushPostCommentsAll', []);
         }
 	}
