@@ -27,3 +27,7 @@ export const followers = axios.create({
 export const followings = axios.create({
 	baseURL: 'http://54.37.227.57:80/api/followings/'
 });
+
+export const search = axios.create({
+	baseURL: 'http://54.37.227.57:80/api/search/'
+});

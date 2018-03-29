@@ -69,19 +69,19 @@
 </template>
 
 <script>
-    import { comments, posts } from '../axios-urls'
-    import { mixinStorage, basicVars } from '../mixins'
-    import Comment from './Comment.vue'
-    import MakeComment from './MakeComment.vue'
-    import Spinner from './Spinner.vue'
+    import { store } from '../store/store';
+    import { comments, posts } from '../axios-urls';
+    import { mixinStorage, basicVars } from '../mixins';
+    import Comment from './Comment.vue';
+    import MakeComment from './MakeComment.vue';
+    import Spinner from './Spinner.vue';
 
     export default {
-        props: ['post'],
+        props: ['postId'],
         mixins: [ mixinStorage, basicVars ],
         data () {
 		    return {
-                newsFeedPost: this.post,
-                description: this.post.description,
+                description: '',
                 descriptionDisabled: true,
                 comments: [],
                 loading: false,
@@ -90,11 +90,6 @@
                 commentPage: 1
 		    }
         },
-        // watch: {
-		// 	post: function() {
-		// 		this.newsFeedPost = this.post;
-        //     }
-		// },
         computed: {
             token() {
 				return this.$store.getters['login/token'];
@@ -102,6 +97,9 @@
             loggedUserId() {
 				return this.$store.getters['login/idUser'];
             },
+            newsFeedPost() {
+				return this.$store.getters['nfPosts/newsFeedPost'];
+			},
             newsFeedPostsAll() {
 				return this.$store.getters['nfPosts/newsFeedPostsAll'];
 			},
@@ -138,7 +136,7 @@
                 iconDescSubmit.show(0);
             },
             submitDescription() {
-                posts.patch('' + this.newsFeedPost.id, { description: this.description }, { headers: { Authorization: 'Bearer ' + this.token } })
+                posts.patch('' + this.postId, { description: this.description }, { headers: { Authorization: 'Bearer ' + this.token } })
                     .then(res => {
                         const iconDescEdit = $('.o-edit-post__edit');
                         const iconDescDelete = $('.o-edit-post__delete');
@@ -166,7 +164,7 @@
             axiosGetComments() {
                 this.loading = true;
                 this.infScrollDisable = true;
-				comments.get('', { headers: { Authorization: 'Bearer ' + this.token }, params: { post_id: this.newsFeedPost.id, amount: this.commentAmount, page: this.commentPage } })
+				comments.get('', { headers: { Authorization: 'Bearer ' + this.token }, params: { post_id: this.postId, amount: this.commentAmount, page: this.commentPage } })
                     .then(res => {
                         if (res.data.data.length > 0) {
                             for (let i = 0; i < res.data.data.length; i++) {
@@ -192,7 +190,7 @@
                     vm.axiosGetComments();
                 }, 500);
                 // update post in NewsFeedPostsAll array
-                posts.get('' + this.newsFeedPost.id, { headers: { Authorization: 'Bearer ' + this.token } })
+                posts.get('' + this.postId, { headers: { Authorization: 'Bearer ' + this.token } })
                     .then(res => {
                         // console.log(res);
                     })
@@ -206,8 +204,19 @@
             appMakeComment: MakeComment,
             appSpinner: Spinner
         },
+        beforeRouteEnter (to, from, next) {
+            posts.get('' + to.params.postId, { headers: { Authorization: 'Bearer ' + store.getters['login/token'] } })
+                .then(res => {
+					const post = res.data.data;
+					store.dispatch('nfPosts/changeNewsFeedPost', post);
+					next();
+                })
+                .catch(error => {
+                    console.log(error);
+				});
+        },
         created() {
-            this.$store.dispatch('nfPosts/changeNewsFeedPost', this.post);
+            this.description = this.newsFeedPost.description;
             if (this.windowWidth > this.breakpoint) {
                 this.$store.dispatch('headings/actSetHeading', 'photogram');
             } else this.$store.dispatch('headings/actSetHeading', 'Edit Post');

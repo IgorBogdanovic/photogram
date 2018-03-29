@@ -82,6 +82,7 @@
 </template>
 
 <script>
+    import { store } from '../store/store';
     import { mixinStorage, basicVars } from '../mixins'
     import { users, posts } from '../axios-urls'
     import NewsFeedPost from './NewsFeedPost.vue'
@@ -320,6 +321,17 @@
 			appNewsFeedPost: NewsFeedPost,
 			appSpinner: Spinner
         },
+        beforeRouteEnter (to, from, next) {
+            users.get('find?id=' + to.params.userId, { headers: { Authorization: 'Bearer ' + store.getters['login/token'] } })
+                .then(res => {
+                    const user = res.data.data;
+                    store.dispatch('nfPosts/changeUser', user);
+                    next();
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        },
         beforeCreate() {
             this.$store.dispatch('nfPosts/pushNewsFeedPostsAll', []);
         },
@@ -327,6 +339,75 @@
             // watch only works when in route and then to watch for changes
             // that's why this check is needed in created (because of possible direct access to upload from link in footer)
             switch (this.$route.name) {
+                case 'photo-detail':
+                    if (this.windowWidth > this.breakpoint) {
+                        $('body').addClass('u-overflow-disabled');
+                        // this get is used so posts can be loaded when child component is reloaded (so user can see them in background)
+                        this.axiosGetPosts();
+                    }
+                    if (!this.infScrollDisable) {
+                        this.infScrollDisable = !this.infScrollDisable;
+                    }
+                    if (this.allCommentsView) {
+                        this.allCommentsView = !this.allCommentsView;
+                    }
+                    if (this.likesView) {
+                        this.likesView = !this.likesView;
+                    }
+                    if (this.upload) {
+                        this.upload = !this.upload;
+                    }
+                    this.postDetailView = !this.postDetailView;
+                    if (this.windowWidth > this.breakpoint) {
+                        this.$store.dispatch('headings/actSetHeading', 'photogram');
+                    } else this.$store.dispatch('headings/actSetHeading', 'Photo');
+                    break;
+                case 'comments-view':
+                    if (this.windowWidth > this.breakpoint) {
+                        $('body').addClass('u-overflow-disabled');
+                        // this get is used so posts can be loaded when child component is reloaded (so user can see them in background)
+                        this.axiosGetPosts();
+                    }
+                    if (!this.infScrollDisable) {
+                        this.infScrollDisable = !this.infScrollDisable;
+                    }
+                    if (this.postDetailView) {
+                        this.postDetailView = !this.postDetailView;
+                    }
+                    if (this.likesView) {
+                        this.likesView = !this.likesView;
+                    }
+                    if (this.upload) {
+                        this.upload = !this.upload;
+                    }
+                    this.allCommentsView = !this.allCommentsView;
+                    if (this.windowWidth > this.breakpoint) {
+                        this.$store.dispatch('headings/actSetHeading', 'photogram');
+                    } else this.$store.dispatch('headings/actSetHeading', 'Comments');
+                    break;
+                case 'likes-view':
+                    if (this.windowWidth > this.breakpoint) {
+                        $('body').addClass('u-overflow-disabled');
+                        // this get is used so posts can be loaded when child component is reloaded (so user can see them in background)
+                        this.axiosGetPosts();
+                    }
+                    if (!this.infScrollDisable) {
+                        this.infScrollDisable = !this.infScrollDisable;
+                    }
+                    if (this.postDetailView) {
+                        this.postDetailView = !this.postDetailView;
+                    }
+                    if (this.allCommentsView) {
+                        this.allCommentsView = !this.allCommentsView;
+                    }
+                    if (this.upload) {
+                        this.upload = !this.upload;
+                    }
+                    this.likesView = !this.likesView;
+                    if (this.windowWidth > this.breakpoint) {
+                        this.$store.dispatch('headings/actSetHeading', 'photogram');
+                    } else this.$store.dispatch('headings/actSetHeading', 'Likes');
+                    break;
                 case 'upload':
                     if (this.windowWidth > this.breakpoint) {
                         $('body').addClass('u-overflow-disabled');
@@ -349,7 +430,6 @@
                     } else this.$store.dispatch('headings/actSetHeading', 'Upload');
                     break;
                 case 'user':
-                console.log(0);
                     this.userAuth_follow = this.user.auth_follow;
                     if (this.windowWidth > this.breakpoint) {
                         $('body').removeClass('u-overflow-disabled');

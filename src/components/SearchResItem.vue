@@ -1,20 +1,20 @@
 <template>
-    <div class="m-like">
+    <div class="m-search-item">
 
-        <router-link :to="{ name: 'user', params: { userId: like.id } }" tag="div" class="m-like__user-img">
-            <img :src="storage + like.image.avatar" alt="user avatar that made this comment">
+        <router-link :to="{ name: 'user', params: { userId: 6 } }" tag="div" class="m-search-item__user-img">
+            <img alt="searched user avatar">
         </router-link>
 
-        <div class="m-like__content">
-            <router-link :to="{ name: 'user', params: { userId: like.id } }" tag="span" class="m-like__username">
-                {{ like.username }}
+        <div class="m-search-item__content">
+            <router-link :to="{ name: 'user', params: { userId: 6 } }" tag="span" class="m-search-item__username">
+                <!-- {{ like.username }} --> igor
             </router-link>
-            <p class="m-like__txt">liked this post</p>
+            <p class="m-search-item__txt">something</p>
         </div>
 
-        <div class="m-like__button">
-            <button v-if="!like.auth_follow && like.id != loggedUserId" class="m-like__btn  m-like__btn--follow" type="button" @click="followUser">Follow</button>
-            <button v-if="like.auth_follow" class="m-like__btn  m-like__btn--unfollow" type="button" @click="unfollowUser">Unfollow</button>
+        <div class="m-search-item__button">
+            <!-- <button v-if="!like.auth_follow && like.id != loggedUserId" class="m-like__btn  m-like__btn--follow" type="button" @click="followUser">Follow</button> -->
+            <button class="m-search-item__btn  m-search-item__btn--unfollow" type="button" @click="unfollowUser">Unfollow</button>
         </div>
 
     </div>
@@ -25,10 +25,10 @@
 
     export default {
         mixins: [ mixinStorage ],
-        props: ['likeObj'],
+        props: ['searchResItem'],
         data () {
 		    return {
-                like: this.likeObj
+                searchedItem: this.searchResItem
 		    }
         },
         computed: {
@@ -69,7 +69,7 @@
 <style lang="scss" scoped>
 	@import '../scss/settings';
 
-    .m-like {
+    .m-search-item {
         &__user-img {
             display: inline-block;
             width: 4.1rem;
@@ -89,6 +89,7 @@
                 width: 100%;
                 height: 100%;
                 border-radius: 50%;
+                background-color: burlywood;
             }
         }
 

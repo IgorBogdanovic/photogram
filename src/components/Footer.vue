@@ -12,7 +12,7 @@
 		</router-link>
 
 		<router-link :to="{ name: 'user', params: { userId: loggedUserId } }" tag="div"
-			class="o-footer__avatar  a-avatar" @click.native="inUserDetail">
+			class="o-footer__avatar  a-avatar">
 			<img :src="storage + userAvatar" alt="logged user avatar">
 		</router-link>
 
@@ -65,16 +65,6 @@
 			}
 		},
 		methods: {
-            inUserDetail() {
-				users.get('find?id=' + this.loggedUserId, { headers: { Authorization: 'Bearer ' + this.token } })
-                .then(res => {
-					const user = res.data.data;
-					this.$store.dispatch('nfPosts/changeUser', user);
-                })
-                .catch(error => {
-                    console.log(error);
-				});
-			},
 			inUserUpload() {
 				users.get('find?id=' + this.loggedUserId, { headers: { Authorization: 'Bearer ' + this.token } })
                 .then(res => {

@@ -5,7 +5,7 @@
         <div class="o-media-detail__wrapper">
 
             <div class="o-media-detail__user  m-detail-user">
-				<router-link :to="{ name: 'user', params: { userId: newsFeedPost.user_id } }" tag="div" class="m-detail-user__link" @click.native="inUserDetail(newsFeedPost.user_id)">
+				<router-link :to="{ name: 'user', params: { userId: newsFeedPost.user_id } }" tag="div" class="m-detail-user__link">
 					<div class="m-detail-user__avatar">
 						<img :src="storage + newsFeedPost.user_image.avatar" alt="avatar">
 					</div>
@@ -66,7 +66,7 @@
 				</div>
 
 				<router-link v-if="$route.name === 'homepage' || $route.name === 'photo'"
-				:to="{ name: 'likes', params: { postId: newsFeedPost.id, typeId: 1 } }" tag="div" class="m-detail-bar__info-likes" @click.native="viewChildRoute">
+				:to="{ name: 'likes', params: { postId: newsFeedPost.id, typeId: 1 } }" tag="div" class="m-detail-bar__info-likes">
 					<div class="m-detail-bar__info-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="2700.998 281.935 22.901 23.092">
                         <path id="Path_79" data-name="Path 79" class="cls-1" d="M19.339,1.1A4.1,4.1,0,0,0,13.823.959h0a5.493,5.493,0,0,1-3.337,1.318A5.225,5.225,0,0,1,6.809.959h0a4.166,4.166,0,0,0-5.448.069,4.366,4.366,0,0,0-.409,5.9h0L10.35,20.1,19.816,6.854A4.416,4.416,0,0,0,19.339,1.1Z" transform="translate(2702.004 283.205)"/>
@@ -76,7 +76,7 @@
                     <p class="m-detail-bar__likes-count">{{ newsFeedPost.likes_count }}</p>
 				</router-link>
 				<router-link v-if="$route.name === 'user' || $route.name === 'photo-detail'"
-				:to="{ name: 'likes-view', params: { postId: newsFeedPost.id, typeId: 1 } }" tag="div" class="m-detail-bar__info-likes" @click.native="viewChildRoute">
+				:to="{ name: 'likes-view', params: { postId: newsFeedPost.id, typeId: 1 } }" tag="div" class="m-detail-bar__info-likes">
 					<div class="m-detail-bar__info-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="2700.998 281.935 22.901 23.092">
                         <path id="Path_79" data-name="Path 79" class="cls-1" d="M19.339,1.1A4.1,4.1,0,0,0,13.823.959h0a5.493,5.493,0,0,1-3.337,1.318A5.225,5.225,0,0,1,6.809.959h0a4.166,4.166,0,0,0-5.448.069,4.366,4.366,0,0,0-.409,5.9h0L10.35,20.1,19.816,6.854A4.416,4.416,0,0,0,19.339,1.1Z" transform="translate(2702.004 283.205)"/>
@@ -89,7 +89,7 @@
             </div>
 
             <div v-if="newsFeedPost.description" class="o-media-detail__media-descrpt  m-detail-media-descrpt">
-				<router-link :to="{ name: 'user', params: { userId: newsFeedPost.user_id } }" tag="div" class="m-detail-media-descrpt__avatar" @click.native="inUserDetail(newsFeedPost.user_id)">
+				<router-link :to="{ name: 'user', params: { userId: newsFeedPost.user_id } }" tag="div" class="m-detail-media-descrpt__avatar">
 					<img :src="storage + newsFeedPost.user_image.avatar" alt="this user avatar">
 				</router-link>
 
@@ -98,7 +98,7 @@
 
             <div class="o-media-detail__comments  m-detail-comments" v-if="newsFeedPost.comments_count >= 0">
                 <div class="m-detail-comments__comment-block" v-for="(comment, index) in newsFeedPost.comments" v-if="index < 1" :key="comment.id">
-					<router-link :to="{ name: 'user', params: { userId: comment.user_id } }" tag="div" class="m-detail-comments__avatar" @click.native="inUserDetail(comment.user_id)">
+					<router-link :to="{ name: 'user', params: { userId: comment.user_id } }" tag="div" class="m-detail-comments__avatar">
 						<img :src="storage + comment.user_image.avatar" alt="user avatar that made this comment">
 					</router-link>
 
@@ -107,9 +107,9 @@
 
                 <!-- need route path once made -->
                 <router-link v-if="$route.name === 'photo' && newsFeedPost.comments_count > 0"
-					:to="{ name: 'comments' }" tag="span" class="m-detail-comments__view-all" @click.native="viewChildRoute">view all comments</router-link>
+					:to="{ name: 'comments' }" tag="span" class="m-detail-comments__view-all">view all comments</router-link>
 				<router-link v-if="$route.name === 'photo-detail' && newsFeedPost.comments_count > 0"
-					:to="{ name: 'comments-view' }" tag="span" class="m-detail-comments__view-all" @click.native="viewChildRoute">view all comments</router-link>
+					:to="{ name: 'comments-view' }" tag="span" class="m-detail-comments__view-all">view all comments</router-link>
             </div>
 
         </div>
@@ -119,12 +119,13 @@
 </template>
 
 <script>
-	import { mixinStorage, basicVars, inUserDetail } from '../mixins'
+	import { store } from '../store/store';
+	import { mixinStorage, basicVars } from '../mixins'
 	import { posts } from '../axios-urls'
 	import MakeComment from './MakeComment.vue'
 
     export default {
-		mixins: [ mixinStorage, basicVars, inUserDetail ],
+		mixins: [ mixinStorage, basicVars ],
         computed: {
 			token() {
 				return this.$store.getters['login/token'];
@@ -219,10 +220,6 @@
                     console.log(error);
 				});
             },
-			viewChildRoute() {
-				const post = this.newsFeedPost;
-				this.$store.dispatch('nfPosts/changeNewsFeedPost', post);
-			},
 			unLikePost() {
                 const postId = this.newsFeedPost.id;
                 const likeId = this.newsFeedPost.auth_like_id;
@@ -289,6 +286,17 @@
 		components: {
             appMakeComment: MakeComment
 		},
+		beforeRouteEnter (to, from, next) {
+			posts.get('' + to.params.postId, { headers: { Authorization: 'Bearer ' + store.getters['login/token'] } })
+                .then(res => {
+					const post = res.data.data;
+					store.dispatch('nfPosts/changeNewsFeedPost', post);
+					next();
+                })
+                .catch(error => {
+                    console.log(error);
+				});
+        },
         created() {
             if (this.windowWidth > this.breakpoint) {
                 this.$store.dispatch('headings/actSetHeading', 'photogram');

@@ -162,20 +162,77 @@
 			this.$store.dispatch('nfPosts/pushNewsFeedPostsAll', []);
         },
 		created() {
-			if (this.windowWidth > this.breakpoint) {
-				$('body').removeClass('u-overflow-disabled');
+			switch (this.$route.name) {
+				case 'photo':
+					if (this.windowWidth > this.breakpoint) {
+						$('body').addClass('u-overflow-disabled');
+						// this get is used so posts can be loaded when child component is reloaded (so user can see them in background)
+						this.axiosGetPosts();
+					}
+					if (!this.infScrollDisable) {
+						this.infScrollDisable = !this.infScrollDisable;
+					}
+					if (this.allCommentsView) {
+						this.allCommentsView = !this.allCommentsView;
+					}
+					if (this.likesView) {
+						this.likesView = !this.likesView;
+					}
+					this.postDetailView = !this.postDetailView;
+					this.$store.dispatch('headings/actSetHeading', 'Photo');
+					break;
+				case 'comments':
+					if (this.windowWidth > this.breakpoint) {
+						$('body').addClass('u-overflow-disabled');
+						// this get is used so posts can be loaded when child component is reloaded (so user can see them in background)
+						this.axiosGetPosts();
+					}
+					if (!this.infScrollDisable) {
+						this.infScrollDisable = !this.infScrollDisable;
+					}
+					if (this.postDetailView) {
+						this.postDetailView = !this.postDetailView;
+					}
+					if (this.likesView) {
+						this.likesView = !this.likesView;
+					}
+					this.allCommentsView = !this.allCommentsView;
+					this.$store.dispatch('headings/actSetHeading', 'Comments');
+					break;
+				case 'likes':
+					if (this.windowWidth > this.breakpoint) {
+						$('body').addClass('u-overflow-disabled');
+						// this get is used so posts can be loaded when child component is reloaded (so user can see them in background)
+						this.axiosGetPosts();
+					}
+					if (!this.infScrollDisable) {
+						this.infScrollDisable = !this.infScrollDisable;
+					}
+					if (this.postDetailView) {
+						this.postDetailView = !this.postDetailView;
+					}
+					if (this.allCommentsView) {
+						this.allCommentsView = !this.allCommentsView;
+					}
+					this.likesView = !this.likesView;
+					this.$store.dispatch('headings/actSetHeading', 'Likes');
+					break;
+				case 'homepage':
+					if (this.windowWidth > this.breakpoint) {
+						$('body').removeClass('u-overflow-disabled');
+					}
+					if (this.infScrollDisable) {
+						this.infScrollDisable = !this.infScrollDisable;
+					}
+					if (this.postDetailView) {
+						this.postDetailView = !this.postDetailView;
+					} else if (this.allCommentsView) {
+						this.allCommentsView = !this.allCommentsView;
+					} else if (this.likesView) {
+						this.likesView = !this.likesView;
+					}
+					this.$store.dispatch('headings/actSetHeading', 'photogram');
 			}
-			if (this.infScrollDisable) {
-				this.infScrollDisable = !this.infScrollDisable;
-			}
-			if (this.postDetailView) {
-				this.postDetailView = !this.postDetailView;
-			} else if (this.allCommentsView) {
-				this.allCommentsView = !this.allCommentsView;
-			} else if (this.likesView) {
-				this.likesView = !this.likesView;
-			}
-			this.$store.dispatch('headings/actSetHeading', 'photogram');
 		},
 		destroyed() {
 			this.$store.dispatch('nfPosts/pushNewsFeedPostsAll', []);

@@ -52,10 +52,8 @@
                     reply_username: username,
 					body: txtJoined
                 };
-                console.log(commentData);
                 this.$store.dispatch('nfPosts/postComment', commentData)
                     .then(res => {
-                        console.log(res);
                         this.$emit('commentSubmited');
                         this.comment = '';
                     })

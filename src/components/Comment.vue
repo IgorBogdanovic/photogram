@@ -1,12 +1,12 @@
 <template>
     <div class="m-comment">
 
-        <router-link :to="{ name: 'user', params: { userId: comment.user_id } }" tag="div" class="m-comment__user-img" @click.native="inUserDetail(comment.user_id)">
+        <router-link :to="{ name: 'user', params: { userId: comment.user_id } }" tag="div" class="m-comment__user-img">
             <img :src="storage + comment.user_image.avatar" alt="user avatar that made this comment">
         </router-link>
 
         <div class="m-comment__content">
-            <router-link :to="{ name: 'user', params: { userId: comment.user_id } }" tag="span" class="m-comment__username" @click.native="inUserDetail(comment.user_id)">
+            <router-link :to="{ name: 'user', params: { userId: comment.user_id } }" tag="span" class="m-comment__username">
                 {{ comment.username }}
             </router-link>
             <form v-if="idUser === comment.user_id || $route.name === 'edit-post'" @submit.prevent="submitComment($event)" class="m-comment__form">
@@ -16,7 +16,12 @@
                     class="m-comment__body--input">
             </form>
             <p v-if="idUser === comment.user_id || $route.name === 'edit-post'" class="m-comment__submit-notification">Comment change successfull</p>
-            <p class="m-comment__body--txt">{{ commentBody }}</p>
+            <p class="m-comment__body--txt">
+                <router-link v-if="comment.reply_username" :to="{ name: 'user', params: { userId: comment.reply_user_id } }" tag="span">
+                    @{{ comment.reply_username }}
+                </router-link>
+                {{ commentBody.replace('@' + comment.reply_username, '') }}
+            </p>
             <div class="m-comment__links  u-clearfix">
                 <span class="m-comment__reply-link" @click="commentReply">reply</span>
                 <span v-if="idUser === comment.user_id" class="m-comment__edit-link" @click="commentEdit($event)">edit</span>
@@ -40,10 +45,10 @@
 
 <script>
     import { comments } from '../axios-urls'
-    import { mixinStorage, inUserDetail } from '../mixins'
+    import { mixinStorage } from '../mixins'
 
     export default {
-        mixins: [ mixinStorage, inUserDetail ],
+        mixins: [ mixinStorage ],
         props: ['postComment'],
         data () {
 		    return {
@@ -144,7 +149,10 @@
             commentReply() {
                 $('.m-make-comment__input').focus().val('@' + this.comment.username + ' ');
             }
-        }
+        },
+        // created() {
+        //     console.log(this.postComment);
+        // }
 	}
 </script>
 
@@ -220,6 +228,12 @@
 
         &__body--txt {
             display: inline;
+
+            span {
+                font-family: 'Roboto-Bold', sans-serif;
+                color: blue;
+                cursor: pointer;
+            }
         }
 
         &__submit-notification {

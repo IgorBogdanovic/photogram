@@ -80,6 +80,12 @@ const MyNotification = resolve => {
 	});
 };
 
+const Search = resolve => {
+	require.ensure(['./components/Search.vue'], () => {
+		resolve(require('./components/Search.vue'));
+	});
+};
+
 Vue.use(VueRouter);
 
 const routes = [
@@ -90,17 +96,17 @@ const routes = [
 	{ path: '/terms', name: 'terms', component: Terms },
 	{ path: '/homepage', name: 'homepage', component: HomePage,
 		children: [
-			{ path: 'photo.:postId', name: 'photo', props: true, component: PostDetail, meta: { requiresAuth: true },
+			{ path: 'photo::postId', name: 'photo', props: true, component: PostDetail, meta: { requiresAuth: true },
 				beforeEnter: (to, from, next) => {
 					tokenCheck(to, from, next);
 				}
 			},
-			{ path: 'comments.:postId', name: 'comments', props: true, component: Comments, meta: { requiresAuth: true },
+			{ path: 'comments::postId', name: 'comments', props: true, component: Comments, meta: { requiresAuth: true },
 				beforeEnter: (to, from, next) => {
 					tokenCheck(to, from, next);
 				}
 			},
-			{ path: 'likes.:postId.:typeId', name: 'likes', props: true, component: Likes, meta: { requiresAuth: true },
+			{ path: 'likes::postId::typeId', name: 'likes', props: true, component: Likes, meta: { requiresAuth: true },
 				beforeEnter: (to, from, next) => {
 					tokenCheck(to, from, next);
 				}
@@ -110,19 +116,19 @@ const routes = [
 			tokenCheck(to, from, next);
 		}
 	},
-	{ path: '/user-id.:userId', name: 'user', props: true, component: User,
+	{ path: '/user-id::userId', name: 'user', props: true, component: User,
 		children: [
-			{ path: 'photo-detail.:postId', name: 'photo-detail', props: true, component: PostDetail, meta: { requiresAuth: true },
+			{ path: 'photo-detail::postId', name: 'photo-detail', props: true, component: PostDetail, meta: { requiresAuth: true },
 				beforeEnter: (to, from, next) => {
 					tokenCheck(to, from, next);
 				}
 			},
-			{ path: 'comments-view.:postId', name: 'comments-view', props: true, component: Comments, meta: { requiresAuth: true },
+			{ path: 'comments-view::postId', name: 'comments-view', props: true, component: Comments, meta: { requiresAuth: true },
 				beforeEnter: (to, from, next) => {
 					tokenCheck(to, from, next);
 				}
 			},
-			{ path: 'likes-view.:postId.:typeId', name: 'likes-view', props: true, component: Likes, meta: { requiresAuth: true },
+			{ path: 'likes-view::postId::typeId', name: 'likes-view', props: true, component: Likes, meta: { requiresAuth: true },
 				beforeEnter: (to, from, next) => {
 					tokenCheck(to, from, next);
 				}
@@ -142,7 +148,7 @@ const routes = [
 			tokenCheck(to, from, next);
 		}
 	},
-	{ path: '/edit-post.:postId', name: 'edit-post', props: true, component: EditPost,
+	{ path: '/edit-post::postId', name: 'edit-post', props: true, component: EditPost,
 		beforeEnter: (to, from, next) => {
 			tokenCheck(to, from, next);
 		}
@@ -152,6 +158,11 @@ const routes = [
 			tokenCheck(to, from, next);
 		}
 	},
+	{ path: '/search', name: 'search', component: Search,
+		beforeEnter: (to, from, next) => {
+			tokenCheck(to, from, next);
+		}
+	}
 ];
 
 export default new VueRouter({ 

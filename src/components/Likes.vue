@@ -21,7 +21,7 @@
     import Spinner from './Spinner.vue'
 
     export default {
-        props: ['typeId'],
+        props: ['postId', 'typeId'],
         mixins: [ basicVars ],
         data () {
 		    return {
@@ -48,7 +48,7 @@
                 this.loading = true;
                 this.infScrollDisable = true;
                 likes.get('', { headers: { Authorization: 'Bearer ' + this.token },
-                params: { likable_id: this.newsFeedPost.id, likable_type: this.typeId, amount: this.likesAmount, page: this.likesPage } })
+                params: { likable_id: this.postId, likable_type: this.typeId, amount: this.likesAmount, page: this.likesPage } })
                     .then(res => {
                         if (res.data.data.length > 0) {
                             for (let i = 0; i < res.data.data.length; i++) {

@@ -23,7 +23,7 @@
         </router-link>
 
         <router-link v-if="heading === 'photogram'" :to="{ name: 'user', params: { userId: loggedUserId } }" tag="div"
-            class="o-header__avatar  a-avatar  u-only-desktop" @click.native="inUserDetail">
+            class="o-header__avatar  a-avatar  u-only-desktop">
             <img :src="storage + userAvatar" alt="logged user avatar">
         </router-link>
 
@@ -40,7 +40,7 @@
             </svg>
 		</router-link>
 
-        <div v-if="heading === 'photogram'" class="o-header__search  a-search">
+        <router-link v-if="heading === 'photogram'" :to="{ name: 'search' }" tag="div" class="o-header__search  a-search">
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                 viewBox="0 0 118.783 118.783" style="enable-background:new 0 0 118.783 118.783;" xml:space="preserve">
             <g>
@@ -51,7 +51,7 @@
                     S65.914,81.243,47.996,81.243z"/>
             </g>
             </svg>
-        </div>
+        </router-link>
 
         <router-link v-if="heading !== 'Terms and Conditions'" :to="{ name: 'my-notification' }" tag="div" class="o-header__bulb  a-bulb" :class="{ 'is-active': isNotificationActive }">
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
@@ -128,17 +128,6 @@
 			}
         },
         methods: {
-            inUserDetail() {
-				users.get('find?id=' + this.loggedUserId, { headers: { Authorization: 'Bearer ' + this.token } })
-                .then(res => {
-					// console.log(res);
-					const user = res.data.data;
-					this.$store.dispatch('nfPosts/changeUser', user);
-                })
-                .catch(error => {
-                    console.log(error);
-				});
-            },
             inUserUpload() {
 				users.get('find?id=' + this.loggedUserId, { headers: { Authorization: 'Bearer ' + this.token } })
                 .then(res => {
@@ -268,6 +257,7 @@
         margin-left: 1.5rem;
         border-radius: 50%;
         background-color: $black;
+        cursor: pointer;
 
         @include breakpoint(desktop) {
             float: right;
