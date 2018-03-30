@@ -19,7 +19,10 @@
 
                 <p class="m-info__about-me">{{ user.about }}</p>
 
-                <router-link v-if="isLoggedUser" :to="{ name: 'edit-profile' }" tag="button" class="m-info__button  m-info__button--edit">Edit Profile</router-link>
+                <div v-if="isLoggedUser" class="m-info__button-wrapper-logged-user">
+                    <router-link :to="{ name: 'edit-profile' }" tag="button" class="m-info__button  m-info__button--edit">Edit Profile</router-link>
+                    <button class="m-info__button  m-info__button--logout" @click="logout">Logout</button>
+                </div>
                 <button v-if="!isLoggedUser && userAuth_follow" class="m-info__button  m-info__button--unfollow" @click="unfollowUser">Unfollow</button>
                 <button v-if="!isLoggedUser && !userAuth_follow" class="m-info__button  m-info__button--follow" @click="followUser">Follow</button>
             </div>
@@ -315,6 +318,9 @@
                     .catch(error => {
                         console.log(error);
                     });
+            },
+            logout() {
+                this.$store.dispatch('login/logout');
             }
 		},
         components: {
@@ -588,8 +594,19 @@
                 margin-top: 4.3rem;
             }
 
+            &-wrapper-logged-user {
+                text-align: center;
+            }
+
             &--edit {
+                display: inline-block;
+                margin-right: 1rem;
                 background-color: $lightgray;
+            }
+
+            &--logout {
+                display: inline-block;
+                background-color: $lightblack;
             }
 
             &--unfollow {

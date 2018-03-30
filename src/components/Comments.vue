@@ -154,13 +154,10 @@
             }
 
             &--sub {
-                padding-bottom: 6rem;
-
                 @include breakpoint(desktop) {
                     position: absolute;
                     width: 57rem;
                     height: 74vh;
-                    padding-bottom: 8rem;
                     overflow-y: auto;
                 }
             }

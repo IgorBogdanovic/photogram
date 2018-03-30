@@ -94,7 +94,6 @@
         font-family: 'Roboto', sans-serif;
 		width: 100%;
         height: 100%;
-        background-color: $red;
         z-index: 9;
 
         @include breakpoint(desktop) {
@@ -119,13 +118,10 @@
             }
 
             &--sub {
-                padding-bottom: 1rem;
-
                 @include breakpoint(desktop) {
                     position: absolute;
                     width: 57rem;
                     height: 74vh;
-                    padding-bottom: 4rem;
                     overflow-y: auto;
                 }
             }

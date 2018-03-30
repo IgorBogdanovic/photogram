@@ -226,6 +226,7 @@
                 color: $lightblack;
                 opacity: .5;
                 position: absolute;
+                display: block;
                 width: 50rem;
                 left: 50%;
                 transform: translateX(-50%);

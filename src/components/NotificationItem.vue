@@ -1,20 +1,20 @@
 <template>
-    <div class="m-search-item">
+    <div class="m-notification-item">
 
-        <router-link :to="{ name: 'user', params: { userId: 6 } }" tag="div" class="m-search-item__user-img">
-            <img alt="searched user avatar">
+        <router-link :to="{ name: 'user', params: { userId: 6 } }" tag="div" class="m-notification-item__user-img">
+            <img alt="notification user avatar">
         </router-link>
 
-        <div class="m-search-item__content">
-            <router-link :to="{ name: 'user', params: { userId: 6 } }" tag="span" class="m-search-item__username">
+        <div class="m-notification-item__content">
+            <router-link :to="{ name: 'user', params: { userId: 6 } }" tag="span" class="m-notification-item__username">
                 <!-- {{ like.username }} --> igor
             </router-link>
-            <p class="m-search-item__txt">something</p>
+            <p class="m-notification-item__txt">something</p>
         </div>
 
-        <div class="m-search-item__button">
+        <div class="m-notification-item__button">
             <!-- <button v-if="!like.auth_follow && like.id != loggedUserId" class="m-like__btn  m-like__btn--follow" type="button" @click="followUser">Follow</button> -->
-            <button class="m-search-item__btn  m-search-item__btn--unfollow" type="button" @click="unfollowUser">Unfollow</button>
+            <button class="m-notification-item__btn  m-notification-item__btn--unfollow" type="button" @click="unfollowUser">Unfollow</button>
         </div>
 
     </div>
@@ -25,10 +25,10 @@
 
     export default {
         mixins: [ mixinStorage ],
-        props: ['searchResItem'],
+        props: ['notifItem'],
         data () {
 		    return {
-                searchedItem: this.searchResItem
+                notification: this.notifItem
 		    }
         },
         computed: {
@@ -69,7 +69,7 @@
 <style lang="scss" scoped>
 	@import '../scss/settings';
 
-    .m-search-item {
+    .m-notification-item {
         &:last-child {
             margin-bottom: 1rem;
         }

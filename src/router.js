@@ -74,9 +74,9 @@ const EditPost = resolve => {
 	});
 };
 
-const MyNotification = resolve => {
-	require.ensure(['./components/MyNotification.vue'], () => {
-		resolve(require('./components/MyNotification.vue'));
+const MyNotifications = resolve => {
+	require.ensure(['./components/MyNotifications.vue'], () => {
+		resolve(require('./components/MyNotifications.vue'));
 	});
 };
 
@@ -153,7 +153,7 @@ const routes = [
 			tokenCheck(to, from, next);
 		}
 	},
-	{ path: '/my-notification', name: 'my-notification', component: MyNotification,
+	{ path: '/my-notifications', name: 'my-notifications', component: MyNotifications,
 		beforeEnter: (to, from, next) => {
 			tokenCheck(to, from, next);
 		}

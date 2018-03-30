@@ -70,6 +70,14 @@
 	@import '../scss/settings';
 
     .m-like {
+        &:last-child {
+            margin-bottom: 1rem;
+
+            @include breakpoint(desktop) {
+                margin-bottom: 4rem;
+            }
+        }
+
         &__user-img {
             display: inline-block;
             width: 4.1rem;

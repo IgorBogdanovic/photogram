@@ -19,6 +19,12 @@ export const login = {
       state.userAvatar = userData.avatar;
       state.userProfile = userData.profile;
     },
+    clearAuthUser(state) {
+      state.idToken = null;
+      state.idUser = null;
+      state.userAvatar = null;
+      state.userProfile = null;
+    },
     changeUser(state, userData) {
       state.userAvatar = userData.avatar;
       state.userProfile = userData.profile;
@@ -55,6 +61,11 @@ export const login = {
           .catch(error => {
             commit('authError');
           });
+    },
+    logout({commit}) {
+      commit('clearAuthUser');
+      localStorage.removeItem('token');
+      router.replace({ name: 'login' });
     },
     tryAutoLogin({commit}) {
       const token = localStorage.getItem('token');

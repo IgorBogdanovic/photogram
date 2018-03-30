@@ -160,6 +160,14 @@
 	@import '../scss/settings';
 
     .m-comment {
+        &:last-child {
+            margin-bottom: 6rem;
+
+            @include breakpoint(desktop) {
+                margin-bottom: 8rem;
+            }
+        }
+
         &__user-img {
             display: inline-block;
             width: 4.1rem;

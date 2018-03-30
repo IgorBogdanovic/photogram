@@ -206,9 +206,9 @@
 			padding-bottom: 4.2rem;
 
 			@include breakpoint(desktop) {
-				width: 148rem;
+				width: 65rem;
 				margin: 0 auto;
-				padding-top: 13.7rem;
+				padding-top: 7.8rem;
 			}
 		}
 
@@ -217,10 +217,25 @@
             padding-top: 1.5rem;
             padding-left: 6rem;
 
+            @include breakpoint(desktop) {
+				position: fixed;
+                background-color: $white;
+                width: 65rem;
+                padding-top: 6.5rem;
+                padding-left: 0;
+                border-bottom: 1px solid rgba($darkgrey, .5);
+			}
+
             &-ul {
                 overflow-x: auto;
                 white-space: nowrap;
                 padding-bottom: 1.4rem;
+
+                @include breakpoint(desktop) {
+                    width: 100%;
+                    display: flex;
+                    justify-content: space-evenly;
+                }
             }
 
             &-li {
@@ -232,6 +247,10 @@
                 margin-right: 2rem;
                 cursor: pointer;
 
+                @include breakpoint(desktop) {
+                    margin-right: 0;
+                }
+
                 &.is-active {
                     color: $lightgreen;
                 }
@@ -239,8 +258,12 @@
         }
 
         &__wrapper {
+            @include breakpoint(desktop) {
+                padding-top: 10rem;
+                margin: 0 auto;
+            }
+
             &-item {
-                // height: 100vh;
 
                 &--people {
                 }
@@ -257,6 +280,11 @@
             border-top: 1px solid rgba($darkgrey, .5);
             border-bottom: 1px solid rgba($darkgrey, .5);
             padding: .5rem 2rem;
+
+            @include breakpoint(desktop) {
+                border-top: none;
+                padding: 2rem 2rem;
+            }
         }
     }
 </style>

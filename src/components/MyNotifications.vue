@@ -1,29 +1,29 @@
 <template>
-    <div class="o-my-notification">
-        <div class="o-my-notification__content">
+    <div class="o-my-notifications">
+        <div class="o-my-notifications__content">
 
-            <nav class="o-my-notification__nav">
-                <ul class="o-my-notification__nav-ul">
-                    <li class="o-my-notification__nav-li  js-notifications" :class="{ 'is-active': (activeWrapperItem === 'notifications') }" @click="activate($event)">My Notification</li>
-                    <li class="o-my-notification__nav-li  js-followers" :class="{ 'is-active': (activeWrapperItem === 'followers') }" @click="activate($event)">My Followers</li>
-                    <li class="o-my-notification__nav-li  js-followings" :class="{ 'is-active': (activeWrapperItem === 'followings') }" @click="activate($event)">My Followings</li>
+            <nav class="o-my-notifications__nav">
+                <ul class="o-my-notifications__nav-ul">
+                    <li class="o-my-notifications__nav-li  js-notifications" :class="{ 'is-active': (activeWrapperItem === 'notifications') }" @click="activate($event)">My Notifications</li>
+                    <li class="o-my-notifications__nav-li  js-followers" :class="{ 'is-active': (activeWrapperItem === 'followers') }" @click="activate($event)">My Followers</li>
+                    <li class="o-my-notifications__nav-li  js-followings" :class="{ 'is-active': (activeWrapperItem === 'followings') }" @click="activate($event)">My Followings</li>
                 </ul>
             </nav>
 
-            <div class="o-my-notification__wrapper">
+            <div class="o-my-notifications__wrapper">
 
-                <div v-if="activeWrapperItem === 'notifications'" class="o-my-notification__wrapper-item  o-my-notification__wrapper-item--notifications">
+                <div v-if="activeWrapperItem === 'notifications'" class="o-my-notifications__wrapper-item  o-my-notifications__wrapper-item--notifications">
                     <p>Not available yet...</p>
                 </div>
 
-                <div v-if="activeWrapperItem === 'followers'" class="o-my-notification__wrapper-item  o-my-notification__wrapper-item--followers"
+                <div v-if="activeWrapperItem === 'followers'" class="o-my-notifications__wrapper-item  o-my-notifications__wrapper-item--followers"
                 v-infinite-scroll="axiosGetFollowers" infinite-scroll-disabled="infScrollDisable" :infinite-scroll-distance="windowHeight/3">
-                    <app-notification v-for="(follower, index) in followArray" :key="'follower.id' + '-' + index" :follower="follower"
-                        class="o-notification__item"></app-notification>
+                    <app-notification-item v-for="(notifItem, index) in notifArray" :key="'notifItem.id' + '-' + index" :notifItem="notifItem"
+                        class="o-my-notifications__item"></app-notification-item>
                     <app-spinner v-if="loading"></app-spinner>
                 </div>
 
-                <div v-if="activeWrapperItem === 'followings'" class="o-my-notification__wrapper-item  o-my-notification__wrapper-item--followings"
+                <div v-if="activeWrapperItem === 'followings'" class="o-my-notifications__wrapper-item  o-my-notifications__wrapper-item--followings"
                 v-infinite-scroll="axiosGetFollowings" infinite-scroll-disabled="infScrollDisable" :infinite-scroll-distance="windowHeight/3">
                     <app-spinner v-if="loading"></app-spinner>
                 </div>
@@ -37,6 +37,7 @@
 <script>
     import { followers, followings } from '../axios-urls'
     import { mixinStorage, basicVars } from '../mixins'
+    import NotificationItem from './NotificationItem.vue'
     import Spinner from './Spinner.vue'
 
     export default {
@@ -44,11 +45,11 @@
         data () {
 		    return {
                 activeWrapperItem: 'notifications',
-                followArray: [],
+                notifArray: [],
                 loading: false,
                 infScrollDisable: false,
-                followAmount: 15,
-                followPage: 1
+                notifAmount: 15,
+                notifPage: 1
 		    }
         },
         computed: {
@@ -61,14 +62,14 @@
                 this.loading = true;
                 this.infScrollDisable = true;
                 followers.get('', { headers: { Authorization: 'Bearer ' + this.token },
-                params: { amount: this.followAmount, page: this.followPage } })
+                params: { amount: this.notifAmount, page: this.notifPage } })
                     .then(res => {
                         console.log(res);
                         if (res.data.length > 0) {
                             for (let i = 0; i < res.data.length; i++) {
-                                this.followArray.push(res.data[i]);
+                                this.notifArray.push(res.data[i]);
                             }
-                            this.followPage++;
+                            this.notifPage++;
                             this.loading = false;
                             this.infScrollDisable = false;
                         } else {
@@ -82,14 +83,14 @@
                 this.loading = true;
                 this.infScrollDisable = true;
                 followings.get('', { headers: { Authorization: 'Bearer ' + this.token },
-                params: { amount: this.followAmount, page: this.followPage } })
+                params: { amount: this.notifAmount, page: this.notifPage } })
                     .then(res => {
                         console.log(res);
                         if (res.data.length > 0) {
                             for (let i = 0; i < res.data.length; i++) {
-                                this.followArray.push(res.data[i]);
+                                this.notifArray.push(res.data[i]);
                             }
-                            this.followPage++;
+                            this.notifPage++;
                             this.loading = false;
                             this.infScrollDisable = false;
                         } else {
@@ -101,8 +102,8 @@
             },
             activate(e) {
                 const activeNavLi = $(e.target);
-                this.followArray = [];
-                this.followPage = 1;
+                this.notifArray = [];
+                this.notifPage = 1;
 
                 if ( activeNavLi.hasClass('js-notifications') ) {
                     this.activeWrapperItem = 'notifications';
@@ -116,12 +117,13 @@
             }
         },
         components: {
+            appNotificationItem: NotificationItem,
             appSpinner: Spinner
         },
         created() {
             if (this.windowWidth > this.breakpoint) {
                 this.$store.dispatch('headings/actSetHeading', 'photogram');
-            } else this.$store.dispatch('headings/actSetHeading', 'My Notification');
+            } else this.$store.dispatch('headings/actSetHeading', 'My Notifications');
         }
         // destroyed() {
         //     console.log(this.comments);
@@ -132,7 +134,7 @@
 <style lang="scss" scoped>
 	@import '../scss/settings';
 
-    .o-my-notification {
+    .o-my-notifications {
         width: 100%;
 		height: 100vh;
 		background-color: $white;
@@ -144,9 +146,9 @@
 			padding-bottom: 4.2rem;
 
 			@include breakpoint(desktop) {
-				width: 148rem;
+				width: 65rem;
 				margin: 0 auto;
-				padding-top: 13.7rem;
+				padding-top: 7.8rem;
 			}
 		}
 
@@ -155,10 +157,25 @@
             padding-top: 1.5rem;
             padding-left: 3.7rem;
 
+            @include breakpoint(desktop) {
+				position: fixed;
+                background-color: $white;
+                width: 65rem;
+                padding-top: 6.5rem;
+                padding-left: 0;
+                border-bottom: 1px solid rgba($darkgrey, .5);
+			}
+
             &-ul {
                 overflow-x: auto;
                 white-space: nowrap;
                 padding-bottom: 1.4rem;
+
+                @include breakpoint(desktop) {
+                    width: 100%;
+                    display: flex;
+                    justify-content: space-evenly;
+                }
             }
 
             &-li {
@@ -170,6 +187,10 @@
                 margin-right: 1.2rem;
                 cursor: pointer;
 
+                @include breakpoint(desktop) {
+                    margin-right: 0;
+                }
+
                 &.is-active {
                     color: $lightgreen;
                 }
@@ -177,6 +198,12 @@
         }
 
         &__wrapper {
+            @include breakpoint(desktop) {
+                width: 95%;
+                padding-top: 10rem;
+                margin: 0 auto;
+            }
+
             &-item {
                 &--notifications {
                     text-align: center;
@@ -190,11 +217,9 @@
                 }
 
                 &--followers {
-                    background-color: green;
                 }
 
                 &--followings {
-                    background-color: red;
                 }
             }
         }
