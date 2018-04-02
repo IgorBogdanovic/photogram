@@ -3,7 +3,7 @@
 
         <div class="o-user__content" v-infinite-scroll="axiosGetPosts" infinite-scroll-disabled="infScrollDisable" :infinite-scroll-distance="windowHeight/3">
 
-            <div v-if="(!postDetailView && !allCommentsView && !upload) || windowWidth > breakpoint" class="o-user__info  m-info">
+            <div v-if="(!postDetailView && !allCommentsView && !likesView && !upload) || windowWidth > breakpoint" class="o-user__info  m-info">
                 <div class="m-info__avatar">
                     <span v-if="windowWidth > breakpoint">{{ user.username }}</span>
                     <img :src="storage + user.image.profile" alt="user avatar">
@@ -27,7 +27,7 @@
                 <button v-if="!isLoggedUser && !userAuth_follow" class="m-info__button  m-info__button--follow" @click="followUser">Follow</button>
             </div>
 
-            <div v-if="(!postDetailView && !allCommentsView && !upload) || windowWidth > breakpoint" class="o-user__view  m-view">
+            <div v-if="(!postDetailView && !allCommentsView && !likesView && !upload) || windowWidth > breakpoint" class="o-user__view  m-view">
                 <div class="m-view__icon  m-view__icon--single" :class="{ 'is-active': singleViewActive }" @click.stop="activateSingleView">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="3119 923 17 17">
                         <path id="Path_101" data-name="Path 101" class="cls-1" d="M0,0H17V17H0Z" transform="translate(3119 923)"/>
@@ -45,7 +45,7 @@
                 </div>
             </div>
 
-            <div v-if="(!postDetailView && !allCommentsView && !upload) || windowWidth > breakpoint"
+            <div v-if="(!postDetailView && !allCommentsView && !likesView && !upload) || windowWidth > breakpoint"
                 class="o-user__posts-wrapper  u-clearfix" :class="{ 'grid-view': gridViewActive, 'single-view': singleViewActive }">
                 <app-news-feed-post v-for="(post, index) in userPostsAll" :key="post.id + '-' + index" :post="post"></app-news-feed-post>
             </div>

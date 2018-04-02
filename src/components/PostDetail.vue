@@ -102,7 +102,12 @@
 						<img :src="storage + comment.user_image.avatar" alt="user avatar that made this comment">
 					</router-link>
 
-                    <p class="m-detail-comments__txt">{{ comment.body }}</p>
+                    <p class="m-detail-comments__txt">
+						<router-link v-if="comment.reply_username" :to="{ name: 'user', params: { userId: comment.reply_user_id } }" tag="span">
+							@{{ comment.reply_username }}
+						</router-link>
+						{{ (comment.body).replace('@' + comment.reply_username, '') }}
+					</p>
                 </div>
 
                 <!-- need route path once made -->
@@ -653,6 +658,16 @@
 				margin-top: 0.7rem;
 				margin-left: 0.7rem;
 			}
+
+			span {
+                font-family: 'Roboto-Bold', sans-serif;
+                color: blue;
+                cursor: pointer;
+
+				@include breakpoint(desktop) {
+					color: aqua;
+				}
+            }
 		}
 
 		&__view-all {

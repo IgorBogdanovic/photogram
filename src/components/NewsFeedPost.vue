@@ -106,7 +106,6 @@
 				</router-link>
 
 				<p class="m-comments__txt">
-					<!-- {{ comment.body }} -->
 					<router-link v-if="comment.reply_username" :to="{ name: 'user', params: { userId: comment.reply_user_id } }" tag="span">
 						@{{ comment.reply_username }}
 					</router-link>
