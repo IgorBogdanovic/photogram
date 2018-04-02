@@ -10,21 +10,19 @@
                 </ul>
             </nav>
 
-            <div class="o-my-notifications__wrapper">
+            <div class="o-my-notifications__wrapper" v-infinite-scroll="axiosGetFollow" infinite-scroll-disabled="infScrollDisable" :infinite-scroll-distance="windowHeight/3">
 
                 <div v-if="activeWrapperItem === 'notifications'" class="o-my-notifications__wrapper-item  o-my-notifications__wrapper-item--notifications">
                     <p>Not available yet...</p>
                 </div>
 
-                <div v-if="activeWrapperItem === 'followers'" class="o-my-notifications__wrapper-item  o-my-notifications__wrapper-item--followers"
-                v-infinite-scroll="axiosGetFollowers" infinite-scroll-disabled="infScrollDisable" :infinite-scroll-distance="windowHeight/3">
-                    <app-notification-item v-for="(notifItem, index) in notifArray" :key="'notifItem.id' + '-' + index" :notifItem="notifItem"
+                <div v-if="activeWrapperItem === 'followers'" class="o-my-notifications__wrapper-item  o-my-notifications__wrapper-item--followers">
+                    <app-notification-item v-for="(notifItem, index) in notifArray" :key="notifItem.id + '-' + index" :notifItem="notifItem"
                         class="o-my-notifications__item"></app-notification-item>
                     <app-spinner v-if="loading"></app-spinner>
                 </div>
 
-                <div v-if="activeWrapperItem === 'followings'" class="o-my-notifications__wrapper-item  o-my-notifications__wrapper-item--followings"
-                v-infinite-scroll="axiosGetFollowings" infinite-scroll-disabled="infScrollDisable" :infinite-scroll-distance="windowHeight/3">
+                <div v-if="activeWrapperItem === 'followings'" class="o-my-notifications__wrapper-item  o-my-notifications__wrapper-item--followings">
                     <app-spinner v-if="loading"></app-spinner>
                 </div>
 
@@ -35,7 +33,7 @@
 </template>
 
 <script>
-    import { followers, followings } from '../axios-urls'
+    import { photogramApi } from '../axios-urls'
     import { mixinStorage, basicVars } from '../mixins'
     import NotificationItem from './NotificationItem.vue'
     import Spinner from './Spinner.vue'
@@ -58,38 +56,20 @@
             }
         },
         methods: {
-            axiosGetFollowers() {
+            axiosGetFollow() {
+                if (this.activeWrapperItem === 'notifications') {
+                    return false;
+                }
                 this.loading = true;
                 this.infScrollDisable = true;
-                followers.get('', { headers: { Authorization: 'Bearer ' + this.token },
+                photogramApi.get(this.activeWrapperItem + '/', { headers: { Authorization: 'Bearer ' + this.token },
                 params: { amount: this.notifAmount, page: this.notifPage } })
                     .then(res => {
-                        console.log(res);
-                        if (res.data.length > 0) {
-                            for (let i = 0; i < res.data.length; i++) {
-                                this.notifArray.push(res.data[i]);
+                        if (res.data.data.length > 0) {
+                            for (let i = 0; i < res.data.data.length; i++) {
+                                this.notifArray.push(res.data.data[i]);
                             }
-                            this.notifPage++;
-                            this.loading = false;
-                            this.infScrollDisable = false;
-                        } else {
-                            this.loading = false;
-                            this.infScrollDisable = true;
-                            console.log('empty array'); // should make some msg displays
-                        }
-                    });
-            },
-            axiosGetFollowings() {
-                this.loading = true;
-                this.infScrollDisable = true;
-                followings.get('', { headers: { Authorization: 'Bearer ' + this.token },
-                params: { amount: this.notifAmount, page: this.notifPage } })
-                    .then(res => {
-                        console.log(res);
-                        if (res.data.length > 0) {
-                            for (let i = 0; i < res.data.length; i++) {
-                                this.notifArray.push(res.data[i]);
-                            }
+                            console.log(this.notifArray);
                             this.notifPage++;
                             this.loading = false;
                             this.infScrollDisable = false;
@@ -104,15 +84,16 @@
                 const activeNavLi = $(e.target);
                 this.notifArray = [];
                 this.notifPage = 1;
+                this.infScrollDisable = false;
 
                 if ( activeNavLi.hasClass('js-notifications') ) {
                     this.activeWrapperItem = 'notifications';
                 } else if ( activeNavLi.hasClass('js-followers') ) {
                     this.activeWrapperItem = 'followers';
-                    this.axiosGetFollowers();
+                    this.axiosGetFollow();
                 } else if ( activeNavLi.hasClass('js-followings') ) {
                     this.activeWrapperItem = 'followings';
-                    this.axiosGetFollowings();
+                    this.axiosGetFollow();
                 }
             }
         },

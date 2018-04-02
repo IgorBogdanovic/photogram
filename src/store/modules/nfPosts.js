@@ -1,5 +1,5 @@
 import router from '../../router';
-import { posts, comments, likes, followers } from '../../axios-urls';
+import { posts, comments, likes, photogramApi } from '../../axios-urls';
 
 export const nfPosts = {
   namespaced: true,
@@ -109,11 +109,11 @@ export const nfPosts = {
     },
     followUser({commit}, userId) {
       const token = localStorage.getItem('token');
-      return followers.post('', { user_id: userId }, { headers: { Authorization: 'Bearer ' + token } });
+      return photogramApi.post('followers/', { user_id: userId }, { headers: { Authorization: 'Bearer ' + token } });
     },
     unfollowUser({commit}, userId) {
       const token = localStorage.getItem('token');
-      return followers.delete('' + userId, { headers: { Authorization: 'Bearer ' + token } });
+      return photogramApi.delete('followers/' + userId, { headers: { Authorization: 'Bearer ' + token } });
     }
   },
 
