@@ -106,6 +106,7 @@
         created() {
             if (this.windowWidth > this.breakpoint) {
                 this.$store.dispatch('headings/actSetHeading', 'photogram');
+                $('body').removeClass('u-overflow-disabled');
             } else this.$store.dispatch('headings/actSetHeading', 'My Notifications');
         }
         // destroyed() {
