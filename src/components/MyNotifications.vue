@@ -18,11 +18,13 @@
 
                 <div v-if="activeWrapperItem === 'followers'" class="o-my-notifications__wrapper-item  o-my-notifications__wrapper-item--followers">
                     <app-notification-item v-for="(notifItem, index) in notifArray" :key="notifItem.id + '-' + index" :notifItem="notifItem"
-                        class="o-my-notifications__item"></app-notification-item>
+                    :activeWrapperItem="activeWrapperItem" class="o-my-notifications__item"></app-notification-item>
                     <app-spinner v-if="loading"></app-spinner>
                 </div>
 
                 <div v-if="activeWrapperItem === 'followings'" class="o-my-notifications__wrapper-item  o-my-notifications__wrapper-item--followings">
+                    <app-notification-item v-for="(notifItem, index) in notifArray" :key="notifItem.id + '-' + index" :notifItem="notifItem"
+                    :activeWrapperItem="activeWrapperItem" class="o-my-notifications__item"></app-notification-item>
                     <app-spinner v-if="loading"></app-spinner>
                 </div>
 
@@ -69,7 +71,6 @@
                             for (let i = 0; i < res.data.data.length; i++) {
                                 this.notifArray.push(res.data.data[i]);
                             }
-                            console.log(this.notifArray);
                             this.notifPage++;
                             this.loading = false;
                             this.infScrollDisable = false;
@@ -84,6 +85,7 @@
                 const activeNavLi = $(e.target);
                 this.notifArray = [];
                 this.notifPage = 1;
+                this.loading = false;
                 this.infScrollDisable = false;
 
                 if ( activeNavLi.hasClass('js-notifications') ) {
@@ -195,12 +197,6 @@
                         @include lineHeightRem(17, 24);
                         color: $lightblack;
                     }
-                }
-
-                &--followers {
-                }
-
-                &--followings {
                 }
             }
         }

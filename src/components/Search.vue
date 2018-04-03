@@ -4,15 +4,15 @@
 
             <nav class="o-search__nav">
                 <ul class="o-search__nav-ul">
-                    <li class="o-search__nav-li  js-people" :class="{ 'is-active': (activeWrapperItem === 'people') }" @click="activate($event)">People</li>
+                    <li class="o-search__nav-li  js-people" :class="{ 'is-active': (activeWrapperItem === 'users') }" @click="activate($event)">People</li>
                     <li class="o-search__nav-li  js-email" :class="{ 'is-active': (activeWrapperItem === 'email') }" @click="activate($event)">Email</li>
-                    <li class="o-search__nav-li  js-tags" :class="{ 'is-active': (activeWrapperItem === 'tags') }" @click="activate($event)">Tags</li>
+                    <li class="o-search__nav-li  js-tags" :class="{ 'is-active': (activeWrapperItem === 'hashtags') }" @click="activate($event)">Tags</li>
                 </ul>
             </nav>
 
             <div class="o-search__wrapper">
 
-                <div v-if="activeWrapperItem === 'people'" class="o-search__wrapper-item  o-search__wrapper-item--people">
+                <div v-if="activeWrapperItem === 'users'" class="o-search__wrapper-item  o-search__wrapper-item--people">
                     <form @submit.prevent="search($event)">
                         <div class="o-search__form-field">
                             <div class="o-search__form-field-icon  c-form-field-icon">
@@ -34,8 +34,8 @@
                                 class="c-form-input">
                         </div>
                     </form>
-                    <app-search-res-item v-for="(searchResItem, index) in searchRes" :key="'searchResItem.id' + '-' + index" :searchResItem="searchResItem"
-                        class="o-search__res-item"></app-search-res-item>
+                    <app-search-res-item v-for="(searchResItem, index) in searchRes" :key="searchResItem.id + '-' + index" :searchResItem="searchResItem"
+                    :activeWrapperItem="activeWrapperItem" class="o-search__res-item"></app-search-res-item>
                     <app-spinner v-if="loading"></app-spinner>
                 </div>
 
@@ -64,7 +64,7 @@
                     <app-spinner v-if="loading"></app-spinner>
                 </div>
 
-                <div v-if="activeWrapperItem === 'tags'" class="o-search__wrapper-item  o-search__wrapper-item--tags">
+                <div v-if="activeWrapperItem === 'hashtags'" class="o-search__wrapper-item  o-search__wrapper-item--tags">
                     <form @submit.prevent="search($event)">
                         <div class="o-search__form-field">
                             <div class="o-search__form-field-icon  c-form-field-icon">
@@ -86,6 +86,8 @@
                                 class="c-form-input">
                         </div>
                     </form>
+                    <app-search-res-item v-for="(searchResItem, index) in searchRes" :key="searchResItem.id + '-' + index" :searchResItem="searchResItem"
+                    :activeWrapperItem="activeWrapperItem" class="o-search__res-item"></app-search-res-item>
                     <app-spinner v-if="loading"></app-spinner>
                 </div>
 
@@ -96,7 +98,7 @@
 </template>
 
 <script>
-    import { search } from '../axios-urls';
+    import { photogramApi } from '../axios-urls';
     import { mixinStorage, basicVars } from '../mixins';
     import SearchResItem from './SearchResItem.vue';
     import Spinner from './Spinner.vue';
@@ -105,9 +107,8 @@
         mixins: [ mixinStorage, basicVars ],
         data () {
 		    return {
-                activeWrapperItem: 'people',
+                activeWrapperItem: 'users',
                 loading: false,
-                infScrollDisable: false,
                 searchRes: [],
                 searchQuery: '',
                 // delay func for search method
@@ -136,19 +137,16 @@
                         return false;
                     } else if (e.keyCode !== 13) {
                         vm.loading = true;
-                        vm.infScrollDisable = true;
-                        search.get('?q=' + vm.searchQuery, { headers: { Authorization: 'Bearer ' + vm.token } })
+                        photogramApi.get('search/' + vm.activeWrapperItem + '/?q=' + encodeURIComponent(vm.searchQuery), { headers: { Authorization: 'Bearer ' + vm.token } })
                         .then(res => {
-                            // console.log(res);
+                            console.log(res);
                             if (res.data.data.length > 0) {
                                 for (let i = 0; i < res.data.data.length; i++) {
                                     vm.searchRes.push(res.data.data[i]);
                                 }
                                 vm.loading = false;
-                                vm.infScrollDisable = false;
                             } else {
                                 vm.loading = false;
-                                vm.infScrollDisable = true;
                                 console.log('empty array'); // should make some msg displays
                             }
                         })
@@ -160,13 +158,16 @@
             },
             activate(e) {
                 const activeNavLi = $(e.target);
+                this.searchRes = [];
                 this.searchQuery = '';
+                this.loading = false;
+
                 if ( activeNavLi.hasClass('js-people') ) {
-                    this.activeWrapperItem = 'people';
+                    this.activeWrapperItem = 'users';
                 } else if ( activeNavLi.hasClass('js-email') ) {
                     this.activeWrapperItem = 'email';
                 } else if ( activeNavLi.hasClass('js-tags') ) {
-                    this.activeWrapperItem = 'tags';
+                    this.activeWrapperItem = 'hashtags';
                 }
                 const inputField = $('.c-form-input');
                 setTimeout ( function() { inputField.focus(); }, 100 );
@@ -261,18 +262,6 @@
             @include breakpoint(desktop) {
                 padding-top: 10rem;
                 margin: 0 auto;
-            }
-
-            &-item {
-
-                &--people {
-                }
-
-                &--email {
-                }
-
-                &--tags {
-                }
             }
         }
 

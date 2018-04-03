@@ -1,20 +1,23 @@
 <template>
     <div class="m-notification-item">
 
-        <router-link :to="{ name: 'user', params: { userId: 6 } }" tag="div" class="m-notification-item__user-img">
-            <img alt="notification user avatar">
+        <router-link :to="{ name: 'user', params: { userId: notification.id } }" tag="div" class="m-notification-item__user-img">
+            <img :src="storage + notification.image.avatar" alt="notification user avatar">
         </router-link>
 
         <div class="m-notification-item__content">
-            <router-link :to="{ name: 'user', params: { userId: 6 } }" tag="span" class="m-notification-item__username">
-                <!-- {{ like.username }} --> igor
+            <router-link :to="{ name: 'user', params: { userId: notification.id } }" tag="span" class="m-notification-item__username">
+                {{ notification.username }}
             </router-link>
-            <p class="m-notification-item__txt">something</p>
+            <p class="m-notification-item__txt">
+                <template v-if="activeWrapperItem === 'followers'">is your follower</template>
+                <template v-if="activeWrapperItem === 'followings'">is your following</template>
+            </p>
         </div>
 
         <div class="m-notification-item__button">
-            <!-- <button v-if="!like.auth_follow && like.id != loggedUserId" class="m-like__btn  m-like__btn--follow" type="button" @click="followUser">Follow</button> -->
-            <button class="m-notification-item__btn  m-notification-item__btn--unfollow" type="button" @click="unfollowUser">Unfollow</button>
+            <button v-if="!notification.auth_follow && notification.id != loggedUserId" class="m-notification-item__btn  m-notification-item__btn--follow" type="button" @click="followUser">Follow</button>
+            <button v-if="notification.auth_follow" class="m-notification-item__btn  m-notification-item__btn--unfollow" type="button" @click="unfollowUser">Unfollow</button>
         </div>
 
     </div>
@@ -25,7 +28,7 @@
 
     export default {
         mixins: [ mixinStorage ],
-        props: ['notifItem'],
+        props: ['notifItem', 'activeWrapperItem'],
         data () {
 		    return {
                 notification: this.notifItem
@@ -41,22 +44,22 @@
         },
         methods: {
             followUser() {
-                const userId = this.like.id;
+                const userId = this.notification.id;
                 this.$store.dispatch('nfPosts/followUser', userId)
                     .then(res => {
                         // console.log(res);
-                        this.like.auth_follow = true;
+                        this.notification.auth_follow = true;
                     })
                     .catch(error => {
                         console.log(error);
                     });
             },
             unfollowUser() {
-                const userId = this.like.id;
+                const userId = this.notification.id;
                 this.$store.dispatch('nfPosts/unfollowUser', userId)
                     .then(res => {
                         // console.log(res);
-                        this.like.auth_follow = false;
+                        this.notification.auth_follow = false;
                     })
                     .catch(error => {
                         console.log(error);
@@ -93,7 +96,6 @@
                 width: 100%;
                 height: 100%;
                 border-radius: 50%;
-                background-color: burlywood;
             }
         }
 

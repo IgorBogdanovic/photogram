@@ -1,20 +1,23 @@
 <template>
     <div class="m-search-item">
 
-        <router-link :to="{ name: 'user', params: { userId: 6 } }" tag="div" class="m-search-item__user-img">
-            <img alt="searched user avatar">
+        <router-link v-if="activeWrapperItem === 'users'" :to="{ name: 'user', params: { userId: searchedItem.id } }" tag="div" class="m-search-item__user-img">
+            <img :src="storage + searchedItem.image.avatar" alt="searched user avatar">
         </router-link>
 
         <div class="m-search-item__content">
-            <router-link :to="{ name: 'user', params: { userId: 6 } }" tag="span" class="m-search-item__username">
-                <!-- {{ like.username }} --> igor
+            <router-link v-if="activeWrapperItem === 'users'" :to="{ name: 'user', params: { userId: searchedItem.id } }" tag="span" class="m-search-item__username">
+                {{ searchedItem.username }}
             </router-link>
-            <p class="m-search-item__txt">something</p>
+            <p class="m-search-item__txt" :class="{ 'is-hashtag': activeWrapperItem === 'hashtags' }">
+                <template v-if="activeWrapperItem === 'users'">is found</template>
+                <template v-if="activeWrapperItem === 'hashtags'">{{ searchedItem }}</template>
+            </p>
         </div>
 
-        <div class="m-search-item__button">
-            <!-- <button v-if="!like.auth_follow && like.id != loggedUserId" class="m-like__btn  m-like__btn--follow" type="button" @click="followUser">Follow</button> -->
-            <button class="m-search-item__btn  m-search-item__btn--unfollow" type="button" @click="unfollowUser">Unfollow</button>
+        <div v-if="activeWrapperItem === 'users'" class="m-search-item__button">
+            <button v-if="!searchedItem.auth_follow && searchedItem.id != loggedUserId" class="m-search-item__btn  m-search-item__btn--follow" type="button" @click="followUser">Follow</button>
+            <button v-if="searchedItem.auth_follow" class="m-search-item__btn  m-search-item__btn--unfollow" type="button" @click="unfollowUser">Unfollow</button>
         </div>
 
     </div>
@@ -25,7 +28,7 @@
 
     export default {
         mixins: [ mixinStorage ],
-        props: ['searchResItem'],
+        props: ['searchResItem', 'activeWrapperItem'],
         data () {
 		    return {
                 searchedItem: this.searchResItem
@@ -41,22 +44,22 @@
         },
         methods: {
             followUser() {
-                const userId = this.like.id;
+                const userId = this.searchedItem.id;
                 this.$store.dispatch('nfPosts/followUser', userId)
                     .then(res => {
                         // console.log(res);
-                        this.like.auth_follow = true;
+                        this.searchedItem.auth_follow = true;
                     })
                     .catch(error => {
                         console.log(error);
                     });
             },
             unfollowUser() {
-                const userId = this.like.id;
+                const userId = this.searchedItem.id;
                 this.$store.dispatch('nfPosts/unfollowUser', userId)
                     .then(res => {
                         // console.log(res);
-                        this.like.auth_follow = false;
+                        this.searchedItem.auth_follow = false;
                     })
                     .catch(error => {
                         console.log(error);
@@ -93,7 +96,6 @@
                 width: 100%;
                 height: 100%;
                 border-radius: 50%;
-                background-color: burlywood;
             }
         }
 
@@ -119,6 +121,10 @@
 
         &__txt {
             display: inline;
+
+            &.is-hashtag {
+                padding: 0 1.5rem;
+            }
         }
 
         &__button {
