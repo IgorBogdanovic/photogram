@@ -24,6 +24,7 @@
     import { required } from 'vuelidate/lib/validators';
 
     export default {
+        props: ['postId'],
         data () {
 		    return {
 		    	comment: ''
@@ -42,16 +43,27 @@
         methods: {
 		    submitComment() {
                 var txtSplited = this.comment.split(' ');
-                if ( txtSplited[0].indexOf('@') > -1 ) {
-                    var username = txtSplited[0].replace('@', '');
+
+                for (let i = 0; txtSplited.length > i; i++) {
+                    if (txtSplited[i].indexOf('@') > -1) {
+                        var username = txtSplited[i].replace('@', '');
+                    }
                 }
                 var txtJoined = txtSplited.join(' ');
+                var postId;
 
+                if (this.newsFeedPost.id) {
+                    // when is loaded in NewsFeedPost comp
+                    postId = this.newsFeedPost.id;
+                // when is loaded in Comments comp
+                } else postId = this.postId;
+                
                 const commentData = {
-                    post_id: this.newsFeedPost.id,
+                    post_id: postId,
                     reply_username: username,
 					body: txtJoined
                 };
+                // console.log(commentData);
                 this.$store.dispatch('nfPosts/postComment', commentData)
                     .then(res => {
                         this.$emit('commentSubmited');

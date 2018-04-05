@@ -11,7 +11,7 @@
                 <app-spinner v-if="loading"></app-spinner>
             </div>
 
-            <app-make-comment class="o-all-comments__make-comment" @commentSubmited="refreshComments"></app-make-comment>
+            <app-make-comment class="o-all-comments__make-comment" @commentSubmited="refreshComments" :postId="postId"></app-make-comment>
         </div>
     </div>
 </template>
@@ -68,6 +68,7 @@
                 });
             },
             refreshComments() {
+                $('.m-make-comment__input').blur();
                 this.comments.length = 0;
                 this.commentPage = 1;
                 this.loading = true;
@@ -109,7 +110,7 @@
             this.$store.dispatch('nfPosts/pushPostCommentsAll', []);
         },
 		created() {
-            // console.log(this.newsFeedPost.id);
+            // console.log(this.newsFeedPost);
             if (this.windowWidth > this.breakpoint) {
                 this.$store.dispatch('headings/actSetHeading', 'photogram');
             } else this.$store.dispatch('headings/actSetHeading', 'Comments');

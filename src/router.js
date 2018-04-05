@@ -91,7 +91,15 @@ Vue.use(VueRouter);
 const routes = [
 	{ path: '*', redirect: '/homepage' },
 	{ path: '/', redirect: '/homepage' },
-	{ path: '/login', name: 'login', component: LogIn },
+	{ path: '/login', name: 'login', component: LogIn,
+		beforeEnter: (to, from, next) => {
+			if (localStorage.getItem('token')) {
+				next('homepage');
+				return false;
+			}
+			next();
+		}
+	},
 	{ path: '/signup', name: 'signup', component: SignUp },
 	{ path: '/terms', name: 'terms', component: Terms },
 	{ path: '/homepage', name: 'homepage', component: HomePage,
