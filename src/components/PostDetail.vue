@@ -108,7 +108,7 @@
 						</router-link>
 						
 						<template v-if="comment.reply_username">
-							{{ (comment.body).replace( (comment.body).match( new RegExp('@' + comment.reply_username, 'i') )[0], '' ) }}
+							{{ (comment.body).replace( (comment.body).match( new RegExp('@' + comment.reply_username, 'i') ), '' ) }}
 						</template>
 						<template v-else>
 							{{ (comment.body) }}

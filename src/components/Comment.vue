@@ -20,12 +20,9 @@
                 <router-link v-if="comment.reply_username" :to="{ name: 'user', params: { userId: comment.reply_user_id } }" tag="span">
                     @{{ comment.reply_username }}
                 </router-link>
-                <!-- {{ commentBody.replace( commentBody.match( new RegExp('@' + comment.reply_username, 'i') )[0], '' ) }} -->
-                <!-- {{ 
-                    commentBody.match(new RegExp('@' + comment.reply_username, 'i'))[0]
-                }} -->
+                
                 <template v-if="comment.reply_username">
-                    {{ commentBody.replace( commentBody.match( new RegExp('@' + comment.reply_username, 'i') )[0], '' ) }}
+                    {{ commentBody.replace( commentBody.match( new RegExp('@' + comment.reply_username, 'i') ), '' ) }}
                 </template>
                 <template v-else>
                     {{ commentBody }}

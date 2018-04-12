@@ -8,9 +8,22 @@
 			</div>
 			
 			<!-- for mobile devices -->
-			<router-view v-if="postDetailView && windowWidth < breakpoint"></router-view>
-			<router-view v-if="allCommentsView && windowWidth < breakpoint"></router-view>
-			<router-view v-if="likesView && windowWidth < breakpoint"></router-view>
+			<transition mode="out-in"
+				enter-active-class="animated fadeIn"
+				leave-active-class="animated fadeOut">
+				<router-view v-if="postDetailView && windowWidth < breakpoint"></router-view>
+			</transition>
+			<transition mode="out-in"
+				enter-active-class="animated fadeIn"
+				leave-active-class="animated fadeOut">
+				<router-view v-if="allCommentsView && windowWidth < breakpoint"></router-view>
+			</transition>
+			<transition mode="out-in"
+				enter-active-class="animated fadeIn"
+				leave-active-class="animated fadeOut">
+				<router-view v-if="likesView && windowWidth < breakpoint"></router-view>
+			</transition>
+			
 			<!-- for all other devices -->
 			<transition mode="out-in"
 				enter-active-class="animated slideInLeft"
@@ -51,7 +64,7 @@
 				likesView: false,
 				loading: false,
 				infScrollDisable: false,
-				postAmount: 12,
+				postAmount: 8,
 				postPage: 1
 		    }
 		},

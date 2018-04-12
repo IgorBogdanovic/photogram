@@ -333,11 +333,12 @@
                 @include fontSizeRem(14, 16);
                 @include lineHeightRem(17, 19);
                 width: 80%;
-                border: none;
+                border: 1px solid $lightgreen;
                 outline: none;
 
                 &:disabled {
                     background-color: $white;
+                    border-color: $white;
                 }
             }
         }

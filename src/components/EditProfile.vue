@@ -192,13 +192,12 @@
                                         }
                                     }
                                     this.$store.dispatch('login/editUser', data);
+                                    this.$router.push({ name: 'user', params: { userId: this.loggedUserId } });
                                 })
                                 .catch(error => {
                                     console.log(error);
                                 });
-                        }
-
-                        this.$router.push({ name: 'user', params: { userId: this.loggedUserId } });
+                        } else this.$router.push({ name: 'user', params: { userId: this.loggedUserId } });
                     })
                     .catch(error => {
                         console.log(error);

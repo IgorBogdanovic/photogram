@@ -126,7 +126,7 @@
         created() {
             if (this.windowWidth > this.breakpoint) {
                 this.$store.dispatch('headings/actSetHeading', 'photogram');
-			} else this.$store.dispatch('headings/actSetHeading', 'Upload');
+            } else this.$store.dispatch('headings/actSetHeading', 'Upload');
         }
 	}
 </script>

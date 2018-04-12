@@ -111,7 +111,7 @@
 					</router-link>
 
 					<template v-if="comment.reply_username">
-						{{ (comment.body).replace( (comment.body).match( new RegExp('@' + comment.reply_username, 'i') )[0], '' ) }}
+						{{ (comment.body).replace( (comment.body).match( new RegExp('@' + comment.reply_username, 'i') ), '' ) }}
 					</template>
 					<template v-else>
 						{{ (comment.body) }}
@@ -295,7 +295,7 @@
             appMakeComment: MakeComment
 		},
 		// created() {
-		// 	console.log(this.newsFeedPost);
+		// 	console.log(this.newsFeedPost.comments);
 		// },
 		// destroyed() {
 		// }
@@ -568,13 +568,13 @@
 			width: 90%;
 			color: $lightblack;
 			display: inline-block;
-			margin-top: 0.5rem;
+			margin-top: .5rem;
 			margin-left: 1rem;
 
 			@include breakpoint(desktop) {
 				width: 83%;
-				margin-top: 0.7rem;
-				margin-left: 0.7rem;
+				margin-top: .7rem;
+				margin-left: .7rem;
 			}
 
 			span {
@@ -588,11 +588,11 @@
 			@include fontSizeRem(10, 14);
 			@include lineHeightRem(12, 17);
 			color: $lightblack;
-			opacity: 0.5;
+			opacity: .5;
 			cursor: pointer;
 
 			@include breakpoint(desktop) {
-				margin-left: 0.5rem;
+				margin-left: .5rem;
 			}
 		}
 	}
