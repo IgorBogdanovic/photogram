@@ -27,9 +27,11 @@ Routes are lazy loaded.
 Modules imported in Vuex store are namespaced.
 
 SASS code is scoped accross all components. There is also some styles that are shared accross all App and is imported in App.vue (main.scss). Classes with styles that are shared have prefix 'c-' for component so be very careful if you decide to change them. All others that are scoped have prefixes: 'a-' for atom, 'm-' for molecule and 'o-' for organism (Atomic Design Methodology). Changes on them will reflect only on specific component. There is also settings.scss (variables, functions and mixins) which are imported in every component so it can be used.
+
+# PWA implementation is in progress.
 ```
 
-## App documentation
+## API documentation
 
 ``` bash
 http://54.37.227.57/documentation

@@ -1,7 +1,7 @@
 {
   "name": "photogram",
   "description": "Photogram web app - Diwanee project",
-  "version": "1.0.1",
+  "version": "1.0.5",
   "author": "giga0 <igor.s.bogdanovic@gmail.com>",
   "license": "MIT",
   "private": true,

@@ -51,26 +51,12 @@
             </div>
 
             <!-- for mobile devices -->
-			<transition mode="out-in"
-				enter-active-class="animated fadeIn"
-				leave-active-class="animated fadeOut">
+			<transition mode="out-in" enter-active-class="animated fadeIn">
 				<router-view v-if="postDetailView && windowWidth < breakpoint"></router-view>
 			</transition>
-			<transition mode="out-in"
-				enter-active-class="animated fadeIn"
-				leave-active-class="animated fadeOut">
-				<router-view v-if="allCommentsView && windowWidth < breakpoint"></router-view>
-			</transition>
-            <transition mode="out-in"
-				enter-active-class="animated fadeIn"
-				leave-active-class="animated fadeOut">
-				<router-view v-if="likesView && windowWidth < breakpoint"></router-view>
-			</transition>
-            <transition mode="out-in"
-				enter-active-class="animated fadeIn"
-				leave-active-class="animated fadeOut">
-				<router-view v-if="upload && windowWidth < breakpoint"></router-view>
-			</transition>
+			<router-view v-if="allCommentsView && windowWidth < breakpoint"></router-view>
+            <router-view v-if="likesView && windowWidth < breakpoint"></router-view>
+            <router-view v-if="upload && windowWidth < breakpoint"></router-view>
 
 			<!-- for all other devices -->
 			<transition mode="out-in"

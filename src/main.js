@@ -37,5 +37,19 @@ if ('serviceWorker' in navigator) {
     .register('/sw.js')
     .then(function() {
       console.log('Service worker registered!');
+    })
+    .catch(function(err) {
+      console.log(err);
     });
 }
+
+// const url = 'http://54.37.227.57:80'
+
+// if ('caches' in window) {
+//   caches.match(url)
+//     .then(function(response) {
+//       if (response) {
+
+//       }
+//     })
+// }
