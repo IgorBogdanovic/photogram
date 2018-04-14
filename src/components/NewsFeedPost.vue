@@ -405,7 +405,7 @@
 			display: inline-block;
 			width: 2.5rem;
 			height: 2.5rem;
-			margin-top: 0.9rem;
+			margin-top: .9rem;
 			margin-left: 1.3rem;
 			cursor: pointer;
 
@@ -419,11 +419,11 @@
 
 			svg {
 				stroke: $lightblack;
-				stroke-width: 0.1rem;
+				stroke-width: .1rem;
 				fill: $white;
 
 				@include breakpoint(desktop) {
-                    stroke-width: 0.2rem;
+                    stroke-width: .2rem;
                 }
 			}
 			
@@ -473,7 +473,7 @@
 			width: 1.3rem;
 			height: 1.3rem;
 			fill: $lightgreen;
-			margin-right: 0.5rem;
+			margin-right: .5rem;
 		}
 
 		&__likes-count {
@@ -482,13 +482,13 @@
 			color: $lightblack;
 			display: inline-block;
 			vertical-align: top;
-			opacity: 0.4;
+			opacity: .4;
 		}
 	}
         
 	.m-media-descrpt {
 		width: 89%;
-		margin: 0.9rem auto 1.7rem auto;
+		margin: .9rem auto 1.7rem auto;
 
 		@include breakpoint(desktop) {
 			width: 100%;
@@ -518,12 +518,13 @@
 			width: 90%;
 			color: $lightblack;
 			display: inline-block;
-			margin-top: 0.7rem;
+			margin-top: .3rem;
 			margin-left: 1rem;
 
 			@include breakpoint(desktop) {
 				width: 83%;
-				margin-left: 0.7rem;
+				margin-top: .7rem;
+				margin-left: .7rem;
 			}
 		}
 	}
@@ -537,7 +538,7 @@
 		}
 
 		&__comment-block {
-			margin-top: 0.9rem;
+			margin-top: .9rem;
 			margin-bottom: 1.7rem;
 
 			@include breakpoint(desktop) {
@@ -568,7 +569,7 @@
 			width: 90%;
 			color: $lightblack;
 			display: inline-block;
-			margin-top: .5rem;
+			margin-top: .3rem;
 			margin-left: 1rem;
 
 			@include breakpoint(desktop) {

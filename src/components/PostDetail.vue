@@ -604,13 +604,14 @@
 			width: 90%;
 			color: $lightblack;
 			display: inline-block;
-			margin-top: 0.3rem;
+			margin-top: .3rem;
 			margin-left: 1rem;
 
 			@include breakpoint(desktop) {
                 width: 83%;
                 color: $white;
-				margin-left: 0.7rem;
+				margin-top: .7rem;
+				margin-left: .7rem;
 			}
 		}
 	}
@@ -655,14 +656,14 @@
 			width: 90%;
 			color: $lightblack;
 			display: inline-block;
-			margin-top: 0.5rem;
+			margin-top: .3rem;
 			margin-left: 1rem;
 
 			@include breakpoint(desktop) {
                 width: 83%;
                 color: $white;
-				margin-top: 0.7rem;
-				margin-left: 0.7rem;
+				margin-top: .7rem;
+				margin-left: .7rem;
 			}
 
 			span {
