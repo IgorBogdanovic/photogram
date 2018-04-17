@@ -1,7 +1,11 @@
+importScripts('/idb.js');
+importScripts('/utility.js');
+
 var CACHE_STATIC_NAME = 'static-v1';
 var CACHE_DYNAMIC_NAME = 'dynamic-v1';
 var STATIC_FILES = [
     '/index.html',
+    '/idb.js',
     '/dist/build.js',
     '/dist/build.js.map',
     '/dist/0.build.js',
@@ -55,6 +59,19 @@ var STATIC_FILES = [
     '/search'
 ];
 
+function trimCache(cacheName, maxItems) {
+    caches.open(cacheName)
+        .then(function(cache) {
+            return cache.keys()
+                .then(function(keys) {
+                    if (keys.length > maxItems) {
+                        cache.delete(keys[0])
+                            .then(trimCache(cacheName, maxItems));
+                    }
+                });
+        });
+}
+
 self.addEventListener('install', function(event) {
     console.log(event);
     event.waitUntil(
@@ -93,16 +110,60 @@ function isInArray(string, array) {
 }
 
 self.addEventListener('fetch', function(event) {
+    const urlDefault = 'http://54.37.227.57/api/';
+    const urlUsers = 'http://54.37.227.57/api/users/';
+    const urlPosts = 'http://54.37.227.57/api/posts/';
+    const urlComments = 'http://54.37.227.57/api/comments/';
+    const urlLikes = 'http://54.37.227.57/api/likes/';
+    const urlFollowers = 'http://54.37.227.57/api/followers/';
+    const urlFollowings = 'http://54.37.227.57/api/followings/';
+    const urlSearch = 'http://54.37.227.57/api/search/users';
+
     if (navigator.onLine) {
-        console.log('fetch');
+        // console.log('fetch');
         event.respondWith(
-            caches.open(CACHE_DYNAMIC_NAME)
-                .then(function(cache) {
-                    return fetch(event.request)
-                        .then(function(res) {
-                            cache.put(event.request, res.clone());
-                            return res;
-                        });
+            fetch(event.request)
+                .then(function (res) {
+                    if (event.request.url.indexOf(urlDefault) > -1) {
+                        var clonedRes = res.clone();
+                        clonedRes.json()
+                            .then(function(data) {
+                                const resData = data.data;
+                                // console.log(resData);
+                                dbPromise
+                                    .then(db => {
+                                        // to users idb
+                                        if (event.request.url.indexOf(urlUsers) > -1) {
+                                            writeData(db, 'users', resData); // defined in utility.js
+                                        }
+                                        // to posts idb
+                                        else if (event.request.url.indexOf(urlPosts) > -1) {
+                                            writeDataLoop(db, 'posts', resData); // defined in utility.js
+                                        }
+                                        // to comments idb
+                                        else if (event.request.url.indexOf(urlComments) > -1) {
+                                            writeDataLoop(db, 'comments', resData); // defined in utility.js
+                                        }
+                                        // to likes idb
+                                        else if (event.request.url.indexOf(urlLikes) > -1) {
+                                            writeDataLoop(db, 'likes', resData); // defined in utility.js
+                                        }
+                                        // to followers idb
+                                        else if (event.request.url.indexOf(urlFollowers) > -1) {
+                                            writeDataLoop(db, 'followers', resData); // defined in utility.js
+                                        }
+                                        // to followings idb
+                                        else if (event.request.url.indexOf(urlFollowings) > -1) {
+                                            writeDataLoop(db, 'followings', resData); // defined in utility.js
+                                        }
+                                        // to search idb
+                                        else if (event.request.url.indexOf(urlSearch) > -1) {
+                                            writeDataLoop(db, 'search', resData); // defined in utility.js
+                                        }
+                                    });
+                            });
+                    }
+                    return res;
                 })
         );
     } else if (isInArray(event.request.url, STATIC_FILES)) {
@@ -110,7 +171,14 @@ self.addEventListener('fetch', function(event) {
             caches.match(event.request)
         );
     } else {
-        console.log('cache');
+        // console.log('cache');
+        // readAllData('posts')
+        //     .then(function(data) {
+        //         caches.open(CACHE_DYNAMIC_NAME)
+        //             .then(function(cache) {
+        //                 cache.put(data);
+        //             });
+        //     });
         event.respondWith(
             caches.match(event.request)
                 .then(function(response) {
@@ -121,6 +189,7 @@ self.addEventListener('fetch', function(event) {
                             .then(function(res) {
                                 return caches.open(CACHE_DYNAMIC_NAME)
                                     .then(function(cache) {
+                                        trimCache(CACHE_DYNAMIC_NAME, 100);
                                         cache.put(event.request.url, res.clone());
                                         return res;
                                     });
@@ -141,32 +210,51 @@ self.addEventListener('fetch', function(event) {
 });
 
 // self.addEventListener('fetch', function(event) {
-//     event.respondWith(
-//         caches.match(event.request)
-//             .then(function(response) {
-//                 if (response) {
-//                     console.log('cache');
-//                     return response;
-//                 } else {
-//                     console.log('fetch');
+//     if (navigator.onLine) {
+//         // console.log('fetch');
+//         event.respondWith(
+//             caches.open(CACHE_DYNAMIC_NAME)
+//                 .then(function(cache) {
 //                     return fetch(event.request)
 //                         .then(function(res) {
-//                             return caches.open(CACHE_DYNAMIC_NAME)
-//                                 .then(function(cache) {
-//                                     cache.put(event.request.url, res.clone());
-//                                     return res;
-//                                 });
-//                         })
-//                         .catch(function(err) {
-//                             return caches.open(CACHE_STATIC_NAME)
-//                                 .then(function(cache) {
-//                                     // if (event.request.headers.get('accept').includes('text/html')) {
-//                                     //     return cache.match('/');
-//                                     // }
-//                                     return cache.match('/');
-//                                 });
+//                             trimCache(CACHE_DYNAMIC_NAME, 100);
+//                             cache.put(event.request, res.clone());
+//                             return res;
 //                         });
-//                 }
-//             })
-//     );
+//                 })
+//         );
+//     } else if (isInArray(event.request.url, STATIC_FILES)) {
+//         event.respondWith(
+//             caches.match(event.request)
+//         );
+//     } else {
+//         // console.log('cache');
+//         event.respondWith(
+//             caches.match(event.request)
+//                 .then(function(response) {
+//                     if (response) {
+//                         return response;
+//                     } else {
+//                         return fetch(event.request)
+//                             .then(function(res) {
+//                                 return caches.open(CACHE_DYNAMIC_NAME)
+//                                     .then(function(cache) {
+//                                         trimCache(CACHE_DYNAMIC_NAME, 100);
+//                                         cache.put(event.request.url, res.clone());
+//                                         return res;
+//                                     });
+//                             })
+//                             .catch(function(err) {
+//                                 return caches.open(CACHE_STATIC_NAME)
+//                                     .then(function(cache) {
+//                                         // if (event.request.headers.get('accept').includes('text/html')) {
+//                                         //     return cache.match('/');
+//                                         // }
+//                                         return cache.match('/');
+//                                     });
+//                             });
+//                     }
+//                 })
+//         );
+//     }
 // });

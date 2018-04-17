@@ -42,14 +42,3 @@ if ('serviceWorker' in navigator) {
       console.log(err);
     });
 }
-
-// const url = 'http://54.37.227.57:80'
-
-// if ('caches' in window) {
-//   caches.match(url)
-//     .then(function(response) {
-//       if (response) {
-
-//       }
-//     })
-// }

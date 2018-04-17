@@ -41,6 +41,7 @@
         deferredPrompt = event;
         return false;
 	});
+	//
 	
 	import { users } from '../axios-urls'
 	import { mixinStorage, basicVars } from '../mixins'
@@ -96,6 +97,7 @@
 							deferredPrompt = null;
 						});
 					}
+					//
                 })
                 .catch(error => {
                     console.log(error);
