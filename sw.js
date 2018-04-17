@@ -55,6 +55,19 @@ var STATIC_FILES = [
     '/search'
 ];
 
+function trimCache(cacheName, maxItems) {
+    caches.open(cacheName)
+        .then(function(cache) {
+            return cache.keys()
+                .then(function(keys) {
+                    if (keys.length > maxItems) {
+                        cache.delete(keys[0])
+                            .then(trimCache(cacheName, maxItems));
+                    }
+                });
+        });
+}
+
 self.addEventListener('install', function(event) {
     console.log(event);
     event.waitUntil(
@@ -94,12 +107,13 @@ function isInArray(string, array) {
 
 self.addEventListener('fetch', function(event) {
     if (navigator.onLine) {
-        console.log('fetch');
+        // console.log('fetch');
         event.respondWith(
             caches.open(CACHE_DYNAMIC_NAME)
                 .then(function(cache) {
                     return fetch(event.request)
                         .then(function(res) {
+                            trimCache(CACHE_DYNAMIC_NAME, 100);
                             cache.put(event.request, res.clone());
                             return res;
                         });
@@ -110,7 +124,7 @@ self.addEventListener('fetch', function(event) {
             caches.match(event.request)
         );
     } else {
-        console.log('cache');
+        // console.log('cache');
         event.respondWith(
             caches.match(event.request)
                 .then(function(response) {
@@ -121,6 +135,7 @@ self.addEventListener('fetch', function(event) {
                             .then(function(res) {
                                 return caches.open(CACHE_DYNAMIC_NAME)
                                     .then(function(cache) {
+                                        trimCache(CACHE_DYNAMIC_NAME, 100);
                                         cache.put(event.request.url, res.clone());
                                         return res;
                                     });
@@ -128,9 +143,6 @@ self.addEventListener('fetch', function(event) {
                             .catch(function(err) {
                                 return caches.open(CACHE_STATIC_NAME)
                                     .then(function(cache) {
-                                        // if (event.request.headers.get('accept').includes('text/html')) {
-                                        //     return cache.match('/');
-                                        // }
                                         return cache.match('/');
                                     });
                             });
@@ -139,34 +151,3 @@ self.addEventListener('fetch', function(event) {
         );
     }
 });
-
-// self.addEventListener('fetch', function(event) {
-//     event.respondWith(
-//         caches.match(event.request)
-//             .then(function(response) {
-//                 if (response) {
-//                     console.log('cache');
-//                     return response;
-//                 } else {
-//                     console.log('fetch');
-//                     return fetch(event.request)
-//                         .then(function(res) {
-//                             return caches.open(CACHE_DYNAMIC_NAME)
-//                                 .then(function(cache) {
-//                                     cache.put(event.request.url, res.clone());
-//                                     return res;
-//                                 });
-//                         })
-//                         .catch(function(err) {
-//                             return caches.open(CACHE_STATIC_NAME)
-//                                 .then(function(cache) {
-//                                     // if (event.request.headers.get('accept').includes('text/html')) {
-//                                     //     return cache.match('/');
-//                                     // }
-//                                     return cache.match('/');
-//                                 });
-//                         });
-//                 }
-//             })
-//     );
-// });
