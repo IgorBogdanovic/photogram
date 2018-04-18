@@ -78,12 +78,40 @@ export const nfPosts = {
     },
     postComment({commit}, data) {
       const token = localStorage.getItem('token');
-      if (data.reply_username) {
-        return comments.post('', { post_id: data.post_id, reply_username: data.reply_username, body: data.body },
-        { headers: { Authorization: 'Bearer ' + token } });
+      // if (data.reply_username) {
+      //   return comments.post('', { post_id: data.post_id, reply_username: data.reply_username, body: data.body },
+      //   { headers: { Authorization: 'Bearer ' + token } });
+      // } else {
+      //   return comments.post('', { post_id: data.post_id, body: data.body },
+      //   { headers: { Authorization: 'Bearer ' + token } });
+      // }
+
+      if ('serviceWorker' in navigator && 'SyncManager' in window && !navigator.onLine) {
+        data.id = new Date().toISOString();
+        data.token = token;
+        navigator.serviceWorker.ready
+          .then(function(sw) {
+            writeData('sync-comments', data)
+              .then(function() {
+                return sw.sync.register('sync-new-comments');
+              })
+              // .then(function() {
+              //   var snackbarContainer = document.querySelector('#confirmation-toast');
+              //   var data = {message: 'Your Post was saved for syncing!'};
+              //   snackbarContainer.MaterialSnackbar.showSnackbar(data);
+              // })
+              .catch(function(err) {
+                console.log(err);
+              });
+          });
       } else {
-        return comments.post('', { post_id: data.post_id, body: data.body },
-        { headers: { Authorization: 'Bearer ' + token } });
+        if (data.reply_username) {
+          return comments.post('', { post_id: data.post_id, reply_username: data.reply_username, body: data.body },
+          { headers: { Authorization: 'Bearer ' + token } });
+        } else {
+          return comments.post('', { post_id: data.post_id, body: data.body },
+          { headers: { Authorization: 'Bearer ' + token } });
+        }
       }
     },
     postPost({commit}, data) {
