@@ -35,10 +35,11 @@
 </template>
 
 <script>
-    import { photogramApi } from '../axios-urls'
-    import { mixinStorage, basicVars } from '../mixins'
-    import NotificationItem from './NotificationItem.vue'
-    import Spinner from './Spinner.vue'
+    import { photogramApi } from '../axios-urls';
+    import { mixinStorage, basicVars } from '../mixins';
+    import NotificationItem from './NotificationItem.vue';
+    import Spinner from './Spinner.vue';
+    import { mapState } from 'vuex';
 
     export default {
         mixins: [ mixinStorage, basicVars ],
@@ -52,11 +53,10 @@
                 notifPage: 1
 		    }
         },
-        computed: {
-            token() {
-				return this.$store.getters['login/token'];
-            }
-        },
+        computed:
+            mapState({
+                token: state => state.login.idToken
+			}),
         methods: {
             axiosGetFollow() {
                 if (this.activeWrapperItem === 'notifications') {

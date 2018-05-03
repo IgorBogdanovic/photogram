@@ -17,11 +17,12 @@
 </template>
 
 <script>
-    import { comments, posts } from '../axios-urls'
-    import { basicVars } from '../mixins'
-    import Comment from './Comment.vue'
-    import MakeComment from './MakeComment.vue'
-    import Spinner from './Spinner.vue'
+    import { comments, posts } from '../axios-urls';
+    import { basicVars } from '../mixins';
+    import Comment from './Comment.vue';
+    import MakeComment from './MakeComment.vue';
+    import Spinner from './Spinner.vue';
+    import { mapState } from 'vuex';
 
     export default {
         props: ['postId'],
@@ -35,17 +36,12 @@
                 commentPage: 1
 		    }
         },
-        computed: {
-            token() {
-				return this.$store.getters['login/token'];
-            },
-            newsFeedPostsAll() {
-				return this.$store.getters['nfPosts/newsFeedPostsAll'];
-			},
-            postCommentsAll() {
-				return this.$store.getters['nfPosts/postCommentsAll'];
-			}
-        },
+        computed:
+            mapState({
+                token: state => state.login.idToken,
+                newsFeedPostsAll: state => state.nfPosts.newsFeedPostsAll,
+				postCommentsAll: state => state.nfPosts.postCommentsAll
+			}),
         methods: {
 			axiosGetComments() {
                 this.loading = true;

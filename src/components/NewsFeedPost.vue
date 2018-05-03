@@ -129,9 +129,10 @@
 </template>
 
 <script>
-	import { posts } from '../axios-urls'
-	import { mixinStorage, basicVars } from '../mixins'
-	import MakeComment from './MakeComment.vue'
+	import { posts } from '../axios-urls';
+	import { mixinStorage, basicVars } from '../mixins';
+	import MakeComment from './MakeComment.vue';
+	import { mapState } from 'vuex';
 
     export default {
         props: ['post'],
@@ -146,17 +147,12 @@
 				this.newsFeedPost = this.post;
             }
 		},
-		computed: {
-			token() {
-				return this.$store.getters['login/token'];
-			},
-			loggedUserId() {
-				return this.$store.getters['login/idUser'];
-            },
-			newsFeedPostsAll() {
-				return this.$store.getters['nfPosts/newsFeedPostsAll'];
-			}
-		},
+		computed:
+			mapState({
+                token: state => state.login.idToken,
+                loggedUserId: state => state.login.idUser,
+                newsFeedPostsAll: state => state.nfPosts.newsFeedPostsAll
+			}),
 		methods: {
 			openList(e) {
 				e.stopPropagation();

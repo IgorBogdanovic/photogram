@@ -50,8 +50,9 @@
 </template>
 
 <script>
-    import { comments } from '../axios-urls'
-    import { mixinStorage } from '../mixins'
+    import { comments } from '../axios-urls';
+    import { mixinStorage } from '../mixins';
+    import { mapState } from 'vuex';
 
     export default {
         mixins: [ mixinStorage ],
@@ -62,17 +63,12 @@
                 commentBody: this.postComment.body
 		    }
         },
-        computed: {
-            token() {
-				return this.$store.getters['login/token'];
-			},
-            idUser() {
-				return this.$store.getters['login/idUser'];
-            },
-            postCommentsAll() {
-				return this.$store.getters['nfPosts/postCommentsAll'];
-			}
-        },
+        computed:
+            mapState({
+                token: state => state.login.idToken,
+                idUser: state => state.login.idUser,
+				postCommentsAll: state => state.nfPosts.postCommentsAll
+			}),
         methods: {
             deleteComment() {
                 const commentId = this.comment.id;

@@ -15,10 +15,11 @@
 </template>
 
 <script>
-    import { likes } from '../axios-urls'
-    import { basicVars } from '../mixins'
-    import Like from './Like.vue'
-    import Spinner from './Spinner.vue'
+    import { likes } from '../axios-urls';
+    import { basicVars } from '../mixins';
+    import Like from './Like.vue';
+    import Spinner from './Spinner.vue';
+    import { mapState } from 'vuex';
 
     export default {
         props: ['postId', 'typeId'],
@@ -32,17 +33,12 @@
                 likesPage: 1
 		    }
         },
-        computed: {
-            token() {
-				return this.$store.getters['login/token'];
-            },
-            newsFeedPost() {
-				return this.$store.getters['nfPosts/newsFeedPost'];
-            },
-            likesAll() {
-				return this.$store.getters['nfPosts/likesAll'];
-			}
-        },
+        computed:
+            mapState({
+                token: state => state.login.idToken,
+                newsFeedPost: state => state.nfPosts.newsFeedPost,
+                likesAll: state => state.nfPosts.likesAll
+			}),
         methods: {
 			axiosGetLikes() {
                 this.loading = true;

@@ -96,40 +96,32 @@
 </template>
 
 <script>
-    import { users } from '../axios-urls'
-    import { mixinStorage, basicVars } from '../mixins'
+    import { users } from '../axios-urls';
+    import { mixinStorage, basicVars } from '../mixins';
+    import { mapState } from 'vuex';
 
     export default {
         mixins: [ mixinStorage, basicVars ],
-        computed: {
-            token() {
-				return this.$store.getters['login/token'];
-			},
-            heading() {
-				return this.$store.getters['headings/heading'];
-            },
-            isHomeActive() {
-                return this.$route.name === 'homepage';
-            },
-            isUploadActive() {
-                return this.$route.name === 'upload';
-			},
-            isNotificationActive() {
-                return this.$route.name === 'my-notifications';
-            },
-            isSearchActive() {
-                return this.$route.name === 'search';
-            },
-			userAvatar() {
-				return this.$store.getters['login/userAvatar'];
-            },
-            loggedUserId() {
-				return this.$store.getters['login/idUser'];
-            },
-            user() {
-				return this.$store.getters['nfPosts/user'];
-			}
-        },
+        computed:
+            mapState({
+                token: state => state.login.idToken,
+                loggedUserId: state => state.login.idUser,
+                userAvatar: state => state.login.userAvatar,
+				user: state => state.nfPosts.user,
+				heading: state => state.headings.heading,
+				isHomeActive() {
+                    return this.$route.name === 'homepage';
+                },
+                isUploadActive() {
+                    return this.$route.name === 'upload';
+                },
+                isNotificationActive() {
+                    return this.$route.name === 'my-notifications';
+                },
+                isSearchActive() {
+                    return this.$route.name === 'search';
+                }
+			}),
         methods: {
             inUserUpload() {
 				users.get('find?id=' + this.loggedUserId, { headers: { Authorization: 'Bearer ' + this.token } })

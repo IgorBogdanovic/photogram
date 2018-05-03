@@ -31,7 +31,7 @@
 							class="c-form-input">
 			        </div>
 		        	<div class="o-signup__msg  c-form-msg">
-			        	<p v-if="$v.password.$error">Please, enter a valid password</p>
+			        	<p v-if="$v.password.$error">Password must contain minimim six characters</p>
 			        </div>
 		        	<div class="o-signup__form-field" :class="{ 'is-invalid': $v.confirmPassword.$error }">
 			        	<div class="o-signup__form-field-icon  c-form-field-icon">
@@ -73,7 +73,7 @@
 			        <p class="o-signup__policy">I accept to the <router-link :to="{ name: 'terms' }" tag="span">Terms & Privacy Policy</router-link></p>
 			        <div class="o-signup__msg  o-signup__msg--check-all  c-form-msg">
 			        	<p v-show="$v.email.$error || $v.password.$error || $v.confirmPassword.$error || $v.username.$error">
-			        	Please, fill all fields before submit</p>
+			        	Please, fill all fields before submit Please, fill all fields before submit</p>
 						<p v-show="serverSuccess">{{ serverSuccess }}</p>
 			        </div>
 			        <div class="o-signup__submit">
@@ -93,8 +93,9 @@
 </template>
 
 <script>
-	import { users } from '../axios-urls'
+	import { users } from '../axios-urls';
 	import { required, email, minLength, sameAs } from 'vuelidate/lib/validators';
+	import { mapState } from 'vuex';
 
 	export default {
 	  	data () {
@@ -113,7 +114,8 @@
 				email
 			},
 			password: {
-				required
+				required,
+				minLen: minLength(6)
 			},
 			confirmPassword: {
 		        sameAs: sameAs('password')
@@ -136,17 +138,16 @@
 				required
 			}
 		},
-		computed: {
-			serverError() {
-				return this.$store.getters['signup/error'];
-			},
-			serverSuccess() {
-				const serverMsg = this.$store.getters['signup/success'];
-				if (serverMsg === "success") {
-					return 'Please, verify your account via mail that is sent on your email address.';
-				} else return false;
-			}
-		},
+		computed:
+			mapState({
+                serverError: state => state.signup.error,
+				serverSuccess(state) {
+					const serverMsg = state.signup.success;
+					if (serverMsg === "Resource created") {
+						return 'Please, verify your account via mail that is sent on your email address.';
+					} else return false;
+				}
+			}),
 		methods: {
 		    signupSubmit() {
 		        const signupData = {
@@ -272,7 +273,7 @@
 
 			&--check-all {
 				margin-top: 1rem;
-				margin-bottom: 0;
+				margin-bottom: 2.5rem;
 				margin-left: 0.3rem;
 				
 				& p:last-child {

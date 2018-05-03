@@ -82,23 +82,5 @@ export const login = {
   },
 
   getters: {
-    isAuthenticated(state) {
-      return state.idToken !== null;
-    },
-    token(state) {
-      return state.idToken;
-    },
-    idUser(state) {
-      return state.idUser;
-    },
-    userAvatar(state) {
-      return state.userAvatar;
-    },
-    userProfile(state) {
-      return state.userProfile;
-    },
-    error(state) {
-      return state.error;
-    }
   }
 };

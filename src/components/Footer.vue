@@ -1,5 +1,5 @@
 <template>
-  	<div class="o-footer  u-only-mobile">
+	<div class="o-footer  u-only-mobile">
 		
 		<router-link :to="{ name: 'homepage' }" tag="div" class="o-footer__home  a-home" :class="{ 'is-active': isHomeActive }">
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="2700 1481 29 29">
@@ -17,7 +17,7 @@
 		</router-link>
 
 		<router-link :to="{ name: 'upload', params: { userId: loggedUserId } }" tag="div"
-		class="o-footer__upload  a-upload" :class="{ 'is-active': isUploadActive }" @click.native="inUserUpload">
+			class="o-footer__upload  a-upload" :class="{ 'is-active': isUploadActive }" @click.native="inUserUpload">
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="2830.105 1480.158 29.843 29.842">
 			<g id="Group_370" data-name="Group 370" transform="translate(2620.228 1461.233)">
 				<g id="Ellipse_170" data-name="Ellipse 170" class="cls-1" transform="translate(209.876 18.925)">
@@ -43,37 +43,27 @@
 	});
 	//
 	
-	import { users } from '../axios-urls'
-	import { mixinStorage, basicVars } from '../mixins'
+	import { users } from '../axios-urls';
+	import { mixinStorage, basicVars } from '../mixins';
+	import { mapState } from 'vuex';
 
     export default {
 		mixins: [ mixinStorage, basicVars ],
-        computed: {
-			token() {
-				return this.$store.getters['login/token'];
-			},
-			heading() {
-				return this.$store.getters['headings/heading'];
-			},
-            isHomeActive() {
-                return this.$route.name === 'homepage';
-			},
-			isUploadActive() {
-                return this.$route.name === 'upload';
-			},
-			user() {
-				return this.$store.getters['nfPosts/user'];
-			},
-			userAvatar() {
-				return this.$store.getters['login/userAvatar'];
-			},
-			loggedUserId() {
-				return this.$store.getters['login/idUser'];
-			},
-			newsFeedPostsAll() {
-				return this.$store.getters['nfPosts/newsFeedPostsAll'];
-			}
-		},
+		computed:
+			mapState({
+                token: state => state.login.idToken,
+                loggedUserId: state => state.login.idUser,
+                userAvatar: state => state.login.userAvatar,
+				user: state => state.nfPosts.user,
+				newsFeedPostsAll: state => state.nfPosts.newsFeedPostsAll,
+				heading: state => state.headings.heading,
+				isHomeActive() {
+					return this.$route.name === 'homepage';
+				},
+				isUploadActive() {
+					return this.$route.name === 'upload';
+				}
+			}),
 		methods: {
 			inUserUpload() {
 				users.get('find?id=' + this.loggedUserId, { headers: { Authorization: 'Bearer ' + this.token } })

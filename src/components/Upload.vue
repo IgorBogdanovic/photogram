@@ -40,7 +40,8 @@
 
 <script>
     import { required } from 'vuelidate/lib/validators';
-    import { basicVars } from '../mixins'
+    import { basicVars } from '../mixins';
+    import { mapState } from 'vuex';
     
     export default {
         mixins: [ basicVars ],
@@ -55,14 +56,11 @@
 				required
 			}
         },
-		computed: {
-            token() {
-				return this.$store.getters['login/token'];
-            },
-            loggedUserId() {
-				return this.$store.getters['login/idUser'];
-            }
-		},
+		computed:
+            mapState({
+                token: state => state.login.idToken,
+                loggedUserId: state => state.login.idUser
+			}),
 		methods: {
 			onFileSelected(e) {
                 if (e.type === 'change') {

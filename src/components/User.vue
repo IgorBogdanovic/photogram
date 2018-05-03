@@ -89,10 +89,11 @@
 
 <script>
     import { store } from '../store/store';
-    import { mixinStorage, basicVars } from '../mixins'
-    import { users, posts } from '../axios-urls'
-    import NewsFeedPost from './NewsFeedPost.vue'
-	import Spinner from './Spinner.vue'
+    import { mixinStorage, basicVars } from '../mixins';
+    import { users, posts } from '../axios-urls';
+    import NewsFeedPost from './NewsFeedPost.vue';
+    import Spinner from './Spinner.vue';
+    import { mapState } from 'vuex';
 
     export default {
         props: ['userId'],
@@ -113,23 +114,16 @@
                 singleViewActive: true
 		    }
 		},
-        computed: {
-			token() {
-				return this.$store.getters['login/token'];
-            },
-			newsFeedPostsAll() {
-				return this.$store.getters['nfPosts/newsFeedPostsAll'];
-            },
-            loggedUserId() {
-				return this.$store.getters['login/idUser'];
-            },
-            user() {
-				return this.$store.getters['nfPosts/user'];
-            },
-            isLoggedUser() {
-                return this.loggedUserId == this.userId;
-            }
-        },
+        computed:
+            mapState({
+                token: state => state.login.idToken,
+                loggedUserId: state => state.login.idUser,
+				user: state => state.nfPosts.user,
+				newsFeedPostsAll: state => state.nfPosts.newsFeedPostsAll,
+				isLoggedUser() {
+                    return this.loggedUserId == this.userId;
+                }
+			}),
         watch: {
             '$route.name': function() {
 				switch (this.$route.name) {
@@ -342,7 +336,7 @@
 			appSpinner: Spinner
         },
         beforeRouteEnter (to, from, next) {
-            users.get('find?id=' + to.params.userId, { headers: { Authorization: 'Bearer ' + store.getters['login/token'] } })
+            users.get('find?id=' + to.params.userId, { headers: { Authorization: 'Bearer ' + store.state.login.idToken } })
                 .then(res => {
                     const user = res.data.data;
                     store.dispatch('nfPosts/changeUser', user);

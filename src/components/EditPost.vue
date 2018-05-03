@@ -75,6 +75,7 @@
     import Comment from './Comment.vue';
     import MakeComment from './MakeComment.vue';
     import Spinner from './Spinner.vue';
+    import { mapState } from 'vuex';
 
     export default {
         props: ['postId'],
@@ -90,23 +91,14 @@
                 commentPage: 1
 		    }
         },
-        computed: {
-            token() {
-				return this.$store.getters['login/token'];
-            },
-            loggedUserId() {
-				return this.$store.getters['login/idUser'];
-            },
-            newsFeedPost() {
-				return this.$store.getters['nfPosts/newsFeedPost'];
-			},
-            newsFeedPostsAll() {
-				return this.$store.getters['nfPosts/newsFeedPostsAll'];
-			},
-            postCommentsAll() {
-				return this.$store.getters['nfPosts/postCommentsAll'];
-			}
-        },
+        computed:
+            mapState({
+                token: state => state.login.idToken,
+                loggedUserId: state => state.login.idUser,
+                newsFeedPost: state => state.nfPosts.newsFeedPost,
+                newsFeedPostsAll: state => state.nfPosts.newsFeedPostsAll,
+				postCommentsAll: state => state.nfPosts.postCommentsAll
+			}),
         methods: {
             enableDescriptionChange(e) {
                 const iconDescEdit = $(e.currentTarget);
@@ -205,7 +197,7 @@
             appSpinner: Spinner
         },
         beforeRouteEnter (to, from, next) {
-            posts.get('' + to.params.postId, { headers: { Authorization: 'Bearer ' + store.getters['login/token'] } })
+            posts.get('' + to.params.postId, { headers: { Authorization: 'Bearer ' + store.state.login.idToken } })
                 .then(res => {
 					const post = res.data.data;
 					store.dispatch('nfPosts/changeNewsFeedPost', post);

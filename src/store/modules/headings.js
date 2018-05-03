@@ -20,8 +20,5 @@ export const headings = {
   },
 
   getters: {
-    heading(state) {
-      return state.heading;
-    }
   }
 };

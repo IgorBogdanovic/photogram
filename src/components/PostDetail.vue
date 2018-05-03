@@ -131,26 +131,20 @@
 
 <script>
 	import { store } from '../store/store';
-	import { mixinStorage, basicVars } from '../mixins'
-	import { posts } from '../axios-urls'
-	import MakeComment from './MakeComment.vue'
+	import { mixinStorage, basicVars } from '../mixins';
+	import { posts } from '../axios-urls';
+	import MakeComment from './MakeComment.vue';
+	import { mapState } from 'vuex';
 
     export default {
 		mixins: [ mixinStorage, basicVars ],
-        computed: {
-			token() {
-				return this.$store.getters['login/token'];
-			},
-			loggedUserId() {
-				return this.$store.getters['login/idUser'];
-            },
-            newsFeedPostsAll() {
-				return this.$store.getters['nfPosts/newsFeedPostsAll'];
-			},
-			newsFeedPost() {
-				return this.$store.getters['nfPosts/newsFeedPost'];
-			}
-        },
+		computed:
+			mapState({
+                token: state => state.login.idToken,
+				loggedUserId: state => state.login.idUser,
+				newsFeedPost: state => state.nfPosts.newsFeedPost,
+                newsFeedPostsAll: state => state.nfPosts.newsFeedPostsAll
+			}),
         methods: {
 			openList(e) {
 				e.stopPropagation();
@@ -298,7 +292,7 @@
             appMakeComment: MakeComment
 		},
 		beforeRouteEnter (to, from, next) {
-			posts.get('' + to.params.postId, { headers: { Authorization: 'Bearer ' + store.getters['login/token'] } })
+			posts.get('' + to.params.postId, { headers: { Authorization: 'Bearer ' + store.state.login.idToken } })
                 .then(res => {
 					const post = res.data.data;
 					store.dispatch('nfPosts/changeNewsFeedPost', post);

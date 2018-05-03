@@ -81,13 +81,14 @@
 </template>
 
 <script>
-    import { users } from '../axios-urls'
+    import { users } from '../axios-urls';
     import { required, minLength, numeric } from 'vuelidate/lib/validators';
-    import { mixinStorage, basicVars } from '../mixins'
+    import { mixinStorage, basicVars } from '../mixins';
     import { store } from '../store/store';
+    import { mapState } from 'vuex';
 
     // used in username validation exception
-    const userName = store.getters['nfPosts/user'].username;
+    const userName = store.state.nfPosts.username;
     
     export default {
         mixins: [ mixinStorage, basicVars ],
@@ -128,20 +129,13 @@
 		    	required
 		    }
         },
-        computed: {
-			token() {
-				return this.$store.getters['login/token'];
-            },
-            loggedUserId() {
-				return this.$store.getters['login/idUser'];
-            },
-			userProfile() {
-				return this.$store.getters['login/userProfile'];
-            },
-            user() {
-				return this.$store.getters['nfPosts/user'];
-            }
-        },
+        computed:
+            mapState({
+                token: state => state.login.idToken,
+                loggedUserId: state => state.login.idUser,
+                userProfile: state => state.login.userProfile,
+                user: state => state.nfPosts.user
+			}),
         watch: {
             selectedFile: function(file) {
                 if (file.type) {

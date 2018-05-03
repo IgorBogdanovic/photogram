@@ -41,6 +41,8 @@
 </template>
 
 <script>
+	import { mapState } from 'vuex';
+	
 	export default {
 	  	data () {
 		    return {
@@ -48,11 +50,10 @@
 	        	password: '1'
 		    }
 		},
-	  	computed: {
-	  		error() {
-	  			return this.$store.getters['login/error'];
-			}
-        },
+		computed:
+			mapState({
+            	error: state => state.login.error
+			}),
 	  	methods: {
 		    loginSubmit() {
 		        const loginData = {

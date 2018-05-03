@@ -24,7 +24,8 @@
 </template>
 
 <script>
-    import { mixinStorage } from '../mixins'
+    import { mixinStorage } from '../mixins';
+    import { mapState } from 'vuex';
 
     export default {
         mixins: [ mixinStorage ],
@@ -34,14 +35,11 @@
                 notification: this.notifItem
 		    }
         },
-        computed: {
-            token() {
-				return this.$store.getters['login/token'];
-			},
-            loggedUserId() {
-				return this.$store.getters['login/idUser'];
-            }
-        },
+        computed:
+            mapState({
+                token: state => state.login.idToken,
+                loggedUserId: state => state.login.idUser
+			}),
         methods: {
             followUser() {
                 const userId = this.notification.id;

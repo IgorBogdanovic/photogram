@@ -146,20 +146,5 @@ export const nfPosts = {
   },
 
   getters: {
-    // newsFeedPostsAll(state) {
-    //   return state.newsFeedPostsAll;
-    // },
-    newsFeedPost(state) {
-      return state.newsFeedPost;
-    },
-    user(state) {
-      return state.user;
-    },
-    postCommentsAll(state) {
-      return state.postCommentsAll;
-    },
-    likesAll(state) {
-      return state.likesAll;
-    }
   }
 };

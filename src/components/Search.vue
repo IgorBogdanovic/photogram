@@ -102,6 +102,7 @@
     import { mixinStorage, basicVars } from '../mixins';
     import SearchResItem from './SearchResItem.vue';
     import Spinner from './Spinner.vue';
+    import { mapState } from 'vuex';
 
     export default {
         mixins: [ mixinStorage, basicVars ],
@@ -121,11 +122,10 @@
                 })()
 		    }
         },
-        computed: {
-            token() {
-				return this.$store.getters['login/token'];
-            }
-        },
+        computed:
+            mapState({
+                token: state => state.login.idToken
+			}),
         methods: {
             search(e) {
                 const vm = this;

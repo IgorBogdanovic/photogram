@@ -22,6 +22,7 @@
 
 <script>
     import { required } from 'vuelidate/lib/validators';
+    import { mapState } from 'vuex';
 
     export default {
         props: ['postId'],
@@ -35,11 +36,10 @@
 				required
 			}
         },
-        computed: {
-            newsFeedPost() {
-				return this.$store.getters['nfPosts/newsFeedPost'];
-            }
-        },
+        computed:
+            mapState({
+                newsFeedPost: state => state.nfPosts.newsFeedPost
+			}),
         methods: {
 		    submitComment() {
                 var txtSplited = this.comment.split(' ');
