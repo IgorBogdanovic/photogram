@@ -43,6 +43,7 @@
 	import { basicVars } from '../mixins'
 	import NewsFeedPost from './NewsFeedPost.vue'
 	import Spinner from './Spinner.vue'
+	import { mapState } from 'vuex'
 
 	export default {
 		mixins: [ basicVars ],
@@ -58,14 +59,17 @@
 				postPage: 1
 		    }
 		},
-		computed: {
-            token() {
-				return this.$store.getters['login/token'];
-			},
-			newsFeedPostsAll() {
-				return this.$store.getters['nfPosts/newsFeedPostsAll'];
-			}
-		},
+		computed:
+			mapState({
+				token: state => state.login.idToken,
+				newsFeedPostsAll: state => state.nfPosts.newsFeedPostsAll
+			}),
+            // token() {
+			// 	return this.$store.getters['login/token'];
+			// },
+			// newsFeedPostsAll() {
+			// 	return this.$store.getters['nfPosts/newsFeedPostsAll'];
+			// }
 		watch: {
             '$route.name': function() {
 				switch (this.$route.name) {

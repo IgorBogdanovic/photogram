@@ -146,9 +146,9 @@ export const nfPosts = {
   },
 
   getters: {
-    newsFeedPostsAll(state) {
-      return state.newsFeedPostsAll;
-    },
+    // newsFeedPostsAll(state) {
+    //   return state.newsFeedPostsAll;
+    // },
     newsFeedPost(state) {
       return state.newsFeedPost;
     },
