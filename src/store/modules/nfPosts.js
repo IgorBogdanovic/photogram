@@ -1,6 +1,17 @@
 import router from '../../router';
 import { posts, comments, likes, photogramApi } from '../../axios-urls';
 
+// func for showing snackbar on background sync
+function showSnackbar(text) {
+  var snackbar = document.getElementById("snackbar");
+  snackbar.classList.add("is-active");
+  snackbar.innerHTML = text;
+  setTimeout(function() {
+    snackbar.classList.remove("is-active");
+  }, 3000);
+}
+//
+
 export const nfPosts = {
   namespaced: true,
   
@@ -78,14 +89,7 @@ export const nfPosts = {
     },
     postComment({commit}, data) {
       const token = localStorage.getItem('token');
-      // if (data.reply_username) {
-      //   return comments.post('', { post_id: data.post_id, reply_username: data.reply_username, body: data.body },
-      //   { headers: { Authorization: 'Bearer ' + token } });
-      // } else {
-      //   return comments.post('', { post_id: data.post_id, body: data.body },
-      //   { headers: { Authorization: 'Bearer ' + token } });
-      // }
-
+      
       if ('serviceWorker' in navigator && 'SyncManager' in window && !navigator.onLine) {
         data.id = new Date().toISOString();
         data.token = token;
@@ -95,11 +99,9 @@ export const nfPosts = {
               .then(function() {
                 return sw.sync.register('sync-new-comments');
               })
-              // .then(function() {
-              //   var snackbarContainer = document.querySelector('#confirmation-toast');
-              //   var data = {message: 'Your Post was saved for syncing!'};
-              //   snackbarContainer.MaterialSnackbar.showSnackbar(data);
-              // })
+              .then(function() {
+                showSnackbar('Your comment was saved for syncing!');
+              })
               .catch(function(err) {
                 console.log(err);
               });

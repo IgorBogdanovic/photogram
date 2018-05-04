@@ -6,6 +6,7 @@
 			leave-active-class="animated zoomOut">
 			<router-view></router-view>
 		</transition>
+		<div id="snackbar"></div>
 		<app-footer v-if="$route.name !== 'login' && $route.name !== 'signup' && $route.name !== 'terms'"></app-footer>
 	</div>
 </template>

@@ -48,6 +48,7 @@
                 this.infScrollDisable = true;
 				comments.get('', { headers: { Authorization: 'Bearer ' + this.token }, params: { post_id: this.postId, amount: this.commentAmount, page: this.commentPage } })
 				.then(res => {
+                    // console.log(res);
 					if (res.data.data.length > 0) {
 						for (let i = 0; i < res.data.data.length; i++) {
                             this.comments.push(res.data.data[i]);

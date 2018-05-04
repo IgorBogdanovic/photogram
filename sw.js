@@ -109,106 +109,6 @@ function isInArray(string, array) {
     return array.indexOf(cachePath) > -1;
 }
 
-// self.addEventListener('fetch', function(event) {
-//     const urlDefault = 'http://54.37.227.57/api/';
-//     const urlUsers = 'http://54.37.227.57/api/users/';
-//     const urlPosts = 'http://54.37.227.57/api/posts/';
-//     const urlComments = 'http://54.37.227.57/api/comments/';
-//     const urlLikes = 'http://54.37.227.57/api/likes/';
-//     const urlFollowers = 'http://54.37.227.57/api/followers/';
-//     const urlFollowings = 'http://54.37.227.57/api/followings/';
-//     const urlSearch = 'http://54.37.227.57/api/search/users';
-
-//     if (navigator.onLine) {
-//         // console.log('fetch');
-//         event.respondWith(
-//             fetch(event.request)
-//                 .then(function (res) {
-//                     if (event.request.url.indexOf(urlDefault) > -1) {
-//                         var clonedRes = res.clone();
-//                         clonedRes.json()
-//                             .then(function(data) {
-//                                 const resData = data.data;
-//                                 // console.log(resData);
-//                                 dbPromise
-//                                     .then(db => {
-//                                         // to users idb
-//                                         if (event.request.url.indexOf(urlUsers) > -1) {
-//                                             writeData(db, 'users', resData); // defined in utility.js
-//                                         }
-//                                         // to posts idb
-//                                         else if (event.request.url.indexOf(urlPosts) > -1) {
-//                                             writeDataLoop(db, 'posts', resData); // defined in utility.js
-//                                         }
-//                                         // to comments idb
-//                                         else if (event.request.url.indexOf(urlComments) > -1) {
-//                                             writeDataLoop(db, 'comments', resData); // defined in utility.js
-//                                         }
-//                                         // to likes idb
-//                                         else if (event.request.url.indexOf(urlLikes) > -1) {
-//                                             writeDataLoop(db, 'likes', resData); // defined in utility.js
-//                                         }
-//                                         // to followers idb
-//                                         else if (event.request.url.indexOf(urlFollowers) > -1) {
-//                                             writeDataLoop(db, 'followers', resData); // defined in utility.js
-//                                         }
-//                                         // to followings idb
-//                                         else if (event.request.url.indexOf(urlFollowings) > -1) {
-//                                             writeDataLoop(db, 'followings', resData); // defined in utility.js
-//                                         }
-//                                         // to search idb
-//                                         else if (event.request.url.indexOf(urlSearch) > -1) {
-//                                             writeDataLoop(db, 'search', resData); // defined in utility.js
-//                                         }
-//                                     });
-//                             });
-//                     }
-//                     return res;
-//                 })
-//         );
-//     } else if (isInArray(event.request.url, STATIC_FILES)) {
-//         event.respondWith(
-//             caches.match(event.request)
-//         );
-//     } else {
-//         // console.log('cache');
-//         // readAllData('posts')
-//         //     .then(function(data) {
-//         //         caches.open(CACHE_DYNAMIC_NAME)
-//         //             .then(function(cache) {
-//         //                 cache.put(data);
-//         //             });
-//         //     });
-//         event.respondWith(
-//             caches.match(event.request)
-//                 .then(function(response) {
-//                     if (response) {
-//                         return response;
-//                     } else {
-//                         return fetch(event.request)
-//                             .then(function(res) {
-//                                 return caches.open(CACHE_DYNAMIC_NAME)
-//                                     .then(function(cache) {
-//                                         trimCache(CACHE_DYNAMIC_NAME, 100);
-//                                         cache.put(event.request.url, res.clone());
-//                                         return res;
-//                                     });
-//                             })
-//                             .catch(function(err) {
-//                                 return caches.open(CACHE_STATIC_NAME)
-//                                     .then(function(cache) {
-//                                         // if (event.request.headers.get('accept').includes('text/html')) {
-//                                         //     return cache.match('/');
-//                                         // }
-//                                         return cache.match('/');
-//                                     });
-//                             });
-//                     }
-//                 })
-//         );
-//     }
-// });
-
 self.addEventListener('fetch', function(event) {
     if (event.request.method === 'GET') {
         console.log(0);
@@ -267,53 +167,70 @@ self.addEventListener('sync', function(event) {
             event.waitUntil(
                 readAllData('sync-comments')
                     .then(function(data) {
-                        for (var dt of data) {
-                            if (dt.reply_username) {
-                                fetch('http://54.37.227.57/api/comments/', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Accept': 'application/json, text/plain, */*',
-                                        'Content-Type': 'application/json',
-                                        Authorization: 'Bearer ' + dt.token
-                                    },
-                                    body: JSON.stringify({
-                                        post_id: dt.post_id,
-                                        reply_username: dt.reply_username,
-                                        body: dt.body
-                                    })
-                                })
-                                .then(function(res) {
-                                    console.log('Sent data', res);
-                                    if (res.ok) {
-                                        deleteItemFromData('sync-comments', dt.id); // Isn't working correctly!
-                                    }
-                                })
-                                .catch(function(err) {
-                                    console.log('Error while sending data', err);
-                                });
-                            } else {
-                                fetch('http://54.37.227.57/api/comments/', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Accept': 'application/json, text/plain, */*',
-                                        'Content-Type': 'application/json',
-                                        Authorization: 'Bearer ' + dt.token
-                                    },
-                                    body: JSON.stringify({
-                                        post_id: dt.post_id,
-                                        body: dt.body
-                                    })
-                                })
-                                .then(function(res) {
-                                    console.log('Sent data', res);
-                                    if (res.ok) {
-                                        deleteItemFromData('sync-comments', dt.id); // Isn't working correctly!
-                                    }
-                                })
-                                .catch(function(err) {
-                                    console.log('Error while sending data', err);
-                                });
-                            }
+                        for (let dt of data) {
+                            setInterval((function(dt){
+                                return function(){ console.log(dt); };
+                            })(dt), 1000);
+
+                            // setTimeout((function(dt){
+                            //     return function(){ console.log(dt); };
+                            // })(dt), 300);
+
+                            // if (dt.reply_username) {
+                            //     fetch('http://54.37.227.57/api/comments/', {
+                            //         method: 'POST',
+                            //         headers: {
+                            //             'Accept': 'application/json, text/plain, */*',
+                            //             'Content-Type': 'application/json',
+                            //             Authorization: 'Bearer ' + dt.token
+                            //         },
+                            //         body: JSON.stringify({
+                            //             post_id: dt.post_id,
+                            //             reply_username: dt.reply_username,
+                            //             body: dt.body
+                            //         })
+                            //     })
+                            //     .then(function(res) {
+                            //         console.log('Sent data', res);
+                            //         if (res.ok) {
+                            //             // console.log(99);
+                            //             // res.json()
+                            //             //     .then(function(resData) {
+                            //             //         deleteItemFromData('sync-comments', resData.id);
+                            //             //     });
+                            //         }
+                            //     })
+                            //     .catch(function(err) {
+                            //         console.log('Error while sending data', err);
+                            //     });
+                            // } else {
+                            //     // console.log(dt);
+                            //     fetch('http://54.37.227.57/api/comments/', {
+                            //         method: 'POST',
+                            //         headers: {
+                            //             'Accept': 'application/json, text/plain, */*',
+                            //             'Content-Type': 'application/json',
+                            //             Authorization: 'Bearer ' + dt.token
+                            //         },
+                            //         body: JSON.stringify({
+                            //             post_id: dt.post_id,
+                            //             body: dt.body
+                            //         })
+                            //     })
+                            //     .then(function(res) {
+                            //         console.log('Sent data', res.json());
+                            //         if (res.ok) {
+                            //             // console.log(99);
+                            //             // res.json()
+                            //             //     .then(function(resData) {
+                            //             //         deleteItemFromData('sync-comments', resData.id);
+                            //             //     });
+                            //         }
+                            //     })
+                            //     .catch(function(err) {
+                            //         console.log('Error while sending data', err);
+                            //     });
+                            // }
                         }
                     })
             );
