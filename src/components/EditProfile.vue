@@ -88,7 +88,7 @@
     import { mapState } from 'vuex';
 
     // used in username validation exception
-    const userName = store.state.nfPosts.username;
+    const userName = store.state.nfPosts.user.username;
     
     export default {
         mixins: [ mixinStorage, basicVars ],
@@ -198,8 +198,18 @@
                     });
             }
         },
+        beforeRouteEnter (to, from, next) {
+            users.get('find?id=' + store.state.login.idUser, { headers: { Authorization: 'Bearer ' + store.state.login.idToken } })
+                .then(res => {
+                    const user = res.data.data;
+                    store.dispatch('nfPosts/changeUser', user);
+                    next();
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        },
         created() {
-            // console.log(this.user);
             if (this.windowWidth > this.breakpoint) {
                 this.$store.dispatch('headings/actSetHeading', 'photogram');
             } else this.$store.dispatch('headings/actSetHeading', 'Edit Profile');
