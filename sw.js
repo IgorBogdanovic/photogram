@@ -111,7 +111,6 @@ function isInArray(string, array) {
 
 self.addEventListener('fetch', function(event) {
     if (event.request.method === 'GET') {
-        console.log(0);
         if (navigator.onLine) {
             // console.log('fetch');
             event.respondWith(
@@ -167,70 +166,67 @@ self.addEventListener('sync', function(event) {
             event.waitUntil(
                 readAllData('sync-comments')
                     .then(function(data) {
-                        for (let dt of data) {
-                            setInterval((function(dt){
-                                return function(){ console.log(dt); };
-                            })(dt), 1000);
+                        for (let i=0; i < data.length; i++) {
+                            setTimeout(() => {
+                                let dt = data[i];
 
-                            // setTimeout((function(dt){
-                            //     return function(){ console.log(dt); };
-                            // })(dt), 300);
-
-                            // if (dt.reply_username) {
-                            //     fetch('http://54.37.227.57/api/comments/', {
-                            //         method: 'POST',
-                            //         headers: {
-                            //             'Accept': 'application/json, text/plain, */*',
-                            //             'Content-Type': 'application/json',
-                            //             Authorization: 'Bearer ' + dt.token
-                            //         },
-                            //         body: JSON.stringify({
-                            //             post_id: dt.post_id,
-                            //             reply_username: dt.reply_username,
-                            //             body: dt.body
-                            //         })
-                            //     })
-                            //     .then(function(res) {
-                            //         console.log('Sent data', res);
-                            //         if (res.ok) {
-                            //             // console.log(99);
-                            //             // res.json()
-                            //             //     .then(function(resData) {
-                            //             //         deleteItemFromData('sync-comments', resData.id);
-                            //             //     });
-                            //         }
-                            //     })
-                            //     .catch(function(err) {
-                            //         console.log('Error while sending data', err);
-                            //     });
-                            // } else {
-                            //     // console.log(dt);
-                            //     fetch('http://54.37.227.57/api/comments/', {
-                            //         method: 'POST',
-                            //         headers: {
-                            //             'Accept': 'application/json, text/plain, */*',
-                            //             'Content-Type': 'application/json',
-                            //             Authorization: 'Bearer ' + dt.token
-                            //         },
-                            //         body: JSON.stringify({
-                            //             post_id: dt.post_id,
-                            //             body: dt.body
-                            //         })
-                            //     })
-                            //     .then(function(res) {
-                            //         console.log('Sent data', res.json());
-                            //         if (res.ok) {
-                            //             // console.log(99);
-                            //             // res.json()
-                            //             //     .then(function(resData) {
-                            //             //         deleteItemFromData('sync-comments', resData.id);
-                            //             //     });
-                            //         }
-                            //     })
-                            //     .catch(function(err) {
-                            //         console.log('Error while sending data', err);
-                            //     });
-                            // }
+                                if (dt.reply_username) {
+                                    fetch('http://54.37.227.57/api/comments/', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Accept': 'application/json, text/plain, */*',
+                                            'Content-Type': 'application/json',
+                                            Authorization: 'Bearer ' + dt.token
+                                        },
+                                        body: JSON.stringify({
+                                            post_id: dt.post_id,
+                                            reply_username: dt.reply_username,
+                                            body: dt.body
+                                        })
+                                    })
+                                    .then(function(res) {
+                                        console.log('Sent data', res);
+                                        if (res.ok) {
+                                            res.json()
+                                                .then(function(resData) {
+                                                    if (dt.body === resData.data.body) {
+                                                        deleteItemFromData('sync-comments', dt.id);
+                                                    }
+                                                });
+                                        }
+                                    })
+                                    .catch(function(err) {
+                                        console.log('Error while sending data', err);
+                                    });
+                                } else {
+                                    fetch('http://54.37.227.57/api/comments/', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Accept': 'application/json, text/plain, */*',
+                                            'Content-Type': 'application/json',
+                                            Authorization: 'Bearer ' + dt.token
+                                        },
+                                        body: JSON.stringify({
+                                            post_id: dt.post_id,
+                                            body: dt.body
+                                        })
+                                    })
+                                    .then(function(res) {
+                                        console.log('Sent data', res);
+                                        if (res.ok) {
+                                            res.json()
+                                                .then(function(resData) {
+                                                    if (dt.body === resData.data.body) {
+                                                        deleteItemFromData('sync-comments', dt.id);
+                                                    }
+                                                });
+                                        }
+                                    })
+                                    .catch(function(err) {
+                                        console.log('Error while sending data', err);
+                                    });
+                                }
+                            }, 3000 * i);
                         }
                     })
             );

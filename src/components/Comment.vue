@@ -25,7 +25,7 @@
                     {{ commentBody.replace( commentBody.match( new RegExp('@' + comment.reply_username, 'i') ), '' ) }}
                 </template>
                 <template v-else>
-                    {{ commentBody }} {{ comment.id }}
+                    {{ commentBody }}
                 </template>
             </p>
             <div class="m-comment__links  u-clearfix">
