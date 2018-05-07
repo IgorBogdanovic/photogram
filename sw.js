@@ -112,7 +112,7 @@ function isInArray(string, array) {
 self.addEventListener('fetch', function(event) {
     if (event.request.method === 'GET') {
         if (navigator.onLine) {
-            // console.log('fetch');
+            // console.log(event.request);
             event.respondWith(
                 caches.open(CACHE_DYNAMIC_NAME)
                     .then(function(cache) {
@@ -129,7 +129,7 @@ self.addEventListener('fetch', function(event) {
                 caches.match(event.request)
             );
         } else {
-            // console.log('cache');
+            // console.log(event.request);
             event.respondWith(
                 caches.match(event.request)
                     .then(function(response) {
@@ -226,10 +226,19 @@ self.addEventListener('sync', function(event) {
                                         console.log('Error while sending data', err);
                                     });
                                 }
-                            }, 3000 * i);
+                            }, 7000 + (300 * i));
                         }
                     })
             );
             // break;
     }
+});
+
+self.addEventListener('notificationclick', function(event) {
+    var notification = event.notification;
+    notification.close();
+});
+
+self.addEventListener('notificationclose', function(event) {
+    console.log('Notification was closed', event);
 });

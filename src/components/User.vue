@@ -22,6 +22,7 @@
                 <div v-if="isLoggedUser" class="m-info__button-wrapper-logged-user">
                     <router-link :to="{ name: 'edit-profile' }" tag="button" class="m-info__button  m-info__button--edit">Edit Profile</router-link>
                     <button class="m-info__button  m-info__button--logout" @click="logout">Logout</button>
+                    <button v-if="notification" class="m-info__button  m-info__button--notifiction" @click="askForNotificationPermission">Enable Notifictions</button>
                 </div>
                 <button v-if="!isLoggedUser && userAuth_follow" class="m-info__button  m-info__button--unfollow" @click="unfollowUser">Unfollow</button>
                 <button v-if="!isLoggedUser && !userAuth_follow" class="m-info__button  m-info__button--follow" @click="followUser">Follow</button>
@@ -95,6 +96,26 @@
     import Spinner from './Spinner.vue';
     import { mapState } from 'vuex';
 
+    // notifications display functionality
+    function displayConfirmNotification() {
+            var options = {
+                body: 'You successfully subscribed to our Notification service!',
+                icon: '/favicon-96x96.png',
+                dir: 'ltr',
+                lang: 'en-US',
+                vibrate: [100, 50, 300],
+                badge: '/favicon-96x96.png',
+                tag: 'confirm-notification',
+                renotify: true
+            };
+
+            navigator.serviceWorker.ready
+                .then(function(swreg) {
+                    swreg.showNotification('>>Successfully subscribed<<', options);
+                });
+    }
+    //
+
     export default {
         props: ['userId'],
         mixins: [ mixinStorage, basicVars ],
@@ -111,7 +132,8 @@
 				postAmount: 8,
 				postPage: 1,
                 gridViewActive: false,
-                singleViewActive: true
+                singleViewActive: true,
+                notification: 'Notification' in window && 'serviceWorker' in navigator
 		    }
 		},
         computed:
@@ -314,6 +336,21 @@
                     })
                     .catch(error => {
                         console.log(error);
+                    });
+            },
+            askForNotificationPermission() {
+                Notification.requestPermission()
+                    .then(function(result) {
+                        console.log('User Choice:', result);
+                        if (result === 'denied') {
+                            console.log('Permission wasn\'t granted.');
+                            return;
+                        }
+                        if (result === 'default') {
+                            console.log('The permission request was dismissed.');
+                            return;
+                        }
+                        displayConfirmNotification();
                     });
             },
             logout() {
@@ -615,6 +652,17 @@
             &--logout {
                 display: inline-block;
                 background-color: $lightblack;
+            }
+
+            &--notifiction {
+                // none is default if there is no 'Notification' in window
+                display: block;
+                background-color: orchid;
+                margin: -1rem auto 2.1rem auto;
+
+                &.is-active {
+                    display: block;
+                }
             }
 
             &--unfollow {
