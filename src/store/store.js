@@ -31,9 +31,9 @@ export const store = new Vuex.Store({
 			'login.userProfile'
 		],
 		storage: {
-		  getItem: key => Cookies.get(key),
-		  setItem: (key, value) => Cookies.set(key, value, { expires: 14 }),
-		  removeItem: key => Cookies.remove(key)
+			getItem: key => Cookies.get(key),
+			setItem: (key, value) => Cookies.set(key, value, { expires: 14 }),
+			removeItem: key => Cookies.remove(key)
 		}
 	})],
 

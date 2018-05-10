@@ -6,6 +6,7 @@ var CACHE_DYNAMIC_NAME = 'dynamic-v1';
 var STATIC_FILES = [
     '/index.html',
     '/idb.js',
+    '/utility.js',
     '/dist/build.js',
     '/dist/build.js.map',
     '/dist/0.build.js',
@@ -192,6 +193,7 @@ self.addEventListener('sync', function(event) {
                                                     if (dt.body === resData.data.body) {
                                                         deleteItemFromData('sync-comments', dt.id);
                                                     }
+                                                    displaySyncedNotification(dt.post_id, dt.body, 'http://localhost:8081/homepage/comments:', 'comment');
                                                 });
                                         }
                                     })
@@ -219,6 +221,7 @@ self.addEventListener('sync', function(event) {
                                                     if (dt.body === resData.data.body) {
                                                         deleteItemFromData('sync-comments', dt.id);
                                                     }
+                                                    displaySyncedNotification(dt.post_id, dt.body, 'http://localhost:8081/homepage/comments:', 'comment');
                                                 });
                                         }
                                     })
@@ -226,7 +229,7 @@ self.addEventListener('sync', function(event) {
                                         console.log('Error while sending data', err);
                                     });
                                 }
-                            }, 7000 + (300 * i));
+                            }, 5000 + (2000 * i));
                         }
                     })
             );
@@ -236,9 +239,60 @@ self.addEventListener('sync', function(event) {
 
 self.addEventListener('notificationclick', function(event) {
     var notification = event.notification;
-    notification.close();
+    var tempNotfTag = notification.tag;
+    var notificationTag = tempNotfTag.replace(notification.data.id, "");
+    // console.log(notification);
+    switch (notificationTag) {
+        case 'confirm-comment-sync-':
+            event.waitUntil(
+                clients.matchAll()
+                    .then(function(clis) {
+                        var client = clis.find(function(c) {
+                            return c.visibilityState === 'visible';
+                        });
+        
+                        if (client !== undefined) {
+                            client.navigate(notification.data.url);
+                            client.focus();
+                        } else {
+                            clients.openWindow(notification.data.url);
+                        }
+                        notification.close();
+                    })
+            );
+    }
 });
 
 self.addEventListener('notificationclose', function(event) {
     console.log('Notification was closed', event);
 });
+
+
+// notifications display functionality
+function displaySyncedNotification(paramId, body, openUrl, typeOfNotf) {
+    var msgBody;
+
+    if (body) {
+        msgBody = 'Your ' + typeOfNotf + ' ["' + body + '"] is synced as the connection is established!';
+    } else {
+        msgBody = 'Your ' + typeOfNotf + 'is synced as the connection is established!';
+    }
+
+    var options = {
+        body: msgBody,
+        icon: './favicon-96x96.png',
+        dir: 'ltr',
+        lang: 'en-US',
+        vibrate: [100, 50, 300],
+        badge: './favicon-96x96.png',
+        tag: 'confirm-' + typeOfNotf + '-sync-' + paramId,
+        renotify: true,
+        data: {
+            url: openUrl + paramId,
+            id: paramId.toString()
+        }
+    };
+
+    self.registration.showNotification('>>Your ' + typeOfNotf + ' is synced<<', options);
+}
+//

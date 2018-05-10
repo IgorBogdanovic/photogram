@@ -67,9 +67,11 @@ export const login = {
       localStorage.removeItem('token');
       router.replace({ name: 'login' });
     },
-    tryAutoLogin({commit}) {
+    tryAutoLogin({commit, dispatch, state}) {
       const token = localStorage.getItem('token');
-      if (!token) {
+      const idUser = state.idUser;
+      if (!token || !idUser) {
+        dispatch('logout');
         return false;
       }
       commit('autologAuthUser', {

@@ -1,4 +1,3 @@
-import router from '../../router';
 import { posts, comments, likes, photogramApi } from '../../axios-urls';
 
 // func for showing snackbar on background sync

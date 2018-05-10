@@ -99,19 +99,19 @@
     // notifications display functionality
     function displayConfirmNotification() {
             var options = {
-                body: 'You successfully subscribed to our Notification service!',
-                icon: '/favicon-96x96.png',
+                body: 'Unfortunately, subscription to our Notification service currently is not possible.',
+                icon: './favicon-96x96.png',
                 dir: 'ltr',
                 lang: 'en-US',
                 vibrate: [100, 50, 300],
-                badge: '/favicon-96x96.png',
+                badge: './favicon-96x96.png',
                 tag: 'confirm-notification',
                 renotify: true
             };
 
             navigator.serviceWorker.ready
                 .then(function(swreg) {
-                    swreg.showNotification('>>Successfully subscribed<<', options);
+                    swreg.showNotification('>>Subscription to Notification service<<', options);
                 });
     }
     //
@@ -355,7 +355,6 @@
             },
             logout() {
                 this.$store.dispatch('login/logout');
-
                 // unregister service workers
                 if ('serviceWorker' in navigator) {
                     navigator.serviceWorker.getRegistrations()
