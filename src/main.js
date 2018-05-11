@@ -33,12 +33,11 @@ new Vue({
 });
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker
-    .register('/sw.js')
-    .then(function() {
-      console.log('Service worker registered!');
-    })
-    .catch(function(err) {
-      console.log(err);
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/dist/service-worker.js').then(registration => {
+      console.log('SW registered: ', registration);
+    }).catch(registrationError => {
+      console.log('SW registration failed: ', registrationError);
     });
+  });
 }

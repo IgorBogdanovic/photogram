@@ -1,5 +1,6 @@
 var path = require('path');
 var webpack = require('webpack');
+const {InjectManifest} = require('workbox-webpack-plugin');
 
 module.exports = {
   entry: './src/main.js',
@@ -97,6 +98,11 @@ module.exports = {
       jquery: 'jquery',
       'window.jQuery': 'jquery',
       jQuery: 'jquery'
+    }),
+    new InjectManifest({
+      swSrc: './sw-base.js',
+      swDest: 'service-worker.js',
+      importWorkboxFrom: 'local'
     })
   ]
 };
