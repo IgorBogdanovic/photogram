@@ -8,31 +8,18 @@ var STATIC_FILES = [
     '/idb.js',
     '/utility.js',
     '/dist/build.js',
-    '/dist/build.js.map',
     '/dist/0.build.js',
-    '/dist/0.build.js.map',
     '/dist/1.build.js',
-    '/dist/1.build.js.map',
     '/dist/2.build.js',
-    '/dist/2.build.js.map',
     '/dist/3.build.js',
-    '/dist/3.build.js.map',
     '/dist/4.build.js',
-    '/dist/4.build.js.map',
     '/dist/5.build.js',
-    '/dist/5.build.js.map',
     '/dist/6.build.js',
-    '/dist/6.build.js.map',
     '/dist/7.build.js',
-    '/dist/7.build.js.map',
     '/dist/8.build.js',
-    '/dist/8.build.js.map',
     '/dist/9.build.js',
-    '/dist/9.build.js.map',
     '/dist/10.build.js',
-    '/dist/10.build.js.map',
     '/dist/11.build.js',
-    '/dist/11.build.js.map',
     '/dist/3e1af3ef546b9e6ecef9f3ba197bf7d2.ttf',
     '/dist/8dc42d2dd5674cddaf92cb059941ebb9.woff2',
     '/dist/9c1d20db71460837e1270a7769f46aec.eot',
@@ -54,7 +41,6 @@ var STATIC_FILES = [
     '/signup',
     '/terms',
     '/homepage',
-    // '/user-id:',
     '/edit-profile',
     '/my-notifications',
     '/search'
@@ -101,22 +87,24 @@ self.addEventListener('activate', function(event) {
 
 function isInArray(string, array) {
     var cachePath;
-    if (string.indexOf(self.origin) === 0) { // request targets domain where we serve the page from (i.e. NOT a CDN)
-        // console.log('matched ', string);
-        cachePath = string.substring(self.origin.length); // take the part of the URL AFTER the domain (e.g. after localhost:8080)
+    if (string.indexOf(self.origin) > -1) {
+        cachePath = string.substring(self.origin.length);
     } else {
-        cachePath = string; // store the full request (for CDNs)
+        cachePath = string;
     }
+    console.log(cachePath, array.indexOf(cachePath) > -1);
     return array.indexOf(cachePath) > -1;
 }
 
 self.addEventListener('fetch', function(event) {
     if (event.request.method === 'GET') {
+        // should be put check for right url
         if (navigator.onLine) {
-            // console.log(event.request);
+            isInArray(event.request.url, STATIC_FILES);
             event.respondWith(
                 caches.open(CACHE_DYNAMIC_NAME)
                     .then(function(cache) {
+                        console.log(event.request);
                         return fetch(event.request)
                             .then(function(res) {
                                 trimCache(CACHE_DYNAMIC_NAME, 100);
@@ -126,6 +114,8 @@ self.addEventListener('fetch', function(event) {
                     })
             );
         } else if (isInArray(event.request.url, STATIC_FILES)) {
+            // console.log(event.request.url);
+            // console.log(STATIC_FILES);
             event.respondWith(
                 caches.match(event.request)
             );
