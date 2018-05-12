@@ -75,7 +75,6 @@
                     const reader = new FileReader();
                     const validImageTypes = ['image/gif', 'image/jpeg', 'image/png'];
                     const validVideoTypes = ['video/mp4', 'video/flv', 'video/wmv', 'video/avi', 'video/mpeg', 'video/qt'];
-
                     if ($.inArray(this.selectedFile.type, validImageTypes) >= 0) {
                         reader.onload = function(e) {
                             $('.o-upload__icon').hide(0);
@@ -92,6 +91,11 @@
                                 .attr('src', e.target.result)
                                 .show(0);
                         };
+                    } else {
+                        $('.o-upload__video').hide(0);
+                        $('.o-upload__image').hide(0);
+                        $('.o-upload__icon').show(0);
+                        this.selectedFile = null;
                     }
                     reader.readAsDataURL(input.files[0]);
                 } else {

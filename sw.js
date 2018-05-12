@@ -45,6 +45,7 @@ var STATIC_FILES = [
     '/my-notifications',
     '/search'
 ];
+var DYNAMIC_FILES = [];
 
 function trimCache(cacheName, maxItems) {
     caches.open(cacheName)
@@ -85,26 +86,33 @@ self.addEventListener('activate', function(event) {
     return self.clients.claim();
 });
 
-function isInArray(string, array) {
-    var cachePath;
+// func should be changed/adapted once everything put on one server
+function isInArray(string) {
+    // temporary hack conditionals -> will be adapted
     if (string.indexOf(self.origin) > -1) {
-        cachePath = string.substring(self.origin.length);
+        // console.log('local');
+        var cachePath = string.substring(self.origin.length);
+        return STATIC_FILES.indexOf(cachePath) > -1;
+    } else if (string.indexOf('http://54.37.227.57/storage/') > -1) {
+        // console.log('online');
+        for (let i = 0; i < DYNAMIC_FILES.length; i++) {
+            if (DYNAMIC_FILES[i].url.indexOf(string) > -1) return true;
+        }
+        return false;
     } else {
-        cachePath = string;
+        // console.log('null');
+        return false;
     }
-    console.log(cachePath, array.indexOf(cachePath) > -1);
-    return array.indexOf(cachePath) > -1;
 }
 
 self.addEventListener('fetch', function(event) {
     if (event.request.method === 'GET') {
         // should be put check for right url
-        if (navigator.onLine) {
-            isInArray(event.request.url, STATIC_FILES);
+        if (navigator.onLine && !isInArray(event.request.url)) {
+            console.log('fetch');
             event.respondWith(
                 caches.open(CACHE_DYNAMIC_NAME)
                     .then(function(cache) {
-                        console.log(event.request);
                         return fetch(event.request)
                             .then(function(res) {
                                 trimCache(CACHE_DYNAMIC_NAME, 100);
@@ -113,14 +121,15 @@ self.addEventListener('fetch', function(event) {
                             });
                     })
             );
-        } else if (isInArray(event.request.url, STATIC_FILES)) {
-            // console.log(event.request.url);
-            // console.log(STATIC_FILES);
-            event.respondWith(
-                caches.match(event.request)
-            );
+            caches.open(CACHE_DYNAMIC_NAME)
+                .then(function(cache) {
+                    cache.keys()
+                        .then(function(keyList) {
+                            self.DYNAMIC_FILES = keyList;
+                        });
+                });
         } else {
-            // console.log(event.request);
+            console.log('cash');
             event.respondWith(
                 caches.match(event.request)
                     .then(function(response) {
