@@ -105,16 +105,11 @@
                 }
             },
             submitPost() {
-                const postData = new FormData();
-                const validImageTypes = ['image/gif', 'image/jpeg', 'image/png'];
-                const validVideoTypes = ['video/mp4', 'video/flv', 'video/wmv', 'video/avi', 'video/mpeg', 'video/qt'];
-                if ($.inArray(this.selectedFile.type, validImageTypes) >= 0) {
-                    postData.append('image', this.selectedFile);
-                } else if ($.inArray(this.selectedFile.type, validVideoTypes) >= 0) {
-                    postData.append('video', this.selectedFile);
-                }
-                postData.append('description', this.description);
-                this.$store.dispatch('nfPosts/postPost', postData)
+                var data = {
+                    media: this.selectedFile,
+                    description: this.description
+                };
+                this.$store.dispatch('nfPosts/postPost', data)
                     .then(res => {
                         this.description = '';
                         this.$store.dispatch('nfPosts/pushNewsFeedPostsAll', []);

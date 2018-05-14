@@ -117,7 +117,36 @@ export const nfPosts = {
     },
     postPost({commit}, data) {
       const token = localStorage.getItem('token');
-      return posts.post('', data, { headers: { Authorization: 'Bearer ' + token } });
+
+      const postData = new FormData();
+      const validImageTypes = ['image/gif', 'image/jpeg', 'image/png'];
+      const validVideoTypes = ['video/mp4', 'video/flv', 'video/wmv', 'video/avi', 'video/mpeg', 'video/qt'];
+      if (validImageTypes.indexOf(data.media.type) > -1) {
+          postData.append('image', data.media);
+      } else if (validVideoTypes.indexOf(data.media.type) > -1) {
+          postData.append('video', data.media);
+      }
+      postData.append('description', data.description);
+
+      if ('serviceWorker' in navigator && 'SyncManager' in window && !navigator.onLine) {
+        data.id = new Date().toISOString();
+        data.token = token;
+        navigator.serviceWorker.ready
+          .then(function(sw) {
+            writeData('sync-posts', data)
+              .then(function() {
+                return sw.sync.register('sync-new-posts');
+              })
+              .then(function() {
+                showSnackbar('Your post was saved for syncing!');
+              })
+              .catch(function(err) {
+                console.log(err);
+              });
+          });
+      } else {
+        return posts.post('', postData, { headers: { Authorization: 'Bearer ' + token } });
+      }
     },
     deleteComment({commit}, commentId) {
       const token = localStorage.getItem('token');

@@ -36,6 +36,7 @@ var STATIC_FILES = [
     '/dist/e31fcf1885e371e19f5786c2bdfeae1b.ttf',
     '/dist/ebb94a5be456c711926db5d106828c13.woff',
     '/dist/ecdd509cadbf1ea78b8d2e31ec52328c.eot',
+    '/manifest.json',
     '/',
     '/login',
     '/signup',
@@ -77,7 +78,7 @@ self.addEventListener('activate', function(event) {
         caches.keys()
             .then(function(keyList) {
                 return Promise.all(keyList.map(function(key) {
-                    if ( key !== CACHE_STATIC_NAME && key !== CACHE_DYNAMIC_NAME ) {
+                    if (key !== CACHE_STATIC_NAME && key !== CACHE_DYNAMIC_NAME) {
                         return caches.delete(key);
                     }
                 }));
@@ -86,30 +87,25 @@ self.addEventListener('activate', function(event) {
     return self.clients.claim();
 });
 
-// func should be changed/adapted once everything put on one server
+// func should be changed/adapted once everything put on one server (self.origin will be 'http://54.37.227.57/')
 function isInArray(string) {
-    // temporary hack conditionals -> will be adapted
     if (string.indexOf(self.origin) > -1) {
-        // console.log('local');
         var cachePath = string.substring(self.origin.length);
         return STATIC_FILES.indexOf(cachePath) > -1;
     } else if (string.indexOf('http://54.37.227.57/storage/') > -1) {
-        // console.log('online');
         for (let i = 0; i < DYNAMIC_FILES.length; i++) {
             if (DYNAMIC_FILES[i].url.indexOf(string) > -1) return true;
         }
         return false;
     } else {
-        // console.log('null');
         return false;
     }
 }
 
 self.addEventListener('fetch', function(event) {
     if (event.request.method === 'GET') {
-        // should be put check for right url
         if (navigator.onLine && !isInArray(event.request.url)) {
-            console.log('fetch');
+            console.log('from network');
             event.respondWith(
                 caches.open(CACHE_DYNAMIC_NAME)
                     .then(function(cache) {
@@ -129,7 +125,7 @@ self.addEventListener('fetch', function(event) {
                         });
                 });
         } else {
-            console.log('cash');
+            console.log('from cashe');
             event.respondWith(
                 caches.match(event.request)
                     .then(function(response) {
@@ -162,7 +158,6 @@ self.addEventListener('sync', function(event) {
     console.log('[Service Worker] Background syncing', event);
     switch (event.tag) {
         case 'sync-new-comments':
-            console.log('[Service Worker] Syncing new...');
             event.waitUntil(
                 readAllData('sync-comments')
                     .then(function(data) {
@@ -189,10 +184,16 @@ self.addEventListener('sync', function(event) {
                                         if (res.ok) {
                                             res.json()
                                                 .then(function(resData) {
+                                                    var notificationData = {
+                                                        paramId: dt.post_id,
+                                                        openUrl: 'http://localhost:8081/homepage/comments:',
+                                                        typeOfNotf: 'comment',
+                                                        body: dt.body
+                                                    };
                                                     if (dt.body === resData.data.body) {
                                                         deleteItemFromData('sync-comments', dt.id);
                                                     }
-                                                    displaySyncedNotification(dt.post_id, dt.body, 'http://localhost:8081/homepage/comments:', 'comment');
+                                                    displaySyncedNotification(notificationData);
                                                 });
                                         }
                                     })
@@ -217,10 +218,16 @@ self.addEventListener('sync', function(event) {
                                         if (res.ok) {
                                             res.json()
                                                 .then(function(resData) {
+                                                    var notificationData = {
+                                                        paramId: dt.post_id,
+                                                        openUrl: 'http://localhost:8081/homepage/comments:',
+                                                        typeOfNotf: 'comment',
+                                                        body: dt.body
+                                                    };
                                                     if (dt.body === resData.data.body) {
                                                         deleteItemFromData('sync-comments', dt.id);
                                                     }
-                                                    displaySyncedNotification(dt.post_id, dt.body, 'http://localhost:8081/homepage/comments:', 'comment');
+                                                    displaySyncedNotification(notificationData);
                                                 });
                                         }
                                     })
@@ -232,34 +239,101 @@ self.addEventListener('sync', function(event) {
                         }
                     })
             );
-            // break;
+            break;
+        case 'sync-new-posts':
+            event.waitUntil(
+                readAllData('sync-posts')
+                    .then(function(data) {
+                        for (let i=0; i < data.length; i++) {
+                            setTimeout(() => {
+                                let dt = data[i];
+
+                                const postData = new FormData();
+                                const validImageTypes = ['image/gif', 'image/jpeg', 'image/png'];
+                                const validVideoTypes = ['video/mp4', 'video/flv', 'video/wmv', 'video/avi', 'video/mpeg', 'video/qt'];
+                                if (validImageTypes.indexOf(dt.media.type) > -1) {
+                                    postData.append('image', dt.media);
+                                } else if (validVideoTypes.indexOf(dt.media.type) > -1) {
+                                    postData.append('video', dt.media);
+                                }
+                                postData.append('description', dt.description);
+
+                                fetch('http://54.37.227.57/api/posts/', {
+                                    method: 'POST',
+                                    headers: {
+                                        Authorization: 'Bearer ' + dt.token
+                                    },
+                                    body: postData
+                                })
+                                .then(function(res) {
+                                    console.log('Sent data', res);
+                                    if (res.ok) {
+                                        res.json()
+                                            .then(function(resData) {
+                                                console.log(resData);
+                                                var notificationData = {
+                                                    paramId: resData.data.id,
+                                                    // openUrl: 'http://localhost:8081/user-id:' + resData.data.user_id + '/photo-detail:',
+                                                    openUrl: 'http://localhost:8081/homepage/photo:',
+                                                    typeOfNotf: 'post',
+                                                    body: 'description: ' + dt.description,
+                                                    // image: 'http://54.37.227.57/storage/' + resData.data.media
+                                                };
+                                                deleteItemFromData('sync-posts', dt.id);
+                                                displaySyncedNotification(notificationData);
+                                            });
+                                    }
+                                })
+                                .catch(function(err) {
+                                    console.log('Error while sending data', err);
+                                });
+                            }, 5000 + (2000 * i));
+                        }
+                    })
+            );
     }
 });
 
 self.addEventListener('notificationclick', function(event) {
     var notification = event.notification;
-    var tempNotfTag = notification.tag;
-    var notificationTag = tempNotfTag.replace(notification.data.id, "");
+    // var tempNotfTag = notification.tag;
+    // var notificationTag = tempNotfTag.replace(notification.data.id, "");
     // console.log(notification);
-    switch (notificationTag) {
-        case 'confirm-comment-sync-':
-            event.waitUntil(
-                clients.matchAll()
-                    .then(function(clis) {
-                        var client = clis.find(function(c) {
-                            return c.visibilityState === 'visible';
-                        });
+    // switch (notificationTag) {
+    //     case 'confirm-comment-sync-':
+    //         event.waitUntil(
+    //             clients.matchAll()
+    //                 .then(function(clis) {
+    //                     var client = clis.find(function(c) {
+    //                         return c.visibilityState === 'visible';
+    //                     });
         
-                        if (client !== undefined) {
-                            client.navigate(notification.data.url);
-                            client.focus();
-                        } else {
-                            clients.openWindow(notification.data.url);
-                        }
-                        notification.close();
-                    })
-            );
-    }
+    //                     if (client !== undefined) {
+    //                         client.navigate(notification.data.url);
+    //                         client.focus();
+    //                     } else {
+    //                         clients.openWindow(notification.data.url);
+    //                     }
+    //                     notification.close();
+    //                 })
+    //         );
+    // }
+    event.waitUntil(
+        clients.matchAll()
+            .then(function(clis) {
+                var client = clis.find(function(c) {
+                    return c.visibilityState === 'visible';
+                });
+
+                if (client !== undefined) {
+                    client.navigate(notification.data.url);
+                    client.focus();
+                } else {
+                    clients.openWindow(notification.data.url);
+                }
+                notification.close();
+            })
+    );
 });
 
 self.addEventListener('notificationclose', function(event) {
@@ -268,30 +342,31 @@ self.addEventListener('notificationclose', function(event) {
 
 
 // notifications display functionality
-function displaySyncedNotification(paramId, body, openUrl, typeOfNotf) {
+function displaySyncedNotification(notificationData) {
     var msgBody;
 
-    if (body) {
-        msgBody = 'Your ' + typeOfNotf + ' ["' + body + '"] is synced as the connection is established!';
+    if (notificationData.body) {
+        msgBody = 'Your ' + notificationData.typeOfNotf + ' ["' + notificationData.body + '"] is synced as the connection is established!';
     } else {
-        msgBody = 'Your ' + typeOfNotf + 'is synced as the connection is established!';
+        msgBody = 'Your ' + notificationData.typeOfNotf + 'is synced as the connection is established!';
     }
 
     var options = {
         body: msgBody,
+        // image: notificationData.image,
         icon: './favicon-96x96.png',
         dir: 'ltr',
         lang: 'en-US',
         vibrate: [100, 50, 300],
         badge: './favicon-96x96.png',
-        tag: 'confirm-' + typeOfNotf + '-sync-' + paramId,
+        tag: 'confirm-' + notificationData.typeOfNotf + '-sync-' + notificationData.paramId,
         renotify: true,
         data: {
-            url: openUrl + paramId,
-            id: paramId.toString()
+            url: notificationData.openUrl + notificationData.paramId,
+            id: notificationData.paramId.toString()
         }
     };
 
-    self.registration.showNotification('>>Your ' + typeOfNotf + ' is synced<<', options);
+    self.registration.showNotification('>>Your ' + notificationData.typeOfNotf + ' is synced<<', options);
 }
 //

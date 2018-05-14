@@ -2,6 +2,9 @@ var dbPromise = idb.open('db-store', 1, db => {
     if (!db.objectStoreNames.contains('sync-comments')) {
         db.createObjectStore('sync-comments', {keyPath: 'id'});
     }
+    if (!db.objectStoreNames.contains('sync-posts')) {
+        db.createObjectStore('sync-posts', {keyPath: 'id'});
+    }
 });
 
 function writeData(st, data) {
@@ -13,7 +16,7 @@ function writeData(st, data) {
             return tx.complete;
     });
 }
-  
+
 function readAllData(st) {
     return dbPromise
         .then(function(db) {
